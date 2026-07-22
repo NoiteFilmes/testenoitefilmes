@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes, viewport-fit=cover" />
     <title>Noite Filmes · rede social</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
@@ -319,8 +319,97 @@
         .comment-item .content .text { font-size:0.75rem; color:rgba(255,255,255,0.8); }
         .comment-item .content .time { font-size:0.55rem; color:rgba(255,255,255,0.3); }
 
-        /* ===== RESPONSIVE PLAYER ===== */
-        @media (max-width: 1023px), (orientation: portrait) {
+        /* ===== PLAYER LAYOUT - DESKTOP E HORIZONTAL (TABLET/CELULAR) ===== */
+        /* Regra base para desktop e qualquer dispositivo em landscape */
+        @media (orientation: landscape) and (min-width: 768px) {
+            .player-layout {
+                flex-direction:row !important;
+                min-height:500px !important;
+                height:calc(100% - 20px) !important;
+            }
+            .player-left {
+                flex:0 0 60% !important;
+                min-height:0 !important;
+            }
+            .player-right {
+                flex:1 !important;
+                border-left:1px solid rgba(255,255,255,0.08) !important;
+                padding-left:16px !important;
+                border-top:none !important;
+                padding-top:0 !important;
+                min-height:0 !important;
+                max-height:none !important;
+            }
+            .player-wrapper {
+                flex:0 0 auto !important;
+                min-height:300px !important;
+                aspect-ratio:16/9 !important;
+            }
+            .player-right #commentsList {
+                max-height:none !important;
+                min-height:0 !important;
+            }
+            .player-info .sinopse {
+                -webkit-line-clamp:2 !important;
+            }
+        }
+
+        /* Regra para dispositivos móveis em landscape (celulares e tablets pequenos) */
+        @media (orientation: landscape) and (max-width: 767px) {
+            .player-box {
+                max-width:100% !important;
+                max-height:98vh !important;
+                padding:10px !important;
+                border-radius:20px !important;
+            }
+            .player-layout {
+                flex-direction:row !important;
+                min-height:auto !important;
+                height:auto !important;
+                gap:10px !important;
+            }
+            .player-left {
+                flex:0 0 55% !important;
+                min-height:0 !important;
+            }
+            .player-right {
+                flex:1 !important;
+                border-left:1px solid rgba(255,255,255,0.08) !important;
+                padding-left:10px !important;
+                border-top:none !important;
+                padding-top:0 !important;
+                min-height:0 !important;
+                max-height:none !important;
+            }
+            .player-wrapper {
+                min-height:180px !important;
+                aspect-ratio:16/9 !important;
+                flex:0 0 auto !important;
+            }
+            .player-info h3 { font-size:0.85rem !important; }
+            .player-info .sinopse { font-size:0.65rem !important; -webkit-line-clamp:2 !important; }
+            .player-info .badges .badge { font-size:0.55rem !important; padding:1px 8px !important; }
+            .player-info .actions-row button { font-size:0.55rem !important; padding:2px 10px !important; }
+            .player-info .actions-row .rating-stars i { font-size:0.7rem !important; }
+            .player-right .comments-section h4 { font-size:0.7rem !important; margin-bottom:4px !important; padding-bottom:4px !important; }
+            .player-right #commentsList { font-size:0.65rem !important; }
+            .player-right .comment-input input { font-size:0.65rem !important; padding:4px 10px !important; }
+            .player-right .comment-input button { font-size:0.6rem !important; padding:4px 12px !important; }
+            .comment-item .avatar { width:22px !important; height:22px !important; }
+            .comment-item .content .user { font-size:0.6rem !important; }
+            .comment-item .content .text { font-size:0.65rem !important; }
+        }
+
+        /* Regra para tablets em landscape */
+        @media (orientation: landscape) and (min-width: 768px) and (max-width: 1024px) {
+            .player-left { flex:0 0 55% !important; }
+            .player-right { flex:1 !important; }
+            .player-wrapper { min-height:250px !important; }
+            .player-info h3 { font-size:0.95rem !important; }
+        }
+
+        /* Regra para celulares em portrait (vertical) */
+        @media (orientation: portrait), (max-width: 767px) and (orientation: portrait) {
             .player-layout {
                 flex-direction:column !important;
                 min-height:auto !important;
@@ -333,18 +422,20 @@
             .player-wrapper {
                 aspect-ratio:16/9 !important;
                 min-height:200px !important;
+                flex:0 0 auto !important;
             }
             .player-right {
                 border-left:none !important;
                 padding-left:0 !important;
                 border-top:1px solid rgba(255,255,255,0.08) !important;
                 padding-top:10px !important;
-                min-height:180px !important;
-                max-height:300px !important;
+                min-height:150px !important;
+                max-height:250px !important;
+                flex:1 !important;
             }
             .player-right #commentsList {
-                max-height:120px !important;
-                min-height:60px !important;
+                max-height:100px !important;
+                min-height:50px !important;
             }
             .player-info .sinopse {
                 -webkit-line-clamp:3 !important;
@@ -354,32 +445,6 @@
                 padding:12px !important;
                 max-width:100% !important;
             }
-        }
-
-        @media (min-width: 1024px) and (orientation: landscape) {
-            .player-box {
-                max-width:95vw !important;
-                max-height:92vh !important;
-                padding:16px !important;
-            }
-            .player-layout {
-                height:calc(100% - 20px) !important;
-                min-height:500px !important;
-            }
-            .player-left { flex:0 0 60% !important; }
-            .player-right { flex:1 !important; }
-            .player-wrapper { flex:0 0 auto !important; min-height:300px !important; }
-        }
-
-        @media (min-width: 1400px) and (orientation: landscape) {
-            .player-left { flex:0 0 58% !important; }
-            .player-right { flex:1 !important; }
-        }
-
-        @media (max-width: 1024px) and (orientation: landscape) {
-            .player-left { flex:0 0 55% !important; }
-            .player-right { flex:1 !important; }
-            .player-wrapper { min-height:250px !important; }
         }
 
         /* ===== SEARCH ===== */
@@ -573,6 +638,22 @@
             .player-wrapper { min-height:150px; }
             .player-right { max-height:150px; min-height:100px; }
         }
+
+        /* ===== DETECÇÃO DE ORIENTAÇÃO - SCRIPT ADICIONAL ===== */
+        .orientation-badge {
+            display:none;
+            position:fixed; bottom:70px; left:50%; transform:translateX(-50%);
+            background:rgba(0,0,0,0.8); backdrop-filter:blur(10px);
+            padding:4px 16px; border-radius:30px; font-size:0.6rem;
+            color:rgba(255,255,255,0.5); z-index:5000;
+            border:1px solid rgba(255,255,255,0.05);
+            pointer-events:none;
+            transition:all 0.5s ease;
+        }
+        .orientation-badge.show {
+            display:block;
+            animation:fadeToast 2s ease forwards;
+        }
     </style>
 </head>
 <body>
@@ -611,6 +692,9 @@
         <div class="bottom-item" data-bottom="perfil"><i class="fas fa-user-circle"></i><span>Perfil</span></div>
     </nav>
 </div>
+
+<!-- ORIENTATION BADGE -->
+<div class="orientation-badge" id="orientationBadge">🔄 Modo Paisagem ativado</div>
 
 <!-- PLAYER OVERLAY -->
 <div class="player-overlay" id="playerOverlay">
@@ -685,6 +769,112 @@
 </div>
 
 <script>
+    // =====================================================
+    // DETECÇÃO DE ORIENTAÇÃO - GIROSCOPIO
+    // =====================================================
+    (function() {
+        const badge = document.getElementById('orientationBadge');
+        let badgeTimeout = null;
+        let lastOrientation = '';
+
+        function showOrientationBadge(text) {
+            if (badge) {
+                badge.textContent = text;
+                badge.classList.add('show');
+                clearTimeout(badgeTimeout);
+                badgeTimeout = setTimeout(() => {
+                    badge.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        function handleOrientationChange() {
+            const isLandscape = window.innerWidth > window.innerHeight;
+            const isMobile = window.innerWidth < 1024;
+            const currentOrientation = isLandscape ? 'landscape' : 'portrait';
+            
+            if (currentOrientation !== lastOrientation) {
+                lastOrientation = currentOrientation;
+                
+                // Mostra badge apenas em dispositivos móveis
+                if (isMobile) {
+                    if (isLandscape) {
+                        showOrientationBadge('🔄 Modo Paisagem - Player em tela cheia');
+                    } else {
+                        showOrientationBadge('📱 Modo Retrato');
+                    }
+                }
+            }
+
+            // Aplica classe ao body para facilitar estilos CSS
+            document.body.classList.remove('orientation-landscape', 'orientation-portrait');
+            if (isLandscape) {
+                document.body.classList.add('orientation-landscape');
+            } else {
+                document.body.classList.add('orientation-portrait');
+            }
+        }
+
+        // Usa matchMedia para detecção mais precisa
+        const mediaQuery = window.matchMedia('(orientation: landscape)');
+        mediaQuery.addEventListener('change', handleOrientationChange);
+
+        // Também detecta redimensionamento (para tablets que mudam de orientação)
+        window.addEventListener('resize', handleOrientationChange);
+
+        // Detecção via Screen Orientation API (mais precisa para dispositivos móveis)
+        if (window.screen && window.screen.orientation) {
+            window.screen.orientation.addEventListener('change', function() {
+                // Pequeno delay para garantir que as dimensões foram atualizadas
+                setTimeout(handleOrientationChange, 100);
+            });
+        }
+
+        // Detecção via evento deviceorientation (giroscópio)
+        if (window.DeviceOrientationEvent) {
+            // Verifica se o dispositivo tem giroscópio
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                // iOS 13+ precisa de permissão
+                DeviceOrientationEvent.requestPermission().then(state => {
+                    if (state === 'granted') {
+                        window.addEventListener('deviceorientation', function(e) {
+                            // beta: -180 a 180 (inclinação para frente/trás)
+                            // gamma: -90 a 90 (inclinação para esquerda/direita)
+                            const gamma = Math.abs(e.gamma || 0);
+                            // Se a inclinação lateral for maior que 30 graus, provavelmente está em landscape
+                            if (gamma > 30) {
+                                const isLandscape = window.innerWidth > window.innerHeight;
+                                if (!isLandscape) {
+                                    // Força a detecção de landscape
+                                    handleOrientationChange();
+                                }
+                            }
+                        });
+                    }
+                }).catch(() => {});
+            } else {
+                // Dispositivos que não precisam de permissão
+                window.addEventListener('deviceorientation', function(e) {
+                    const gamma = Math.abs(e.gamma || 0);
+                    if (gamma > 30) {
+                        const isLandscape = window.innerWidth > window.innerHeight;
+                        if (!isLandscape) {
+                            handleOrientationChange();
+                        }
+                    }
+                });
+            }
+        }
+
+        // Inicializa
+        setTimeout(handleOrientationChange, 500);
+
+        // Reavalia periodicamente (para casos onde a detecção falha)
+        setInterval(handleOrientationChange, 5000);
+
+        console.log('🔄 Detecção de orientação ativada!');
+    })();
+
     // =====================================================
     // FIREBASE CONFIG
     // =====================================================
@@ -991,7 +1181,6 @@
                 const data = snap.val();
                 if (data) {
                     filmes = Object.values(data).filter(i => i && !i.hidden);
-                    // ORDENAR POR createdAt (mais recente primeiro)
                     filmes.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
                 } else {
                     filmes = JSON.parse(JSON.stringify(MOCK_FILMES));
@@ -1909,7 +2098,7 @@
     }
 
     // =====================================================
-    // PERFIL (resumido para caber no código)
+    // PERFIL (resumido)
     // =====================================================
     function renderProfile(showOtherUserId = null) {
         if (!dataLoaded || !currentUser) return;
@@ -2749,6 +2938,7 @@
         console.log('🚀 NoiteFilmes carregado com sucesso!');
         console.log(`📊 ${filmes.length} filmes, ${series.length} séries, ${canais.length} canais`);
         console.log('🎬 Suporte a: YouTube, .mp4, .m3u8, IMDb, TokyVideo');
+        console.log('🔄 Detecção de orientação ativada - Layout adaptável!');
     }
 
     if (document.readyState === 'loading') {
@@ -2787,6 +2977,7 @@
     console.log('🎬 Clique em um card para assistir ao conteúdo.');
     console.log('👑 Admin: senha "admin123"');
     console.log('🎥 Formatos suportados: YouTube, .mp4, .m3u8, IMDb, TokyVideo');
+    console.log('🔄 Gire o dispositivo para paisagem e veja o layout adaptado!');
 </script>
 </body>
 </html>
