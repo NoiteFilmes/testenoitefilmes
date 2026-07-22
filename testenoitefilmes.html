@@ -2555,6 +2555,630 @@
     console.log('🎬 Clique em um card para assistir ao conteúdo.');
     console.log('👑 Admin: senha "admin123"');
     console.log('🎥 Formatos suportados: YouTube, .mp4, .m3u8, IMDb, TokyVideo');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===== PLAYER LAYOUT - DESKTOP/HORIZONTAL ===== */
+@media (min-width: 768px) and (orientation: landscape) {
+    .player-box {
+        max-width: 95vw !important;
+        max-height: 92vh !important;
+        padding: 16px !important;
+    }
+    
+    .player-box .player-layout {
+        display: flex !important;
+        gap: 16px !important;
+        height: calc(100% - 20px) !important;
+        min-height: 500px !important;
+    }
+    
+    .player-box .player-left {
+        flex: 0 0 60% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+        min-width: 0 !important;
+    }
+    
+    .player-box .player-wrapper {
+        flex: 0 0 70% !important;
+        min-height: 300px !important;
+        aspect-ratio: 16/9 !important;
+    }
+    
+    .player-box .player-info {
+        flex: 1 !important;
+        margin-top: 0 !important;
+        overflow-y: auto !important;
+        padding-right: 4px !important;
+    }
+    
+    .player-box .player-right {
+        flex: 0 0 38% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        border-left: 1px solid rgba(255,255,255,0.08) !important;
+        padding-left: 16px !important;
+        min-width: 0 !important;
+        height: 100% !important;
+    }
+    
+    .player-box .player-right .comments-section {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        border-top: none !important;
+    }
+    
+    .player-box .player-right .comments-section h4 {
+        flex-shrink: 0 !important;
+        padding-bottom: 8px !important;
+        border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+    }
+    
+    .player-box .player-right #commentsList {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        padding-right: 4px !important;
+    }
+    
+    .player-box .player-right .comment-input {
+        flex-shrink: 0 !important;
+        margin-top: 8px !important;
+    }
+    
+    /* Ajustes para telas muito grandes */
+    @media (min-width: 1400px) {
+        .player-box .player-left { flex: 0 0 58% !important; }
+        .player-box .player-right { flex: 0 0 40% !important; }
+    }
+    
+    /* Ajustes para telas médias */
+    @media (max-width: 1024px) and (orientation: landscape) {
+        .player-box .player-left { flex: 0 0 55% !important; }
+        .player-box .player-right { flex: 0 0 43% !important; }
+        .player-box .player-wrapper { flex: 0 0 60% !important; min-height: 250px !important; }
+    }
+}
+
+/* ===== PLAYER LAYOUT - MOBILE/RETRATO ===== */
+@media (max-width: 767px), (orientation: portrait) {
+    .player-box .player-layout {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    
+    .player-box .player-left {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+    
+    .player-box .player-wrapper {
+        flex: 0 0 auto !important;
+        aspect-ratio: 16/9 !important;
+        min-height: 200px !important;
+    }
+    
+    .player-box .player-right {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: 200px !important;
+        border-top: 1px solid rgba(255,255,255,0.08) !important;
+        padding-top: 10px !important;
+    }
+    
+    .player-box .player-right .comments-section {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        border-top: none !important;
+    }
+    
+    .player-box .player-right #commentsList {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        max-height: 150px !important;
+    }
+}
+
+/* ===== BADGES ===== */
+.player-info .badges {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin-top: 4px !important;
+}
+
+.player-info .badges .badge {
+    background: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 30px !important;
+    padding: 2px 12px !important;
+    font-size: 0.65rem !important;
+    color: rgba(255,255,255,0.7) !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+}
+
+.player-info .badges .badge:hover {
+    background: rgba(229,9,20,0.25) !important;
+    border-color: #e50914 !important;
+    color: #fff !important;
+}
+
+.player-info .badges .badge i {
+    margin-right: 4px !important;
+}
+
+.player-info .badges .badge.views {
+    cursor: default !important;
+}
+
+.player-info .badges .badge.views:hover {
+    background: rgba(255,255,255,0.08) !important;
+    border-color: rgba(255,255,255,0.1) !important;
+    color: rgba(255,255,255,0.7) !important;
+}
+
+.player-info .actions-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin-top: 6px !important;
+}
+
+.player-info .actions-row button {
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 30px !important;
+    padding: 4px 14px !important;
+    color: rgba(255,255,255,0.6) !important;
+    font-size: 0.65rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+}
+
+.player-info .actions-row button:hover {
+    background: rgba(229,9,20,0.2) !important;
+    border-color: rgba(229,9,20,0.3) !important;
+    color: #fff !important;
+}
+
+.player-info .actions-row button.liked {
+    color: #e50914 !important;
+    background: rgba(229,9,20,0.15) !important;
+    border-color: rgba(229,9,20,0.3) !important;
+}
+
+.player-info .actions-row .rating-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+}
+
+.player-info .actions-row .rating-stars i {
+    font-size: 0.9rem !important;
+}
+
+.player-info .sinopse {
+    font-size: 0.75rem !important;
+    color: rgba(255,255,255,0.6) !important;
+    margin-top: 2px !important;
+    line-height: 1.4 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// =====================================================
+// ORDENAR FILMES - MAIS RECENTES PRIMEIRO
+// =====================================================
+function loadFilmes() {
+    return new Promise((resolve) => {
+        db.ref('filmes').once('value', snap => {
+            const data = snap.val();
+            if (data) {
+                filmes = Object.values(data).filter(i => i && !i.hidden);
+                // ORDENAR POR createdAt (mais recente primeiro)
+                filmes.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            } else {
+                filmes = JSON.parse(JSON.stringify(MOCK_FILMES));
+                // ORDENAR MOCK POR createdAt (mais recente primeiro)
+                filmes.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                MOCK_FILMES.forEach(f => {
+                    db.ref(`filmes/${f.id}`).set(f).catch(() => {});
+                });
+            }
+            updateContentCounters();
+            resolve();
+        }).catch(() => {
+            filmes = JSON.parse(JSON.stringify(MOCK_FILMES));
+            filmes.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            resolve();
+        });
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- PLAYER OVERLAY - ESTRUTURA ATUALIZADA -->
+<div class="player-overlay" id="playerOverlay">
+    <div class="player-box">
+        <button class="close-btn" id="closePlayer"><i class="fas fa-times"></i></button>
+        <div class="player-layout">
+            <div class="player-left">
+                <div class="player-wrapper" id="playerWrapper">
+                    <div id="youtubePlayer" style="display:none; width:100%; height:100%;"></div>
+                    <video id="hlsPlayer" controls style="display:none; width:100%; height:100%; background:#000;"></video>
+                    <div class="player-loading" id="playerLoading">Carregando...</div>
+                </div>
+                <div class="player-info" id="playerInfo">
+                    <h3 id="playerTitle">Título</h3>
+                    <div class="sinopse" id="playerSinopse">Sinopse do filme...</div>
+                    <div class="badges" id="playerBadges">
+                        <span class="badge" id="playerYearBadge"><i class="fas fa-calendar"></i> <span id="playerYear">2024</span></span>
+                        <span class="badge" id="playerGenreBadge"><i class="fas fa-tag"></i> <span id="playerGenre">Gênero</span></span>
+                        <span class="badge views" id="playerViewsBadge"><i class="fas fa-eye"></i> <span id="playerViews">0</span> visualizações</span>
+                    </div>
+                    <div class="actions-row">
+                        <button id="likeBtn"><i class="far fa-heart"></i> <span id="likeCount">0</span></button>
+                        <button id="shareBtn"><i class="fas fa-share-alt"></i> Compartilhar</button>
+                        <button id="saveBtn"><i class="far fa-star"></i> Favoritar</button>
+                        <button id="reportBtn"><i class="fas fa-flag"></i> Reportar</button>
+                        <div class="rating-wrapper">
+                            <div class="rating-stars" id="ratingStars">
+                                <i data-value="1" class="far fa-star"></i>
+                                <i data-value="2" class="far fa-star"></i>
+                                <i data-value="3" class="far fa-star"></i>
+                                <i data-value="4" class="far fa-star"></i>
+                                <i data-value="5" class="far fa-star"></i>
+                            </div>
+                            <span id="ratingPercent" style="font-size:0.65rem; color:#ffc107;">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="player-right">
+                <div class="comments-section">
+                    <h4>💬 Comentários</h4>
+                    <div id="commentsList"></div>
+                    <div class="comment-input">
+                        <input type="text" id="commentInput" placeholder="Adicione um comentário...">
+                        <button id="submitComment">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+// =====================================================
+// FUNÇÃO playMedia ATUALIZADA COM NOVO LAYOUT
+// =====================================================
+function playMedia(item, type) {
+    if (!item) { showToast('Item não encontrado'); return; }
+    currentMedia = item;
+    currentMediaType = type;
+
+    playerOverlay.classList.add('active');
+
+    // ===== ATUALIZAR INFORMAÇÕES DO PLAYER =====
+    document.getElementById('playerTitle').textContent = item.title || 'Sem título';
+    document.getElementById('playerSinopse').textContent = item.description || item.sinopse || 'Sinopse não disponível.';
+    document.getElementById('playerYear').textContent = item.year || '';
+    document.getElementById('playerGenre').textContent = item.category || 'Geral';
+    document.getElementById('playerViews').textContent = item.views || 0;
+
+    // ===== BADGES CLICÁVEIS =====
+    const yearBadge = document.getElementById('playerYearBadge');
+    const genreBadge = document.getElementById('playerGenreBadge');
+    
+    // Ano - filtro por ano
+    yearBadge.onclick = function(e) {
+        e.stopPropagation();
+        if (item.year) {
+            currentTab = 'filmes';
+            // Filtra filmes pelo ano
+            const year = item.year;
+            const filtered = filmes.filter(f => f.year === year);
+            if (filtered.length > 0) {
+                renderFilteredGrid(filtered, `📅 Filmes de ${year}`);
+            } else {
+                showToast(`Nenhum filme encontrado para o ano ${year}`);
+            }
+            closePlayer();
+        }
+    };
+    
+    // Gênero - filtro por gênero
+    genreBadge.onclick = function(e) {
+        e.stopPropagation();
+        if (item.category) {
+            currentTab = 'filmes';
+            const genre = item.category;
+            const filtered = filmes.filter(f => f.category === genre);
+            if (filtered.length > 0) {
+                renderFilteredGrid(filtered, `🎭 Filmes de ${genre}`);
+            } else {
+                showToast(`Nenhum filme encontrado para o gênero ${genre}`);
+            }
+            closePlayer();
+        }
+    };
+
+    incrementView(item.id);
+    loadLikeCount(item.id);
+    loadRatings(item.id);
+    loadComments(item.id);
+    setupPlayerButtons(item);
+
+    // ===== REPRODUÇÃO =====
+    const link = item.link || '';
+    const videoId = extractYoutubeId(link);
+    const isHls = isIptvLink(link);
+    const isImdb = isImdbLink(link);
+    const isToky = isTokyVideoLink(link);
+
+    const youtubeDiv = document.getElementById('youtubePlayer');
+    const hlsVideo = document.getElementById('hlsPlayer');
+    const loading = document.getElementById('playerLoading');
+    const wrapper = document.querySelector('.player-wrapper');
+
+    youtubeDiv.style.display = 'none';
+    hlsVideo.style.display = 'none';
+    loading.style.display = 'flex';
+    wrapper.querySelectorAll('iframe').forEach(iframe => iframe.remove());
+
+    // YOUTUBE
+    if (videoId) {
+        youtubeDiv.style.display = 'block';
+        loading.style.display = 'none';
+        if (ytPlayer) {
+            ytPlayer.loadVideoById(videoId);
+            ytPlayer.playVideo();
+        } else {
+            ytPlayer = new YT.Player('youtubePlayer', {
+                videoId: videoId,
+                playerVars: { autoplay: 1, controls: 1, modestbranding: 1, rel: 0 },
+                events: {
+                    onReady: () => { loading.style.display = 'none'; },
+                    onError: () => { showToast('Erro ao carregar vídeo do YouTube'); }
+                }
+            });
+        }
+        return;
+    }
+
+    // IPTV
+    if (isHls) {
+        hlsVideo.style.display = 'block';
+        loading.style.display = 'none';
+        if (Hls.isSupported()) {
+            if (window.hlsInstance) window.hlsInstance.destroy();
+            const hls = new Hls();
+            hls.loadSource(link);
+            hls.attachMedia(hlsVideo);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => hlsVideo.play());
+            window.hlsInstance = hls;
+        } else if (hlsVideo.canPlayType('application/vnd.apple.mpegurl')) {
+            hlsVideo.src = link;
+            hlsVideo.play();
+        } else {
+            showToast('Formato IPTV não suportado neste navegador');
+            loading.style.display = 'none';
+        }
+        return;
+    }
+
+    // IMDB
+    if (isImdb) {
+        const embedUrl = getImdbEmbedUrl(link);
+        if (!embedUrl) {
+            showToast('Link IMDb inválido');
+            loading.style.display = 'none';
+            return;
+        }
+        const iframe = document.createElement('iframe');
+        iframe.src = embedUrl;
+        iframe.allowFullscreen = true;
+        iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
+        wrapper.appendChild(iframe);
+        loading.style.display = 'none';
+        iframe.onerror = () => {
+            showToast('Erro ao carregar o IMDb. Tente abrir diretamente.');
+            loading.style.display = 'none';
+        };
+        return;
+    }
+
+    // TOKYVIDEO
+    if (isToky) {
+        const embedUrl = getTokyVideoEmbedUrl(link);
+        if (!embedUrl) {
+            showToast('Link TokyVideo inválido');
+            loading.style.display = 'none';
+            return;
+        }
+        const iframe = document.createElement('iframe');
+        iframe.src = embedUrl;
+        iframe.allowFullscreen = true;
+        iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
+        wrapper.appendChild(iframe);
+        loading.style.display = 'none';
+        iframe.onerror = () => {
+            showToast('Erro ao carregar o TokyVideo. Tente abrir diretamente.');
+            loading.style.display = 'none';
+        };
+        return;
+    }
+
+    showToast('Link não suportado. Formatos: YouTube, .mp4, .m3u8, IMDb, TokyVideo');
+    loading.style.display = 'none';
+}
+
+// =====================================================
+// FUNÇÃO PARA RENDERIZAR GRID FILTRADO
+// =====================================================
+function renderFilteredGrid(items, title) {
+    if (items.length === 0) {
+        mainEl.innerHTML = `<div style="color:rgba(255,255,255,0.3); text-align:center; padding:40px;">
+            <i class="fas fa-search" style="font-size:2rem; display:block; margin-bottom:10px;"></i>
+            Nenhum resultado encontrado.
+        </div>`;
+        return;
+    }
+
+    let html = `
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap;">
+            <span class="back-link" onclick="renderGrid()"><i class="fas fa-arrow-left"></i> Voltar</span>
+            <h2 class="section-title">${title}</h2>
+            <span style="color:rgba(255,255,255,0.3); font-size:0.8rem;">${items.length} filmes</span>
+        </div>
+        <div class="grid">
+    `;
+    
+    items.forEach(item => {
+        html += `
+            <div class="card" data-id="${item.id}" data-type="filme">
+                <div class="poster">
+                    ${item.thumb ? `<img src="${item.thumb}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">` : ''}
+                    <i class="fas fa-play-circle" style="${item.thumb ? 'display:none;' : ''}"></i>
+                </div>
+                <h4>${escapeHtml(item.title)}</h4>
+                <p>${item.year || ''}</p>
+            </div>
+        `;
+    });
+    html += `</div>`;
+    mainEl.innerHTML = html;
+
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', () => {
+            const id = card.getAttribute('data-id');
+            const item = filmes.find(f => f.id === id);
+            if (item) playMedia(item, 'filme');
+        });
+    });
+}
+
+// =====================================================
+// FUNÇÃO loadFilmes ATUALIZADA - ORDENAÇÃO
+// =====================================================
+function loadFilmes() {
+    return new Promise((resolve) => {
+        db.ref('filmes').once('value', snap => {
+            const data = snap.val();
+            if (data) {
+                filmes = Object.values(data).filter(i => i && !i.hidden);
+                // ORDENAR POR createdAt (mais recente primeiro)
+                filmes.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            } else {
+                filmes = JSON.parse(JSON.stringify(MOCK_FILMES));
+                filmes.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                MOCK_FILMES.forEach(f => {
+                    db.ref(`filmes/${f.id}`).set(f).catch(() => {});
+                });
+            }
+            updateContentCounters();
+            resolve();
+        }).catch(() => {
+            filmes = JSON.parse(JSON.stringify(MOCK_FILMES));
+            filmes.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            resolve();
+        });
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
 </body>
 </html>
