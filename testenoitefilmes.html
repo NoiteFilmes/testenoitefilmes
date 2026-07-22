@@ -206,12 +206,22 @@
             font-size:1.2rem; cursor:pointer; transition:0.2s; z-index:10;
         }
         .player-box .close-btn:hover { background:#e50914; transform:scale(1.1); }
-        .player-wrapper { background:#000; border-radius:16px; overflow:hidden; aspect-ratio:16/9; }
-        .player-wrapper iframe, .player-wrapper video { width:100%; height:100%; border:none; }
+        .player-wrapper { 
+            background:#000; border-radius:16px; overflow:hidden; aspect-ratio:16/9; 
+            position:relative;
+        }
+        .player-wrapper iframe, .player-wrapper video { 
+            width:100%; height:100%; border:none; 
+            position:absolute; top:0; left:0;
+        }
+        .player-wrapper .player-loading {
+            position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+            color:rgba(255,255,255,0.3); background:#000; z-index:1;
+        }
         .player-info { margin-top:12px; }
         .player-info h3 { font-size:1.1rem; color:#fff; }
         .player-info .meta { font-size:0.8rem; color:rgba(255,255,255,0.5); display:flex; gap:12px; flex-wrap:wrap; }
-        .player-info .actions { display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; }
+        .player-info .actions { display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; align-items:center; }
         .player-info .actions button {
             background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);
             border-radius:30px; padding:4px 14px; color:#fff; font-size:0.7rem;
@@ -240,12 +250,50 @@
         .comment-input button:hover { background:#b20710; }
 
         /* ===== SEARCH ===== */
-        .search-box { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-        .search-box input { flex:1; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); border-radius:30px; padding:8px 16px; color:#fff; font-size:0.85rem; outline:none; min-width:180px; }
+        .search-box { 
+            display:flex; gap:10px; align-items:center; flex-wrap:wrap; 
+            position:relative;
+        }
+        .search-box .search-input-wrapper {
+            flex:1; position:relative; min-width:180px;
+        }
+        .search-box input { 
+            width:100%;
+            background:rgba(255,255,255,0.08); 
+            border:1px solid rgba(255,255,255,0.1); 
+            border-radius:30px; 
+            padding:8px 40px 8px 16px; 
+            color:#fff; 
+            font-size:0.85rem; 
+            outline:none;
+        }
         .search-box input::placeholder { color:rgba(255,255,255,0.3); }
+        .search-box .clear-search-btn {
+            position:absolute; right:12px; top:50%; transform:translateY(-50%);
+            background:rgba(255,255,255,0.15); border:none; border-radius:50%;
+            width:24px; height:24px; color:#fff; font-size:12px;
+            cursor:pointer; display:none; align-items:center; justify-content:center;
+            transition:all 0.2s;
+        }
+        .search-box .clear-search-btn:hover {
+            background:rgba(255,255,255,0.3); transform:translateY(-50%) scale(1.1);
+        }
         .search-filters { display:flex; gap:6px; flex-wrap:wrap; }
-        .search-filters button { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:30px; padding:4px 14px; color:rgba(255,255,255,0.6); font-size:0.7rem; cursor:pointer; transition:0.2s; }
-        .search-filters button.active { background:rgba(229,9,20,0.3); border-color:#e50914; color:#fff; }
+        .search-filters button { 
+            background:rgba(255,255,255,0.06); 
+            border:1px solid rgba(255,255,255,0.08); 
+            border-radius:30px; 
+            padding:4px 14px; 
+            color:rgba(255,255,255,0.6); 
+            font-size:0.7rem; 
+            cursor:pointer; 
+            transition:0.2s; 
+        }
+        .search-filters button.active { 
+            background:rgba(229,9,20,0.3); 
+            border-color:#e50914; 
+            color:#fff; 
+        }
 
         /* ===== PROFILE ===== */
         .profile-header { display:flex; align-items:center; gap:20px; flex-wrap:wrap; padding:10px 0; }
@@ -333,11 +381,11 @@
         /* ===== LOGIN MODAL ===== */
         .login-modal {
             position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.95);
-            backdrop-filter:blur(20px); display:none; /* ← OCULTO POR PADRÃO */
+            backdrop-filter:blur(20px); display:none;
             align-items:center; justify-content:center;
             padding:20px;
         }
-        .login-modal.active { display:flex; } /* ← MOSTRA QUANDO ATIVO */
+        .login-modal.active { display:flex; }
         .login-box {
             background:rgba(20,20,20,0.95); border-radius:32px; padding:30px;
             max-width:400px; width:100%; border:1px solid rgba(255,0,0,0.2);
@@ -428,9 +476,9 @@
     <div class="player-box">
         <button class="close-btn" id="closePlayer"><i class="fas fa-times"></i></button>
         <div class="player-wrapper" id="playerWrapper">
-            <div id="youtubePlayer"></div>
+            <div id="youtubePlayer" style="display:none; width:100%; height:100%;"></div>
             <video id="hlsPlayer" controls style="display:none; width:100%; height:100%; background:#000;"></video>
-            <div id="playerLoading" style="display:flex; align-items:center; justify-content:center; height:100%; color:rgba(255,255,255,0.3);">Carregando...</div>
+            <div class="player-loading" id="playerLoading">Carregando...</div>
         </div>
         <div class="player-info">
             <h3 id="playerTitle">Título</h3>
@@ -464,7 +512,7 @@
     </div>
 </div>
 
-<!-- LOGIN MODAL - OCULTO POR PADRÃO (class="active" é adicionado via JS quando necessário) -->
+<!-- LOGIN MODAL -->
 <div class="login-modal" id="loginModal">
     <div class="login-box">
         <h2><i class="fas fa-film"></i> NoiteFilmes</h2>
@@ -539,14 +587,10 @@
     const userIndicator = document.getElementById('userIndicator');
 
     // =====================================================
-    // FUNÇÕES DE LOGIN - CORRIGIDAS
+    // FUNÇÕES DE LOGIN
     // =====================================================
-    function showLoginModal() { 
-        loginModal.classList.add('active'); 
-    }
-    function hideLoginModal() { 
-        loginModal.classList.remove('active'); 
-    }
+    function showLoginModal() { loginModal.classList.add('active'); }
+    function hideLoginModal() { loginModal.classList.remove('active'); }
 
     // =====================================================
     // FUNÇÕES AUXILIARES
@@ -598,9 +642,62 @@
         return url.includes('.m3u8') || url.includes('.m3u') || url.includes('.mp4') || url.includes('playlist') || url.includes('m3u8?');
     }
 
+    // =====================================================
+    // DETECÇÃO E CONVERSÃO DE LINKS - IMDB E TOKYVIDEO
+    // =====================================================
+    function isImdbLink(url) {
+        if (!url) return false;
+        return /playimdb\.com/.test(url) || 
+               /streamimdb\.ru/.test(url) ||
+               /imdb\.com\/title\/tt\d+/.test(url);
+    }
+
+    function getImdbEmbedUrl(url) {
+        const match = url.match(/tt\d+/);
+        if (!match) return null;
+        const imdbId = match[0];
+        if (url.includes('/embed/') || url.includes('playimdb.com')) {
+            return url;
+        }
+        return `https://playimdb.com/pt/title/${imdbId}/`;
+    }
+
+    function isTokyVideoLink(url) {
+        if (!url) return false;
+        return url.includes('tokyvideo.com');
+    }
+
+    function getTokyVideoEmbedUrl(url) {
+        let slug = null;
+        const patterns = [
+            /tokyvideo\.com\/br\/embed\/(\d+)/,
+            /tokyvideo\.com\/embed\/(\d+)/,
+            /tokyvideo\.com\/br\/video\/([a-zA-Z0-9\-_]+)/,
+            /tokyvideo\.com\/video\/([a-zA-Z0-9\-_]+)/
+        ];
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match && match[1]) { slug = match[1]; break; }
+        }
+        if (!slug) {
+            const parts = url.split('/');
+            for (let i = parts.length - 1; i >= 0; i--) {
+                const part = parts[i];
+                if (part && part.length > 0 && /^[a-zA-Z0-9\-_]+$/.test(part)) {
+                    slug = part; break;
+                }
+            }
+        }
+        if (!slug) return null;
+        if (/^\d+$/.test(slug)) {
+            return `https://www.tokyvideo.com/br/embed/${slug}`;
+        }
+        return `https://www.tokyvideo.com/embed/${slug}`;
+    }
+
     function makeNicknamesClickable(text) {
         if (!text) return text;
-        return text.replace(/@([a-zA-Z0-9_]+)/g, (m, n) => `<span class="clickable-nick" data-nick="${n}">${m}</span>`);
+        return text.replace(/@([a-zA-Z0-9_]+)/g, (m, n) => `<span class="clickable-nick" data-nick="${n}">${m}</span>`;
     }
 
     function setupNicknameClicks() {
@@ -669,12 +766,12 @@
     };
 
     // =====================================================
-    // AUTH STATE - CORRIGIDO
+    // AUTH STATE
     // =====================================================
     auth.onAuthStateChanged(user => {
         currentUser = user;
         if (user) {
-            hideLoginModal(); // ← OCULTA O MODAL QUANDO LOGADO
+            hideLoginModal();
             userIndicator.innerHTML = `🟢 ${currentUsername}`;
             loadUserNickname(user.uid);
             loadFavoritos(user.uid);
@@ -692,7 +789,7 @@
                 }
             });
         } else {
-            showLoginModal(); // ← MOSTRA O MODAL QUANDO DESLOGADO
+            showLoginModal();
             userIndicator.innerHTML = '🔴 Offline';
             currentUsername = 'Cinéfilo';
         }
@@ -802,7 +899,6 @@
         html += `</div>`;
         mainEl.innerHTML = html;
 
-        // Eventos dos cards
         document.querySelectorAll('.card').forEach(card => {
             card.addEventListener('click', () => {
                 const id = card.getAttribute('data-id');
@@ -815,7 +911,6 @@
             });
         });
 
-        // Eventos dos badges de franquia
         document.querySelectorAll('.franchise-badge').forEach(badge => {
             badge.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -871,7 +966,7 @@
     }
 
     // =====================================================
-    // PLAYER
+    // PLAYER - CORRIGIDO COM SUPORTE A IMDB E TOKYVIDEO
     // =====================================================
     function playMedia(item, type) {
         currentMedia = item;
@@ -890,17 +985,28 @@
         loadComments(item.id);
         setupPlayerButtons(item);
 
+        const link = item.link || '';
+        const videoId = extractYoutubeId(link);
+        const isHls = isIptvLink(link);
+        const isImdb = isImdbLink(link);
+        const isToky = isTokyVideoLink(link);
+
         const youtubeDiv = document.getElementById('youtubePlayer');
         const hlsVideo = document.getElementById('hlsPlayer');
         const loading = document.getElementById('playerLoading');
+        const wrapper = document.querySelector('.player-wrapper');
 
+        // Resetar tudo
         youtubeDiv.style.display = 'none';
         hlsVideo.style.display = 'none';
         loading.style.display = 'flex';
 
-        const videoId = extractYoutubeId(item.link);
-        const isHls = isIptvLink(item.link);
+        // Remover iframes antigos
+        wrapper.querySelectorAll('iframe').forEach(iframe => iframe.remove());
 
+        // =============================================
+        // 1. YOUTUBE
+        // =============================================
         if (videoId) {
             youtubeDiv.style.display = 'block';
             loading.style.display = 'none';
@@ -917,35 +1023,104 @@
                     }
                 });
             }
-        } else if (isHls) {
+            return;
+        }
+
+        // =============================================
+        // 2. IPTV / MP4 / M3U8
+        // =============================================
+        if (isHls) {
             hlsVideo.style.display = 'block';
             loading.style.display = 'none';
             if (Hls.isSupported()) {
                 if (window.hlsInstance) window.hlsInstance.destroy();
                 const hls = new Hls();
-                hls.loadSource(item.link);
+                hls.loadSource(link);
                 hls.attachMedia(hlsVideo);
                 hls.on(Hls.Events.MANIFEST_PARSED, () => hlsVideo.play());
                 window.hlsInstance = hls;
             } else if (hlsVideo.canPlayType('application/vnd.apple.mpegurl')) {
-                hlsVideo.src = item.link;
+                hlsVideo.src = link;
                 hlsVideo.play();
             } else {
-                showToast('Formato não suportado');
+                showToast('Formato IPTV não suportado neste navegador');
                 loading.style.display = 'none';
             }
-        } else {
-            showToast('Link não suportado');
-            loading.style.display = 'none';
+            return;
         }
+
+        // =============================================
+        // 3. IMDB (playimdb.com, streamimdb.ru)
+        // =============================================
+        if (isImdb) {
+            const embedUrl = getImdbEmbedUrl(link);
+            if (!embedUrl) {
+                showToast('Link IMDb inválido');
+                loading.style.display = 'none';
+                return;
+            }
+
+            const iframe = document.createElement('iframe');
+            iframe.src = embedUrl;
+            iframe.allowFullscreen = true;
+            iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
+
+            wrapper.appendChild(iframe);
+            loading.style.display = 'none';
+
+            iframe.onerror = () => {
+                showToast('Erro ao carregar o IMDb. Tente abrir diretamente.');
+                loading.style.display = 'none';
+            };
+            return;
+        }
+
+        // =============================================
+        // 4. TOKYVIDEO
+        // =============================================
+        if (isToky) {
+            const embedUrl = getTokyVideoEmbedUrl(link);
+            if (!embedUrl) {
+                showToast('Link TokyVideo inválido');
+                loading.style.display = 'none';
+                return;
+            }
+
+            const iframe = document.createElement('iframe');
+            iframe.src = embedUrl;
+            iframe.allowFullscreen = true;
+            iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
+
+            wrapper.appendChild(iframe);
+            loading.style.display = 'none';
+
+            iframe.onerror = () => {
+                showToast('Erro ao carregar o TokyVideo. Tente abrir diretamente.');
+                loading.style.display = 'none';
+            };
+            return;
+        }
+
+        // =============================================
+        // 5. NENHUM FORMATO SUPORTADO
+        // =============================================
+        showToast('Link não suportado. Formatos: YouTube, .mp4, .m3u8, IMDb, TokyVideo');
+        loading.style.display = 'none';
     }
 
+    // =====================================================
+    // CLOSE PLAYER - LIMPA IFRAMES
+    // =====================================================
     function closePlayer() {
         playerOverlay.classList.remove('active');
         if (ytPlayer) { ytPlayer.stopVideo(); }
         if (window.hlsInstance) { window.hlsInstance.destroy(); window.hlsInstance = null; }
         const hlsVideo = document.getElementById('hlsPlayer');
         if (hlsVideo) { hlsVideo.pause(); hlsVideo.src = ''; hlsVideo.load(); }
+        const wrapper = document.querySelector('.player-wrapper');
+        if (wrapper) {
+            wrapper.querySelectorAll('iframe').forEach(iframe => iframe.remove());
+        }
         document.getElementById('playerLoading').style.display = 'flex';
     }
 
@@ -977,15 +1152,46 @@
         });
     }
 
+    // =====================================================
+    // AVALIAÇÕES - CORRIGIDO (validação NaN)
+    // =====================================================
     function loadRatings(id) {
         db.ref(`avaliacoes/${id}`).once('value', snap => {
             const data = snap.val();
-            const total = data ? data.totalVotos || 0 : 0;
-            const soma = data ? data.soma || 0 : 0;
-            const media = total > 0 ? (soma / total) : 0;
-            const percent = total > 0 ? Math.round((media / 5) * 100) : 0;
+            let totalVotos = 0;
+            let soma = 0;
+            
+            if (data) {
+                // Soma apenas valores numéricos válidos
+                for (const key in data) {
+                    if (key === 'totalVotos' || key === 'soma') continue;
+                    const val = data[key];
+                    if (typeof val === 'number' && !isNaN(val) && val >= 0 && val <= 5) {
+                        soma += val;
+                        totalVotos++;
+                    }
+                }
+                // Usa valores salvos se existirem e forem válidos
+                if (data.totalVotos && !isNaN(data.totalVotos) && data.totalVotos > 0) {
+                    totalVotos = data.totalVotos;
+                }
+                if (data.soma && !isNaN(data.soma)) {
+                    soma = data.soma;
+                }
+            }
+            
+            const media = totalVotos > 0 ? (soma / totalVotos) : 0;
+            const percent = totalVotos > 0 ? Math.round((media / 5) * 100) : 0;
             document.getElementById('ratingPercent').textContent = percent + '%';
             updateStars(percent);
+            
+            // Salva dados corrigidos
+            if (totalVotos > 0) {
+                db.ref(`avaliacoes/${id}`).update({
+                    totalVotos: totalVotos,
+                    soma: soma
+                }).catch(() => {});
+            }
         });
     }
 
@@ -998,6 +1204,74 @@
         });
     }
 
+    // =====================================================
+    // SALVAR AVALIAÇÃO - CORRIGIDO (sem NaN)
+    // =====================================================
+    function salvarAvaliacao(mediaId, novaNota) {
+        if (!currentUser) { showToast('Faça login para avaliar'); return; }
+        if (novaNota < 0 || novaNota > 5 || isNaN(novaNota)) { showToast('Nota inválida'); return; }
+
+        const userRatingRef = db.ref(`avaliacoes/${mediaId}/${currentUser.uid}`);
+        
+        userRatingRef.once('value', (snapshot) => {
+            const notaAntiga = snapshot.val();
+            const oldVal = (typeof notaAntiga === 'number' && !isNaN(notaAntiga)) ? notaAntiga : 0;
+            
+            if (oldVal === novaNota) {
+                showToast(`Sua avaliação já é ${novaNota}/5 ⭐`);
+                return;
+            }
+
+            userRatingRef.set(novaNota);
+
+            db.ref(`avaliacoes/${mediaId}`).transaction((dados) => {
+                let totalVotos = 0;
+                let soma = 0;
+                
+                if (dados) {
+                    // Soma apenas valores numéricos válidos
+                    for (const key in dados) {
+                        if (key === 'totalVotos' || key === 'soma') continue;
+                        const val = dados[key];
+                        if (typeof val === 'number' && !isNaN(val) && val >= 0 && val <= 5) {
+                            soma += val;
+                            totalVotos++;
+                        }
+                    }
+                }
+
+                if (oldVal === 0 && novaNota > 0) {
+                    totalVotos++;
+                    soma += novaNota;
+                } else if (oldVal > 0 && novaNota > 0) {
+                    soma = soma - oldVal + novaNota;
+                } else if (oldVal > 0 && novaNota === 0) {
+                    totalVotos--;
+                    soma = soma - oldVal;
+                }
+
+                // Garante valores válidos
+                totalVotos = Math.max(0, totalVotos);
+                soma = Math.max(0, soma);
+
+                return { totalVotos, soma };
+            }).then(() => {
+                showToast(`Avaliação ${novaNota}/5 salva! 🌟`);
+                loadRatings(mediaId);
+                const container = document.getElementById('ratingStars');
+                if (container) {
+                    updateStars(Math.round((novaNota / 5) * 100));
+                }
+            }).catch((erro) => {
+                console.error('Erro:', erro);
+                showToast('Erro ao salvar avaliação');
+            });
+        });
+    }
+
+    // =====================================================
+    // SETUP PLAYER BUTTONS - CORRIGIDO
+    // =====================================================
     function setupPlayerButtons(item) {
         const likeBtn = document.getElementById('likeBtn');
         const saveBtn = document.getElementById('saveBtn');
@@ -1043,24 +1317,8 @@
 
         stars.forEach(star => {
             star.onclick = () => {
-                if (!currentUser) { showToast('Faça login para avaliar'); return; }
                 const value = parseInt(star.getAttribute('data-value'));
-                const ref = db.ref(`avaliacoes/${item.id}/${currentUser.uid}`);
-                ref.once('value', snap => {
-                    const old = snap.val() || 0;
-                    if (old === value) { showToast(`Sua avaliação já é ${value}/5`); return; }
-                    ref.set(value);
-                    db.ref(`avaliacoes/${item.id}`).transaction(data => {
-                        if (!data) return { totalVotos: 1, soma: value };
-                        let { totalVotos, soma } = data;
-                        if (old === 0) { totalVotos++; soma += value; }
-                        else { soma = soma - old + value; }
-                        return { totalVotos, soma };
-                    }).then(() => {
-                        showToast(`⭐ Avaliação ${value}/5 salva!`);
-                        loadRatings(item.id);
-                    });
-                });
+                salvarAvaliacao(item.id, value);
             };
             star.onmouseenter = function() {
                 const val = parseInt(this.getAttribute('data-value'));
@@ -1125,12 +1383,15 @@
     });
 
     // =====================================================
-    // SEARCH
+    // SEARCH - COM BOTÃO (X) PARA LIMPAR
     // =====================================================
     function renderSearch() {
         let html = `
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Buscar filmes, séries ou canais...">
+                <div class="search-input-wrapper">
+                    <input type="text" id="searchInput" placeholder="Buscar filmes, séries ou canais...">
+                    <button class="clear-search-btn" id="clearSearchBtn"><i class="fas fa-times"></i></button>
+                </div>
                 <div class="search-filters">
                     <button data-filter="todos" class="active">Todos</button>
                     <button data-filter="filmes">🎬 Filmes</button>
@@ -1142,7 +1403,22 @@
         `;
         mainEl.innerHTML = html;
 
-        document.getElementById('searchInput').addEventListener('input', performSearch);
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearSearchBtn');
+
+        // Mostrar/ocultar botão (X)
+        searchInput.addEventListener('input', () => {
+            clearBtn.style.display = searchInput.value.length > 0 ? 'flex' : 'none';
+            performSearch();
+        });
+
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            clearBtn.style.display = 'none';
+            document.getElementById('searchResults').innerHTML = '<div style="color:rgba(255,255,255,0.3); text-align:center; padding:20px;">🔍 Digite para buscar</div>';
+            searchInput.focus();
+        });
+
         document.querySelectorAll('.search-filters button').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.search-filters button').forEach(b => b.classList.remove('active'));
@@ -1817,7 +2093,7 @@
                     </div>
                     <div class="admin-form" id="adminForm">
                         <input type="text" id="adminTitle" placeholder="Título">
-                        <input type="text" id="adminLink" placeholder="Link (YouTube, .mp4, .m3u8)">
+                        <input type="text" id="adminLink" placeholder="Link (YouTube, .mp4, .m3u8, IMDb, TokyVideo)">
                         <input type="text" id="adminThumb" placeholder="URL da miniatura">
                         <input type="text" id="adminCategory" placeholder="Gênero">
                         <input type="text" id="adminYear" placeholder="Ano">
@@ -2016,6 +2292,14 @@
             const fileName = link.split('/').pop().split('.')[0].replace(/[_-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
             document.getElementById('adminTitle').value = fileName || 'Vídeo';
             showToast('✅ Nome extraído do link');
+        } else if (isImdbLink(link)) {
+            document.getElementById('adminTitle').value = 'IMDb Filme';
+            document.getElementById('adminThumb').value = 'https://upload.wikimedia.org/wikipedia/commons/6/69/IMDB_Logo_2016.svg';
+            showToast('✅ IMDb reconhecido');
+        } else if (isTokyVideoLink(link)) {
+            document.getElementById('adminTitle').value = 'TokyVideo';
+            document.getElementById('adminThumb').value = 'https://via.placeholder.com/300x450?text=TokyVideo';
+            showToast('✅ TokyVideo reconhecido');
         } else {
             showToast('Link não reconhecido');
         }
@@ -2183,6 +2467,7 @@
 
         console.log('🚀 NoiteFilmes carregado com sucesso!');
         console.log(`📊 ${filmes.length} filmes, ${series.length} séries, ${canais.length} canais`);
+        console.log('🎬 Suporte a: YouTube, .mp4, .m3u8, IMDb, TokyVideo');
     }
 
     if (document.readyState === 'loading') {
@@ -2220,6 +2505,7 @@
     console.log('💡 Use @nome para mencionar usuários nos comentários e posts.');
     console.log('🎬 Clique em um card para assistir ao conteúdo.');
     console.log('👑 Admin: senha "admin123"');
+    console.log('🎥 Formatos suportados: YouTube, .mp4, .m3u8, IMDb, TokyVideo');
 </script>
 </body>
 </html>
