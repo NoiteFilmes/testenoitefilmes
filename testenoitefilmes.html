@@ -119,6 +119,18 @@
         .main-content::-webkit-scrollbar { width:4px; }
         .main-content::-webkit-scrollbar-thumb { background:#e50914; border-radius:12px; }
 
+        /* ===== LOADING ===== */
+        .loading-screen {
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            height:100%; color:rgba(255,255,255,0.5); gap:16px;
+        }
+        .loading-screen .spinner {
+            width:40px; height:40px; border:3px solid rgba(255,255,255,0.1);
+            border-top-color:#e50914; border-radius:50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
         /* ===== CARDS ===== */
         .grid {
             display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:18px; margin-top:4px;
@@ -459,7 +471,10 @@
 
     <!-- MAIN CONTENT -->
     <div class="main-content" id="mainContent">
-        <!-- Renderizado via JavaScript -->
+        <div class="loading-screen">
+            <div class="spinner"></div>
+            <span>Carregando NoiteFilmes...</span>
+        </div>
     </div>
 
     <!-- BOTTOM MENU -->
@@ -551,6 +566,28 @@
     const storage = firebase.storage();
 
     // =====================================================
+    // DADOS MOCK (fallback se o Firebase estiver vazio)
+    // =====================================================
+    const MOCK_FILMES = [
+        { id: 'filme-1', title: 'Todo Mundo em Pânico 6', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Filme+1', category: 'Comédia', year: '2026', views: 0 },
+        { id: 'filme-2', title: 'Noir & Vinil', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Filme+2', category: 'Drama', year: '2025', views: 0 },
+        { id: 'filme-3', title: 'Máscaras', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Filme+3', category: 'Suspense', year: '2024', views: 0 },
+        { id: 'filme-4', title: 'Estrela Perdida', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Filme+4', category: 'Drama', year: '2025', views: 0 },
+        { id: 'filme-5', title: 'Espectro', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Filme+5', category: 'Terror', year: '2023', views: 0 },
+        { id: 'filme-6', title: 'Reino de Sangue', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Filme+6', category: 'Ação', year: '2025', views: 0 }
+    ];
+
+    const MOCK_SERIES = [
+        { id: 'serie-1', title: 'Smallville', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Série+1', category: 'Ficção', year: '2001-2011', views: 0 },
+        { id: 'serie-2', title: 'Supernatural', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Série+2', category: 'Terror', year: '2005-2020', views: 0 }
+    ];
+
+    const MOCK_CANAIS = [
+        { id: 'canal-1', title: 'SBT', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Canal+1', category: 'Aberto', year: '', views: 0 },
+        { id: 'canal-2', title: 'Netflix', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Canal+2', category: 'Streaming', year: '', views: 0 }
+    ];
+
+    // =====================================================
     // ESTADO GLOBAL
     // =====================================================
     let currentUser = null;
@@ -562,10 +599,6 @@
     let currentMedia = null;
     let currentMediaType = 'filme';
     let currentTab = 'filmes';
-    let currentView = 'grid';
-    let selectedSerie = null;
-    let selectedTemporada = null;
-    let selectedEpisode = null;
     let ytPlayer = null;
     let currentChat = 'geral';
     let currentChatUser = null;
@@ -576,6 +609,7 @@
     let currentViewingUserId = null;
     let userProfileData = { displayName: '', bio: '', externalLink: '', avatarUrl: '' };
     const DEFAULT_AVATAR = 'https://i.ibb.co/Wps2rDCZ/C384-BA2-C-C5-BD-495-C-88-B8-00-C345-BE829-E.png';
+    let dataLoaded = false;
 
     // DOM refs
     const mainEl = document.getElementById('mainContent');
@@ -642,23 +676,16 @@
         return url.includes('.m3u8') || url.includes('.m3u') || url.includes('.mp4') || url.includes('playlist') || url.includes('m3u8?');
     }
 
-    // =====================================================
-    // DETECÇÃO E CONVERSÃO DE LINKS - IMDB E TOKYVIDEO
-    // =====================================================
     function isImdbLink(url) {
         if (!url) return false;
-        return /playimdb\.com/.test(url) || 
-               /streamimdb\.ru/.test(url) ||
-               /imdb\.com\/title\/tt\d+/.test(url);
+        return /playimdb\.com/.test(url) || /streamimdb\.ru/.test(url) || /imdb\.com\/title\/tt\d+/.test(url);
     }
 
     function getImdbEmbedUrl(url) {
         const match = url.match(/tt\d+/);
         if (!match) return null;
         const imdbId = match[0];
-        if (url.includes('/embed/') || url.includes('playimdb.com')) {
-            return url;
-        }
+        if (url.includes('/embed/') || url.includes('playimdb.com')) return url;
         return `https://playimdb.com/pt/title/${imdbId}/`;
     }
 
@@ -689,15 +716,13 @@
             }
         }
         if (!slug) return null;
-        if (/^\d+$/.test(slug)) {
-            return `https://www.tokyvideo.com/br/embed/${slug}`;
-        }
+        if (/^\d+$/.test(slug)) return `https://www.tokyvideo.com/br/embed/${slug}`;
         return `https://www.tokyvideo.com/embed/${slug}`;
     }
 
     function makeNicknamesClickable(text) {
         if (!text) return text;
-        return text.replace(/@([a-zA-Z0-9_]+)/g, (m, n) => `<span class="clickable-nick" data-nick="${n}">${m}</span>`;
+        return text.replace(/@([a-zA-Z0-9_]+)/g, (m, n) => `<span class="clickable-nick" data-nick="${n}">${m}</span>`);
     }
 
     function setupNicknameClicks() {
@@ -727,6 +752,18 @@
                 showToast(`Usuário @${nickname} não encontrado`);
             }
         });
+    }
+
+    // =====================================================
+    // MOSTRAR LOADING
+    // =====================================================
+    function showLoading() {
+        mainEl.innerHTML = `
+            <div class="loading-screen">
+                <div class="spinner"></div>
+                <span>Carregando NoiteFilmes...</span>
+            </div>
+        `;
     }
 
     // =====================================================
@@ -766,7 +803,7 @@
     };
 
     // =====================================================
-    // AUTH STATE
+    // AUTH STATE - CORRIGIDO
     // =====================================================
     auth.onAuthStateChanged(user => {
         currentUser = user;
@@ -776,8 +813,10 @@
             loadUserNickname(user.uid);
             loadFavoritos(user.uid);
             loadChatList();
-            renderProfile();
-            renderFeed();
+            if (dataLoaded) {
+                renderProfile();
+                renderFeed();
+            }
             updateLastSeen();
             db.ref(`usuarios/${user.uid}`).once('value', snap => {
                 const data = snap.val();
@@ -819,35 +858,69 @@
     }
 
     // =====================================================
-    // CARREGAR DADOS DO BANCO
+    // CARREGAR DADOS DO BANCO - COM FALLBACK MOCK
     // =====================================================
     function loadFilmes() {
-        db.ref('filmes').once('value', snap => {
-            const data = snap.val();
-            filmes = data ? Object.values(data).filter(i => i && !i.hidden) : [];
-            updateContentCounters();
-            if (currentTab === 'filmes') renderGrid();
-            if (isAdminLogged) renderAdminList();
+        return new Promise((resolve) => {
+            db.ref('filmes').once('value', snap => {
+                const data = snap.val();
+                if (data) {
+                    filmes = Object.values(data).filter(i => i && !i.hidden);
+                } else {
+                    filmes = JSON.parse(JSON.stringify(MOCK_FILMES));
+                    // Salva mock no Firebase para futuras execuções
+                    MOCK_FILMES.forEach(f => {
+                        db.ref(`filmes/${f.id}`).set(f).catch(() => {});
+                    });
+                }
+                updateContentCounters();
+                resolve();
+            }).catch(() => {
+                filmes = JSON.parse(JSON.stringify(MOCK_FILMES));
+                resolve();
+            });
         });
     }
 
     function loadSeries() {
-        db.ref('series').once('value', snap => {
-            const data = snap.val();
-            series = data ? Object.values(data).filter(i => i && !i.hidden) : [];
-            updateContentCounters();
-            if (currentTab === 'series') renderGrid();
-            if (isAdminLogged) renderAdminList();
+        return new Promise((resolve) => {
+            db.ref('series').once('value', snap => {
+                const data = snap.val();
+                if (data) {
+                    series = Object.values(data).filter(i => i && !i.hidden);
+                } else {
+                    series = JSON.parse(JSON.stringify(MOCK_SERIES));
+                    MOCK_SERIES.forEach(s => {
+                        db.ref(`series/${s.id}`).set(s).catch(() => {});
+                    });
+                }
+                updateContentCounters();
+                resolve();
+            }).catch(() => {
+                series = JSON.parse(JSON.stringify(MOCK_SERIES));
+                resolve();
+            });
         });
     }
 
     function loadCanais() {
-        db.ref('canais').once('value', snap => {
-            const data = snap.val();
-            canais = data ? Object.values(data).filter(i => i && !i.hidden) : [];
-            updateContentCounters();
-            if (currentTab === 'canais') renderGrid();
-            if (isAdminLogged) renderAdminList();
+        return new Promise((resolve) => {
+            db.ref('canais').once('value', snap => {
+                const data = snap.val();
+                if (data) {
+                    canais = Object.values(data).filter(i => i && !i.hidden);
+                } else {
+                    canais = JSON.parse(JSON.stringify(MOCK_CANAIS));
+                    MOCK_CANAIS.forEach(c => {
+                        db.ref(`canais/${c.id}`).set(c).catch(() => {});
+                    });
+                }
+                updateContentCounters();
+                resolve();
+            }).catch(() => {
+                canais = JSON.parse(JSON.stringify(MOCK_CANAIS));
+                resolve();
+            });
         });
     }
 
@@ -861,9 +934,33 @@
     }
 
     // =====================================================
+    // CARREGAR TODOS OS DADOS
+    // =====================================================
+    async function loadAllData() {
+        showLoading();
+        try {
+            await Promise.all([loadFilmes(), loadSeries(), loadCanais()]);
+            dataLoaded = true;
+            if (currentUser) {
+                renderProfile();
+                renderFeed();
+            }
+            switchTab('filmes');
+            console.log('✅ Dados carregados com sucesso!');
+            console.log(`📊 ${filmes.length} filmes, ${series.length} séries, ${canais.length} canais`);
+        } catch (error) {
+            console.error('Erro ao carregar dados:', error);
+            showToast('⚠️ Erro ao carregar dados, usando dados de exemplo');
+            switchTab('filmes');
+        }
+    }
+
+    // =====================================================
     // RENDER GRID (Filmes / Séries / Canais)
     // =====================================================
     function renderGrid() {
+        if (!dataLoaded) { showLoading(); return; }
+
         let items = [];
         let type = 'filme';
         if (currentTab === 'filmes') { items = filmes; type = 'filme'; }
@@ -966,15 +1063,16 @@
     }
 
     // =====================================================
-    // PLAYER - CORRIGIDO COM SUPORTE A IMDB E TOKYVIDEO
+    // PLAYER - COM SUPORTE A IMDB E TOKYVIDEO
     // =====================================================
     function playMedia(item, type) {
+        if (!item) { showToast('Item não encontrado'); return; }
         currentMedia = item;
         currentMediaType = type;
 
         playerOverlay.classList.add('active');
 
-        document.getElementById('playerTitle').textContent = item.title;
+        document.getElementById('playerTitle').textContent = item.title || 'Sem título';
         document.getElementById('playerYear').textContent = item.year || '';
         document.getElementById('playerGenre').textContent = item.category || '';
         document.getElementById('playerViews').innerHTML = `<i class="fas fa-eye"></i> ${item.views || 0}`;
@@ -996,17 +1094,12 @@
         const loading = document.getElementById('playerLoading');
         const wrapper = document.querySelector('.player-wrapper');
 
-        // Resetar tudo
         youtubeDiv.style.display = 'none';
         hlsVideo.style.display = 'none';
         loading.style.display = 'flex';
-
-        // Remover iframes antigos
         wrapper.querySelectorAll('iframe').forEach(iframe => iframe.remove());
 
-        // =============================================
-        // 1. YOUTUBE
-        // =============================================
+        // YOUTUBE
         if (videoId) {
             youtubeDiv.style.display = 'block';
             loading.style.display = 'none';
@@ -1026,9 +1119,7 @@
             return;
         }
 
-        // =============================================
-        // 2. IPTV / MP4 / M3U8
-        // =============================================
+        // IPTV
         if (isHls) {
             hlsVideo.style.display = 'block';
             loading.style.display = 'none';
@@ -1049,9 +1140,7 @@
             return;
         }
 
-        // =============================================
-        // 3. IMDB (playimdb.com, streamimdb.ru)
-        // =============================================
+        // IMDB
         if (isImdb) {
             const embedUrl = getImdbEmbedUrl(link);
             if (!embedUrl) {
@@ -1059,15 +1148,12 @@
                 loading.style.display = 'none';
                 return;
             }
-
             const iframe = document.createElement('iframe');
             iframe.src = embedUrl;
             iframe.allowFullscreen = true;
             iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
-
             wrapper.appendChild(iframe);
             loading.style.display = 'none';
-
             iframe.onerror = () => {
                 showToast('Erro ao carregar o IMDb. Tente abrir diretamente.');
                 loading.style.display = 'none';
@@ -1075,9 +1161,7 @@
             return;
         }
 
-        // =============================================
-        // 4. TOKYVIDEO
-        // =============================================
+        // TOKYVIDEO
         if (isToky) {
             const embedUrl = getTokyVideoEmbedUrl(link);
             if (!embedUrl) {
@@ -1085,15 +1169,12 @@
                 loading.style.display = 'none';
                 return;
             }
-
             const iframe = document.createElement('iframe');
             iframe.src = embedUrl;
             iframe.allowFullscreen = true;
             iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
-
             wrapper.appendChild(iframe);
             loading.style.display = 'none';
-
             iframe.onerror = () => {
                 showToast('Erro ao carregar o TokyVideo. Tente abrir diretamente.');
                 loading.style.display = 'none';
@@ -1101,15 +1182,12 @@
             return;
         }
 
-        // =============================================
-        // 5. NENHUM FORMATO SUPORTADO
-        // =============================================
         showToast('Link não suportado. Formatos: YouTube, .mp4, .m3u8, IMDb, TokyVideo');
         loading.style.display = 'none';
     }
 
     // =====================================================
-    // CLOSE PLAYER - LIMPA IFRAMES
+    // CLOSE PLAYER
     // =====================================================
     function closePlayer() {
         playerOverlay.classList.remove('active');
@@ -1153,16 +1231,14 @@
     }
 
     // =====================================================
-    // AVALIAÇÕES - CORRIGIDO (validação NaN)
+    // AVALIAÇÕES - CORRIGIDO
     // =====================================================
     function loadRatings(id) {
         db.ref(`avaliacoes/${id}`).once('value', snap => {
             const data = snap.val();
             let totalVotos = 0;
             let soma = 0;
-            
             if (data) {
-                // Soma apenas valores numéricos válidos
                 for (const key in data) {
                     if (key === 'totalVotos' || key === 'soma') continue;
                     const val = data[key];
@@ -1171,7 +1247,6 @@
                         totalVotos++;
                     }
                 }
-                // Usa valores salvos se existirem e forem válidos
                 if (data.totalVotos && !isNaN(data.totalVotos) && data.totalVotos > 0) {
                     totalVotos = data.totalVotos;
                 }
@@ -1179,18 +1254,12 @@
                     soma = data.soma;
                 }
             }
-            
             const media = totalVotos > 0 ? (soma / totalVotos) : 0;
             const percent = totalVotos > 0 ? Math.round((media / 5) * 100) : 0;
             document.getElementById('ratingPercent').textContent = percent + '%';
             updateStars(percent);
-            
-            // Salva dados corrigidos
             if (totalVotos > 0) {
-                db.ref(`avaliacoes/${id}`).update({
-                    totalVotos: totalVotos,
-                    soma: soma
-                }).catch(() => {});
+                db.ref(`avaliacoes/${id}`).update({ totalVotos: totalVotos, soma: soma }).catch(() => {});
             }
         });
     }
@@ -1204,32 +1273,23 @@
         });
     }
 
-    // =====================================================
-    // SALVAR AVALIAÇÃO - CORRIGIDO (sem NaN)
-    // =====================================================
     function salvarAvaliacao(mediaId, novaNota) {
         if (!currentUser) { showToast('Faça login para avaliar'); return; }
         if (novaNota < 0 || novaNota > 5 || isNaN(novaNota)) { showToast('Nota inválida'); return; }
 
         const userRatingRef = db.ref(`avaliacoes/${mediaId}/${currentUser.uid}`);
-        
         userRatingRef.once('value', (snapshot) => {
             const notaAntiga = snapshot.val();
             const oldVal = (typeof notaAntiga === 'number' && !isNaN(notaAntiga)) ? notaAntiga : 0;
-            
             if (oldVal === novaNota) {
                 showToast(`Sua avaliação já é ${novaNota}/5 ⭐`);
                 return;
             }
-
             userRatingRef.set(novaNota);
-
             db.ref(`avaliacoes/${mediaId}`).transaction((dados) => {
                 let totalVotos = 0;
                 let soma = 0;
-                
                 if (dados) {
-                    // Soma apenas valores numéricos válidos
                     for (const key in dados) {
                         if (key === 'totalVotos' || key === 'soma') continue;
                         const val = dados[key];
@@ -1239,7 +1299,6 @@
                         }
                     }
                 }
-
                 if (oldVal === 0 && novaNota > 0) {
                     totalVotos++;
                     soma += novaNota;
@@ -1249,19 +1308,12 @@
                     totalVotos--;
                     soma = soma - oldVal;
                 }
-
-                // Garante valores válidos
                 totalVotos = Math.max(0, totalVotos);
                 soma = Math.max(0, soma);
-
                 return { totalVotos, soma };
             }).then(() => {
                 showToast(`Avaliação ${novaNota}/5 salva! 🌟`);
                 loadRatings(mediaId);
-                const container = document.getElementById('ratingStars');
-                if (container) {
-                    updateStars(Math.round((novaNota / 5) * 100));
-                }
             }).catch((erro) => {
                 console.error('Erro:', erro);
                 showToast('Erro ao salvar avaliação');
@@ -1270,7 +1322,7 @@
     }
 
     // =====================================================
-    // SETUP PLAYER BUTTONS - CORRIGIDO
+    // SETUP PLAYER BUTTONS
     // =====================================================
     function setupPlayerButtons(item) {
         const likeBtn = document.getElementById('likeBtn');
@@ -1383,7 +1435,7 @@
     });
 
     // =====================================================
-    // SEARCH - COM BOTÃO (X) PARA LIMPAR
+    // SEARCH - COM BOTÃO (X)
     // =====================================================
     function renderSearch() {
         let html = `
@@ -1406,7 +1458,6 @@
         const searchInput = document.getElementById('searchInput');
         const clearBtn = document.getElementById('clearSearchBtn');
 
-        // Mostrar/ocultar botão (X)
         searchInput.addEventListener('input', () => {
             clearBtn.style.display = searchInput.value.length > 0 ? 'flex' : 'none';
             performSearch();
@@ -1483,9 +1534,10 @@
     }
 
     // =====================================================
-    // FEED (Posts estilo Instagram)
+    // FEED
     // =====================================================
     function renderFeed() {
+        if (!dataLoaded || !currentUser) return;
         let html = `
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
                 <h2 class="section-title"><i class="fas fa-rss" style="color:#e50914;"></i> Feed</h2>
@@ -1507,6 +1559,7 @@
 
     function loadFeedPosts() {
         const container = document.getElementById('feedPosts');
+        if (!container) return;
         db.ref('feed_posts').orderByChild('createdAt').once('value', snap => {
             const data = snap.val();
             if (!data) {
@@ -1627,6 +1680,7 @@
     // PERFIL
     // =====================================================
     function renderProfile(showOtherUserId = null) {
+        if (!dataLoaded || !currentUser) return;
         let targetUserId = currentUser ? currentUser.uid : null;
         let isOwn = true;
 
@@ -2402,13 +2456,14 @@
             item.classList.toggle('active', item.getAttribute('data-bottom') === tab || 
                 (tab === 'inicio' && item.getAttribute('data-bottom') === 'inicio'));
         });
+        if (!dataLoaded) { showLoading(); return; }
         switch (tab) {
             case 'filmes': renderGrid(); break;
             case 'series': renderGrid(); break;
             case 'canais': renderGrid(); break;
             case 'buscar': renderSearch(); break;
-            case 'feed': renderFeed(); break;
-            case 'perfil': renderProfile(); break;
+            case 'feed': if (currentUser) renderFeed(); else showToast('Faça login para ver o feed'); break;
+            case 'perfil': if (currentUser) renderProfile(); else showToast('Faça login para ver o perfil'); break;
             case 'admin': renderAdmin(); break;
             default: renderGrid();
         }
@@ -2439,16 +2494,10 @@
     // =====================================================
     // INICIALIZAÇÃO
     // =====================================================
-    function init() {
-        loadFilmes();
-        loadSeries();
-        loadCanais();
-        switchTab('filmes');
-
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && currentUser) updateLastSeen();
-        });
-
+    async function init() {
+        await loadAllData();
+        
+        // Verifica parâmetros URL
         const params = new URLSearchParams(window.location.search);
         const mediaId = params.get('mediaId');
         const type = params.get('type');
@@ -2476,10 +2525,11 @@
         init();
     }
 
+    // =====================================================
+    // EXPORTAR FUNÇÕES
+    // =====================================================
     window.reloadData = function() {
-        loadFilmes();
-        loadSeries();
-        loadCanais();
+        loadAllData();
         showToast('📊 Dados recarregados!');
     };
 
@@ -2499,7 +2549,6 @@
     window.deleteAdminItem = deleteAdminItem;
     window.renderAdminList = renderAdminList;
     window.showFranchise = showFranchise;
-    window.reloadData = window.reloadData;
 
     console.log('✅ Todos os dados do banco integrados!');
     console.log('💡 Use @nome para mencionar usuários nos comentários e posts.');
