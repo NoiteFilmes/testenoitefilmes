@@ -212,96 +212,6 @@
             max-height:95vh; overflow:hidden; border:1px solid rgba(255,0,0,0.2);
             padding:16px; position:relative;
         }
-
-        /* ===== CORREÇÃO 1: REDUZIR PLAYER EM 10% EM LANDSCAPE ===== */
-        @media (orientation: landscape) and (max-width: 1024px) {
-            .player-box {
-                max-height: 90vh !important;
-            }
-            .player-wrapper {
-                min-height: 180px !important;
-                aspect-ratio: 16/9 !important;
-                flex: 0 0 auto !important;
-            }
-            .player-layout {
-                flex-direction: row !important;
-                min-height: auto !important;
-                height: auto !important;
-                gap: 10px !important;
-            }
-            .player-left {
-                flex: 0 0 55% !important;
-                min-height: 0 !important;
-            }
-            .player-right {
-                flex: 1 !important;
-                border-left: 1px solid rgba(255,255,255,0.08) !important;
-                padding-left: 10px !important;
-                border-top: none !important;
-                padding-top: 0 !important;
-                min-height: 0 !important;
-                max-height: none !important;
-                overflow: hidden;
-            }
-            .player-right #commentsList {
-                max-height: 120px !important;
-                overflow-y: auto !important;
-            }
-            .player-info h3 {
-                font-size: 0.85rem !important;
-            }
-            .player-info .sinopse {
-                font-size: 0.65rem !important;
-            }
-        }
-
-        /* ===== CORREÇÃO 2: LEGENDA EXPANSÍVEL COM ROLAGEM ===== */
-        .player-info .sinopse-wrapper {
-            position: relative;
-            max-height: 200px;
-            overflow-y: auto;
-            padding-right: 4px;
-        }
-        .player-info .sinopse-wrapper::-webkit-scrollbar {
-            width: 3px;
-        }
-        .player-info .sinopse-wrapper::-webkit-scrollbar-thumb {
-            background: #e50914;
-            border-radius: 10px;
-        }
-        .player-info .sinopse-wrapper::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-        }
-        .player-info .sinopse {
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.6);
-            line-height: 1.5;
-            cursor: pointer;
-            padding: 4px 0;
-        }
-        .player-info .sinopse-toggle {
-            background: none;
-            border: none;
-            color: #e50914;
-            font-size: 0.65rem;
-            cursor: pointer;
-            padding: 4px 0;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.2s;
-            margin-top: 2px;
-        }
-        .player-info .sinopse-toggle:hover {
-            color: #ff4757;
-            transform: scale(1.02);
-        }
-        .player-info .sinopse-toggle i {
-            font-size: 0.55rem;
-        }
-
-        /* ===== OUTROS ESTILOS DO PLAYER ===== */
         .player-box .close-btn {
             position:absolute; top:12px; right:16px; background:rgba(255,0,0,0.2);
             border:none; border-radius:50%; width:36px; height:36px; color:#fff;
@@ -338,6 +248,42 @@
             min-height:0;
         }
         .player-info h3 { font-size:1.1rem; color:#fff; margin:0; }
+        
+        /* ===== SINOPSE EXPANDÍVEL ===== */
+        .player-info .sinopse-wrapper {
+            position:relative;
+        }
+        .player-info .sinopse {
+            font-size:0.75rem; color:rgba(255,255,255,0.6); line-height:1.5;
+            max-height: 3em; /* 2 linhas */
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            cursor: pointer;
+        }
+        .player-info .sinopse.expanded {
+            max-height: 500px; /* suficiente para qualquer texto */
+        }
+        .player-info .sinopse-toggle {
+            background: none;
+            border: none;
+            color: #e50914;
+            font-size: 0.65rem;
+            cursor: pointer;
+            padding: 2px 0;
+            margin-top: 2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .player-info .sinopse-toggle:hover {
+            color: #ff4757;
+            transform: scale(1.02);
+        }
+        .player-info .sinopse-toggle i {
+            font-size: 0.55rem;
+        }
+
         .player-info .badges { display:flex; flex-wrap:wrap; gap:6px; margin-top:2px; }
         .player-info .badges .badge {
             background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);
@@ -405,7 +351,47 @@
         .comment-item .content .text { font-size:0.75rem; color:rgba(255,255,255,0.8); }
         .comment-item .content .time { font-size:0.55rem; color:rgba(255,255,255,0.3); }
 
-        /* ===== RESPONSIVE PLAYER LAYOUT ===== */
+        /* ===== PLAYER LAYOUT - RESPONSIVE ===== */
+        @media (orientation: landscape) and (min-width: 768px) {
+            .player-layout {
+                flex-direction:row !important;
+                min-height:500px !important;
+                height:calc(100% - 20px) !important;
+            }
+            .player-left { flex:0 0 60% !important; min-height:0 !important; }
+            .player-right { flex:1 !important; border-left:1px solid rgba(255,255,255,0.08) !important; padding-left:16px !important; border-top:none !important; padding-top:0 !important; min-height:0 !important; max-height:none !important; }
+            .player-wrapper { flex:0 0 auto !important; min-height:300px !important; aspect-ratio:16/9 !important; }
+            .player-right #commentsList { max-height:none !important; min-height:0 !important; }
+        }
+
+        @media (orientation: landscape) and (max-width: 767px) {
+            .player-box { max-width:100% !important; max-height:98vh !important; padding:10px !important; border-radius:20px !important; }
+            .player-layout { flex-direction:row !important; min-height:auto !important; height:auto !important; gap:10px !important; }
+            .player-left { flex:0 0 55% !important; min-height:0 !important; }
+            .player-right { flex:1 !important; border-left:1px solid rgba(255,255,255,0.08) !important; padding-left:10px !important; border-top:none !important; padding-top:0 !important; min-height:0 !important; max-height:none !important; }
+            .player-wrapper { min-height:180px !important; aspect-ratio:16/9 !important; flex:0 0 auto !important; }
+            .player-info h3 { font-size:0.85rem !important; }
+            .player-info .sinopse { font-size:0.65rem !important; }
+            .player-info .badges .badge { font-size:0.55rem !important; padding:1px 8px !important; }
+            .player-info .actions-row button { font-size:0.55rem !important; padding:2px 10px !important; }
+            .player-info .actions-row .rating-stars i { font-size:0.7rem !important; }
+            .player-right .comments-section h4 { font-size:0.7rem !important; margin-bottom:4px !important; padding-bottom:4px !important; }
+            .player-right #commentsList { font-size:0.65rem !important; }
+            .player-right .comment-input input { font-size:0.65rem !important; padding:4px 10px !important; }
+            .player-right .comment-input button { font-size:0.6rem !important; padding:4px 12px !important; }
+            .comment-item .avatar { width:22px !important; height:22px !important; }
+            .comment-item .content .user { font-size:0.6rem !important; }
+            .comment-item .content .text { font-size:0.65rem !important; }
+        }
+
+        @media (orientation: landscape) and (min-width: 768px) and (max-width: 1024px) {
+            .player-left { flex:0 0 55% !important; }
+            .player-right { flex:1 !important; }
+            .player-wrapper { min-height:250px !important; }
+            .player-info h3 { font-size:0.95rem !important; }
+        }
+
+        /* ===== CORREÇÃO: PLAYER EM VERTICAL (LANDSCAPE) - REDUZIDO EM 10% ===== */
         @media (orientation: portrait), (max-width: 767px) and (orientation: portrait) {
             .player-layout {
                 flex-direction:column !important;
@@ -413,8 +399,23 @@
                 height:auto !important;
             }
             .player-left { flex:1 !important; min-height:0 !important; }
-            .player-wrapper { aspect-ratio:16/9 !important; min-height:200px !important; flex:0 0 auto !important; }
-            .player-right { border-left:none !important; padding-left:0 !important; border-top:1px solid rgba(255,255,255,0.08) !important; padding-top:10px !important; min-height:150px !important; max-height:250px !important; flex:1 !important; }
+            /* REDUZINDO O PLAYER EM 10% PARA DISPOSITIVOS MÓVEIS EM VERTICAL */
+            .player-wrapper { 
+                aspect-ratio: 16/9 !important; 
+                min-height: 180px !important; 
+                flex: 0 0 auto !important;
+                height: 90% !important; /* 10% menor */
+                max-height: 90% !important; /* 10% menor */
+            }
+            .player-right { 
+                border-left:none !important; 
+                padding-left:0 !important; 
+                border-top:1px solid rgba(255,255,255,0.08) !important; 
+                padding-top:10px !important; 
+                min-height:150px !important; 
+                max-height:250px !important; 
+                flex:1 !important; 
+            }
             .player-right #commentsList { max-height:100px !important; min-height:50px !important; }
             .player-box { max-height:98vh !important; padding:12px !important; max-width:100% !important; }
         }
@@ -662,8 +663,7 @@
                 </div>
                 <div class="player-info" id="playerInfo">
                     <h3 id="playerTitle">Título</h3>
-                    <!-- SINOPSE EXPANSÍVEL COM ROLAGEM -->
-                    <div class="sinopse-wrapper" id="sinopseWrapper">
+                    <div class="sinopse-wrapper">
                         <div class="sinopse" id="playerSinopse">Sinopse do filme...</div>
                         <button class="sinopse-toggle" id="sinopseToggle" style="display:none;">
                             <i class="fas fa-chevron-down"></i> <span>Ver mais</span>
@@ -1009,36 +1009,29 @@
     }
 
     // =====================================================
-    // FUNÇÃO: CONFIGURAR SINOPSE EXPANSÍVEL COM ROLAGEM
+    // FUNÇÃO: CONFIGURAR SINOPSE EXPANDÍVEL
     // =====================================================
     function setupSinopseToggle() {
         const sinopseEl = document.getElementById('playerSinopse');
         const toggleBtn = document.getElementById('sinopseToggle');
-        const wrapper = document.getElementById('sinopseWrapper');
         
-        if (!sinopseEl || !toggleBtn || !wrapper) return;
+        if (!sinopseEl || !toggleBtn) return;
 
-        // Obtém o texto completo
-        const fullText = sinopseEl.textContent || '';
-        const maxHeight = 3 * parseFloat(getComputedStyle(sinopseEl).fontSize) * 1.5; // 3 linhas
+        // Verifica se o texto precisa de expansão
+        const text = sinopseEl.textContent || '';
+        const lineHeight = 1.5; // em em
+        const fontSize = parseFloat(getComputedStyle(sinopseEl).fontSize) || 12;
+        const maxHeight = 3 * lineHeight * fontSize; // 3 linhas
 
         // Reseta o estado
         sinopseEl.classList.remove('expanded');
-        sinopseEl.style.maxHeight = '4.5em'; // 3 linhas
+        sinopseEl.style.maxHeight = '3em';
         toggleBtn.style.display = 'none';
         toggleBtn.querySelector('span').textContent = 'Ver mais';
         toggleBtn.querySelector('i').className = 'fas fa-chevron-down';
 
-        // Limpa altura máxima do wrapper
-        wrapper.style.maxHeight = '200px';
-
-        // Verifica se o texto ultrapassa 3 linhas
-        // Força um reflow para verificar
-        sinopseEl.style.maxHeight = 'none';
-        const fullHeight = sinopseEl.scrollHeight;
-        sinopseEl.style.maxHeight = '4.5em';
-
-        if (fullHeight > maxHeight + 10) {
+        // Se o texto for maior que 3 linhas, mostra o botão
+        if (sinopseEl.scrollHeight > maxHeight + 10) {
             toggleBtn.style.display = 'inline-flex';
         }
 
@@ -1046,28 +1039,20 @@
             e.stopPropagation();
             const isExpanded = sinopseEl.classList.contains('expanded');
             if (isExpanded) {
-                // Contrai
                 sinopseEl.classList.remove('expanded');
-                sinopseEl.style.maxHeight = '4.5em';
-                wrapper.style.maxHeight = '200px';
+                sinopseEl.style.maxHeight = '3em';
                 this.querySelector('span').textContent = 'Ver mais';
                 this.querySelector('i').className = 'fas fa-chevron-down';
-                // Volta ao topo
-                wrapper.scrollTop = 0;
             } else {
-                // Expande
                 sinopseEl.classList.add('expanded');
                 sinopseEl.style.maxHeight = sinopseEl.scrollHeight + 'px';
-                wrapper.style.maxHeight = 'none';
                 this.querySelector('span').textContent = 'Ver menos';
                 this.querySelector('i').className = 'fas fa-chevron-up';
             }
         };
 
         // Também permite clicar na sinopse para expandir/contrair
-        sinopseEl.onclick = function(e) {
-            // Se clicou em um link ou elemento interativo dentro, não faz nada
-            if (e.target.closest('a') || e.target.closest('button')) return;
+        sinopseEl.onclick = function() {
             toggleBtn.click();
         };
     }
@@ -1415,7 +1400,7 @@
     }
 
     // =====================================================
-    // PLAYER - COM SINOPSE EXPANSÍVEL E BADGES
+    // PLAYER - ATUALIZADO COM BADGES DIVIDIDOS E SINOPSE EXPANDÍVEL
     // =====================================================
     function playMedia(item, type) {
         if (!item) { showToast('Item não encontrado'); return; }
@@ -1431,12 +1416,8 @@
         const sinopseEl = document.getElementById('playerSinopse');
         sinopseEl.textContent = item.description || item.sinopse || 'Sinopse não disponível.';
         sinopseEl.classList.remove('expanded');
-        sinopseEl.style.maxHeight = '4.5em';
+        sinopseEl.style.maxHeight = '3em';
         
-        // Reset do wrapper
-        const wrapper = document.getElementById('sinopseWrapper');
-        wrapper.style.maxHeight = '200px';
-
         // ===== BADGES DE GÊNERO DIVIDIDOS =====
         const badgesContainer = document.getElementById('playerBadges');
         badgesContainer.innerHTML = '';
@@ -1496,7 +1477,7 @@
             });
         }
 
-        // ===== CONFIGURAR SINOPSE EXPANSÍVEL =====
+        // ===== CONFIGURAR SINOPSE EXPANDÍVEL =====
         setTimeout(setupSinopseToggle, 100);
 
         incrementView(item.id);
@@ -1515,12 +1496,12 @@
         const youtubeDiv = document.getElementById('youtubePlayer');
         const hlsVideo = document.getElementById('hlsPlayer');
         const loading = document.getElementById('playerLoading');
-        const playerWrapper = document.querySelector('.player-wrapper');
+        const wrapper = document.querySelector('.player-wrapper');
 
         youtubeDiv.style.display = 'none';
         hlsVideo.style.display = 'none';
         loading.style.display = 'flex';
-        playerWrapper.querySelectorAll('iframe').forEach(iframe => iframe.remove());
+        wrapper.querySelectorAll('iframe').forEach(iframe => iframe.remove());
 
         // YOUTUBE
         if (videoId) {
@@ -1575,7 +1556,7 @@
             iframe.src = embedUrl;
             iframe.allowFullscreen = true;
             iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
-            playerWrapper.appendChild(iframe);
+            wrapper.appendChild(iframe);
             loading.style.display = 'none';
             iframe.onerror = () => {
                 showToast('Erro ao carregar o IMDb. Tente abrir diretamente.');
@@ -1596,7 +1577,7 @@
             iframe.src = embedUrl;
             iframe.allowFullscreen = true;
             iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen');
-            playerWrapper.appendChild(iframe);
+            wrapper.appendChild(iframe);
             loading.style.display = 'none';
             iframe.onerror = () => {
                 showToast('Erro ao carregar o TokyVideo. Tente abrir diretamente.');
@@ -2963,8 +2944,7 @@
         console.log('🎬 Suporte a: YouTube, .mp4, .m3u8, IMDb, TokyVideo');
         console.log('🔄 Detecção de orientação ativada - Layout adaptável!');
         console.log('🏷️ Gêneros divididos por vírgula em badges separados!');
-        console.log('📝 Sinopse expandível com botão "Ver mais" e rolagem!');
-        console.log('📱 Player reduzido em 10% em modo paisagem/vertical!');
+        console.log('📝 Sinopse expandível com botão "Ver mais"!');
     }
 
     if (document.readyState === 'loading') {
