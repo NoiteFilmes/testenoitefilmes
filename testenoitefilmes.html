@@ -422,6 +422,61 @@
             .player-box { max-height:98vh !important; padding:12px !important; max-width:100% !important; }
         }
 
+        /* ===== LAYOUT HORIZONTAL PARA TV, SMART TV, XBOX, PLAYSTATION ===== */
+        @media (orientation: landscape) and (min-width: 1280px) {
+            .player-box {
+                max-width:98vw !important;
+                max-height:96vh !important;
+                padding:20px !important;
+            }
+            .player-layout {
+                min-height:600px !important;
+                height:calc(100% - 30px) !important;
+                gap:20px !important;
+            }
+            .player-left { flex:0 0 58% !important; }
+            .player-right { flex:1 !important; padding-left:20px !important; }
+            .player-wrapper { min-height:400px !important; }
+            .player-info h3 { font-size:1.3rem !important; }
+            .player-info .sinopse { font-size:0.85rem !important; -webkit-line-clamp:3 !important; }
+            .player-info .badges .badge { font-size:0.7rem !important; padding:4px 16px !important; }
+            .player-info .actions-row button { font-size:0.75rem !important; padding:6px 18px !important; }
+            .player-info .actions-row .rating-stars i { font-size:1.1rem !important; }
+            .player-right .comments-section h4 { font-size:0.95rem !important; margin-bottom:12px !important; padding-bottom:12px !important; }
+            .player-right #commentsList { font-size:0.8rem !important; flex:0 0 80%; height:80%; }
+            .player-right .comment-input-bottom input { font-size:0.8rem !important; padding:8px 16px !important; height:42px; }
+            .player-right .comment-input-bottom button { font-size:0.8rem !important; padding:8px 20px !important; height:42px; }
+            .comment-item .avatar { width:32px !important; height:32px !important; }
+            .comment-item .content .user { font-size:0.75rem !important; }
+            .comment-item .content .text { font-size:0.8rem !important; }
+        }
+
+        /* ===== LAYOUT HORIZONTAL PARA DISPOSITIVOS MÓVEIS EM LANDSCAPE ===== */
+        @media (orientation: landscape) and (max-width: 767px) and (min-height: 300px) {
+            .player-box { padding:8px !important; }
+            .player-layout { gap:8px !important; min-height:auto !important; }
+            .player-left { flex:0 0 50% !important; }
+            .player-right { flex:1 !important; padding-left:8px !important; }
+            .player-wrapper { min-height:140px !important; }
+            .player-right .comments-section h4 { font-size:0.6rem !important; margin-bottom:2px !important; padding-bottom:4px !important; }
+            .player-right #commentsList { font-size:0.55rem !important; flex:0 0 80%; height:80%; min-height:60px; }
+            .player-right .comment-input-bottom input { font-size:0.55rem !important; padding:3px 8px !important; height:26px; }
+            .player-right .comment-input-bottom button { font-size:0.5rem !important; padding:3px 10px !important; height:26px; }
+            .comment-item .avatar { width:18px !important; height:18px !important; }
+            .comment-item .content .user { font-size:0.5rem !important; }
+            .comment-item .content .text { font-size:0.55rem !important; }
+            .comment-item .content .time { font-size:0.45rem !important; }
+            .player-info h3 { font-size:0.7rem !important; }
+            .player-info .sinopse { font-size:0.55rem !important; -webkit-line-clamp:2 !important; }
+            .player-info .badges .badge { font-size:0.45rem !important; padding:1px 6px !important; }
+            .player-info .actions-row button { font-size:0.45rem !important; padding:2px 8px !important; }
+            .player-info .actions-row .rating-stars i { font-size:0.6rem !important; }
+            .player-info .actions-row .rating-wrapper span { font-size:0.5rem !important; }
+            .player-right .comments-section h4 { font-size:0.55rem !important; }
+            .player-right .comment-input-bottom input { font-size:0.5rem !important; }
+            .player-right .comment-input-bottom button { font-size:0.5rem !important; }
+        }
+
         /* ===== SEARCH ===== */
         .search-box { 
             display:flex; gap:10px; align-items:center; flex-wrap:wrap; 
@@ -2948,6 +3003,7 @@
         console.log('🏷️ Gêneros divididos por vírgula em badges separados!');
         console.log('📝 Sinopse expandível com botão "Ver mais"!');
         console.log('💬 Comentários: 80% lista / 20% input no bottom!');
+        console.log('📺 Layout horizontal otimizado para TV, Smart TV, Xbox, PlayStation!');
     }
 
     if (document.readyState === 'loading') {
@@ -2988,6 +3044,7 @@
     console.log('🎥 Formatos suportados: YouTube, .mp4, .m3u8, IMDb, TokyVideo');
     console.log('🔄 Gire o dispositivo para paisagem e veja o layout adaptado!');
     console.log('📝 Comentários: 80% lista de comentários, 20% input de envio!');
+    console.log('📺 Layout otimizado para TV, Smart TV, Xbox, PlayStation e dispositivos horizontais!');
 </script>
 </body>
 </html>
