@@ -248,10 +248,42 @@
             min-height:0;
         }
         .player-info h3 { font-size:1.1rem; color:#fff; margin:0; }
-        .player-info .sinopse {
-            font-size:0.75rem; color:rgba(255,255,255,0.6); line-height:1.4;
-            display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+        
+        /* ===== SINOPSE EXPANDÍVEL ===== */
+        .player-info .sinopse-wrapper {
+            position:relative;
         }
+        .player-info .sinopse {
+            font-size:0.75rem; color:rgba(255,255,255,0.6); line-height:1.5;
+            max-height: 3em; /* 2 linhas */
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            cursor: pointer;
+        }
+        .player-info .sinopse.expanded {
+            max-height: 500px; /* suficiente para qualquer texto */
+        }
+        .player-info .sinopse-toggle {
+            background: none;
+            border: none;
+            color: #e50914;
+            font-size: 0.65rem;
+            cursor: pointer;
+            padding: 2px 0;
+            margin-top: 2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .player-info .sinopse-toggle:hover {
+            color: #ff4757;
+            transform: scale(1.02);
+        }
+        .player-info .sinopse-toggle i {
+            font-size: 0.55rem;
+        }
+
         .player-info .badges { display:flex; flex-wrap:wrap; gap:6px; margin-top:2px; }
         .player-info .badges .badge {
             background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);
@@ -319,75 +351,27 @@
         .comment-item .content .text { font-size:0.75rem; color:rgba(255,255,255,0.8); }
         .comment-item .content .time { font-size:0.55rem; color:rgba(255,255,255,0.3); }
 
-        /* ===== PLAYER LAYOUT - DESKTOP E HORIZONTAL (TABLET/CELULAR) ===== */
-        /* Regra base para desktop e qualquer dispositivo em landscape */
+        /* ===== PLAYER LAYOUT - RESPONSIVE ===== */
         @media (orientation: landscape) and (min-width: 768px) {
             .player-layout {
                 flex-direction:row !important;
                 min-height:500px !important;
                 height:calc(100% - 20px) !important;
             }
-            .player-left {
-                flex:0 0 60% !important;
-                min-height:0 !important;
-            }
-            .player-right {
-                flex:1 !important;
-                border-left:1px solid rgba(255,255,255,0.08) !important;
-                padding-left:16px !important;
-                border-top:none !important;
-                padding-top:0 !important;
-                min-height:0 !important;
-                max-height:none !important;
-            }
-            .player-wrapper {
-                flex:0 0 auto !important;
-                min-height:300px !important;
-                aspect-ratio:16/9 !important;
-            }
-            .player-right #commentsList {
-                max-height:none !important;
-                min-height:0 !important;
-            }
-            .player-info .sinopse {
-                -webkit-line-clamp:2 !important;
-            }
+            .player-left { flex:0 0 60% !important; min-height:0 !important; }
+            .player-right { flex:1 !important; border-left:1px solid rgba(255,255,255,0.08) !important; padding-left:16px !important; border-top:none !important; padding-top:0 !important; min-height:0 !important; max-height:none !important; }
+            .player-wrapper { flex:0 0 auto !important; min-height:300px !important; aspect-ratio:16/9 !important; }
+            .player-right #commentsList { max-height:none !important; min-height:0 !important; }
         }
 
-        /* Regra para dispositivos móveis em landscape (celulares e tablets pequenos) */
         @media (orientation: landscape) and (max-width: 767px) {
-            .player-box {
-                max-width:100% !important;
-                max-height:98vh !important;
-                padding:10px !important;
-                border-radius:20px !important;
-            }
-            .player-layout {
-                flex-direction:row !important;
-                min-height:auto !important;
-                height:auto !important;
-                gap:10px !important;
-            }
-            .player-left {
-                flex:0 0 55% !important;
-                min-height:0 !important;
-            }
-            .player-right {
-                flex:1 !important;
-                border-left:1px solid rgba(255,255,255,0.08) !important;
-                padding-left:10px !important;
-                border-top:none !important;
-                padding-top:0 !important;
-                min-height:0 !important;
-                max-height:none !important;
-            }
-            .player-wrapper {
-                min-height:180px !important;
-                aspect-ratio:16/9 !important;
-                flex:0 0 auto !important;
-            }
+            .player-box { max-width:100% !important; max-height:98vh !important; padding:10px !important; border-radius:20px !important; }
+            .player-layout { flex-direction:row !important; min-height:auto !important; height:auto !important; gap:10px !important; }
+            .player-left { flex:0 0 55% !important; min-height:0 !important; }
+            .player-right { flex:1 !important; border-left:1px solid rgba(255,255,255,0.08) !important; padding-left:10px !important; border-top:none !important; padding-top:0 !important; min-height:0 !important; max-height:none !important; }
+            .player-wrapper { min-height:180px !important; aspect-ratio:16/9 !important; flex:0 0 auto !important; }
             .player-info h3 { font-size:0.85rem !important; }
-            .player-info .sinopse { font-size:0.65rem !important; -webkit-line-clamp:2 !important; }
+            .player-info .sinopse { font-size:0.65rem !important; }
             .player-info .badges .badge { font-size:0.55rem !important; padding:1px 8px !important; }
             .player-info .actions-row button { font-size:0.55rem !important; padding:2px 10px !important; }
             .player-info .actions-row .rating-stars i { font-size:0.7rem !important; }
@@ -400,7 +384,6 @@
             .comment-item .content .text { font-size:0.65rem !important; }
         }
 
-        /* Regra para tablets em landscape */
         @media (orientation: landscape) and (min-width: 768px) and (max-width: 1024px) {
             .player-left { flex:0 0 55% !important; }
             .player-right { flex:1 !important; }
@@ -408,43 +391,17 @@
             .player-info h3 { font-size:0.95rem !important; }
         }
 
-        /* Regra para celulares em portrait (vertical) */
         @media (orientation: portrait), (max-width: 767px) and (orientation: portrait) {
             .player-layout {
                 flex-direction:column !important;
                 min-height:auto !important;
                 height:auto !important;
             }
-            .player-left {
-                flex:1 !important;
-                min-height:0 !important;
-            }
-            .player-wrapper {
-                aspect-ratio:16/9 !important;
-                min-height:200px !important;
-                flex:0 0 auto !important;
-            }
-            .player-right {
-                border-left:none !important;
-                padding-left:0 !important;
-                border-top:1px solid rgba(255,255,255,0.08) !important;
-                padding-top:10px !important;
-                min-height:150px !important;
-                max-height:250px !important;
-                flex:1 !important;
-            }
-            .player-right #commentsList {
-                max-height:100px !important;
-                min-height:50px !important;
-            }
-            .player-info .sinopse {
-                -webkit-line-clamp:3 !important;
-            }
-            .player-box {
-                max-height:98vh !important;
-                padding:12px !important;
-                max-width:100% !important;
-            }
+            .player-left { flex:1 !important; min-height:0 !important; }
+            .player-wrapper { aspect-ratio:16/9 !important; min-height:200px !important; flex:0 0 auto !important; }
+            .player-right { border-left:none !important; padding-left:0 !important; border-top:1px solid rgba(255,255,255,0.08) !important; padding-top:10px !important; min-height:150px !important; max-height:250px !important; flex:1 !important; }
+            .player-right #commentsList { max-height:100px !important; min-height:50px !important; }
+            .player-box { max-height:98vh !important; padding:12px !important; max-width:100% !important; }
         }
 
         /* ===== SEARCH ===== */
@@ -638,22 +595,6 @@
             .player-wrapper { min-height:150px; }
             .player-right { max-height:150px; min-height:100px; }
         }
-
-        /* ===== DETECÇÃO DE ORIENTAÇÃO - SCRIPT ADICIONAL ===== */
-        .orientation-badge {
-            display:none;
-            position:fixed; bottom:70px; left:50%; transform:translateX(-50%);
-            background:rgba(0,0,0,0.8); backdrop-filter:blur(10px);
-            padding:4px 16px; border-radius:30px; font-size:0.6rem;
-            color:rgba(255,255,255,0.5); z-index:5000;
-            border:1px solid rgba(255,255,255,0.05);
-            pointer-events:none;
-            transition:all 0.5s ease;
-        }
-        .orientation-badge.show {
-            display:block;
-            animation:fadeToast 2s ease forwards;
-        }
     </style>
 </head>
 <body>
@@ -693,9 +634,6 @@
     </nav>
 </div>
 
-<!-- ORIENTATION BADGE -->
-<div class="orientation-badge" id="orientationBadge">🔄 Modo Paisagem ativado</div>
-
 <!-- PLAYER OVERLAY -->
 <div class="player-overlay" id="playerOverlay">
     <div class="player-box">
@@ -709,12 +647,13 @@
                 </div>
                 <div class="player-info" id="playerInfo">
                     <h3 id="playerTitle">Título</h3>
-                    <div class="sinopse" id="playerSinopse">Sinopse do filme...</div>
-                    <div class="badges" id="playerBadges">
-                        <span class="badge" id="playerYearBadge"><i class="fas fa-calendar"></i> <span id="playerYear">2024</span></span>
-                        <span class="badge" id="playerGenreBadge"><i class="fas fa-tag"></i> <span id="playerGenre">Gênero</span></span>
-                        <span class="badge views" id="playerViewsBadge"><i class="fas fa-eye"></i> <span id="playerViews">0</span> visualizações</span>
+                    <div class="sinopse-wrapper">
+                        <div class="sinopse" id="playerSinopse">Sinopse do filme...</div>
+                        <button class="sinopse-toggle" id="sinopseToggle" style="display:none;">
+                            <i class="fas fa-chevron-down"></i> <span>Ver mais</span>
+                        </button>
                     </div>
+                    <div class="badges" id="playerBadges"></div>
                     <div class="actions-row">
                         <button id="likeBtn"><i class="far fa-heart"></i> <span id="likeCount">0</span></button>
                         <button id="shareBtn"><i class="fas fa-share-alt"></i> Compartilhar</button>
@@ -770,43 +709,11 @@
 
 <script>
     // =====================================================
-    // DETECÇÃO DE ORIENTAÇÃO - GIROSCOPIO
+    // DETECÇÃO DE ORIENTAÇÃO
     // =====================================================
     (function() {
-        const badge = document.getElementById('orientationBadge');
-        let badgeTimeout = null;
-        let lastOrientation = '';
-
-        function showOrientationBadge(text) {
-            if (badge) {
-                badge.textContent = text;
-                badge.classList.add('show');
-                clearTimeout(badgeTimeout);
-                badgeTimeout = setTimeout(() => {
-                    badge.classList.remove('show');
-                }, 3000);
-            }
-        }
-
         function handleOrientationChange() {
             const isLandscape = window.innerWidth > window.innerHeight;
-            const isMobile = window.innerWidth < 1024;
-            const currentOrientation = isLandscape ? 'landscape' : 'portrait';
-            
-            if (currentOrientation !== lastOrientation) {
-                lastOrientation = currentOrientation;
-                
-                // Mostra badge apenas em dispositivos móveis
-                if (isMobile) {
-                    if (isLandscape) {
-                        showOrientationBadge('🔄 Modo Paisagem - Player em tela cheia');
-                    } else {
-                        showOrientationBadge('📱 Modo Retrato');
-                    }
-                }
-            }
-
-            // Aplica classe ao body para facilitar estilos CSS
             document.body.classList.remove('orientation-landscape', 'orientation-portrait');
             if (isLandscape) {
                 document.body.classList.add('orientation-landscape');
@@ -815,64 +722,18 @@
             }
         }
 
-        // Usa matchMedia para detecção mais precisa
         const mediaQuery = window.matchMedia('(orientation: landscape)');
         mediaQuery.addEventListener('change', handleOrientationChange);
-
-        // Também detecta redimensionamento (para tablets que mudam de orientação)
         window.addEventListener('resize', handleOrientationChange);
 
-        // Detecção via Screen Orientation API (mais precisa para dispositivos móveis)
         if (window.screen && window.screen.orientation) {
             window.screen.orientation.addEventListener('change', function() {
-                // Pequeno delay para garantir que as dimensões foram atualizadas
                 setTimeout(handleOrientationChange, 100);
             });
         }
 
-        // Detecção via evento deviceorientation (giroscópio)
-        if (window.DeviceOrientationEvent) {
-            // Verifica se o dispositivo tem giroscópio
-            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                // iOS 13+ precisa de permissão
-                DeviceOrientationEvent.requestPermission().then(state => {
-                    if (state === 'granted') {
-                        window.addEventListener('deviceorientation', function(e) {
-                            // beta: -180 a 180 (inclinação para frente/trás)
-                            // gamma: -90 a 90 (inclinação para esquerda/direita)
-                            const gamma = Math.abs(e.gamma || 0);
-                            // Se a inclinação lateral for maior que 30 graus, provavelmente está em landscape
-                            if (gamma > 30) {
-                                const isLandscape = window.innerWidth > window.innerHeight;
-                                if (!isLandscape) {
-                                    // Força a detecção de landscape
-                                    handleOrientationChange();
-                                }
-                            }
-                        });
-                    }
-                }).catch(() => {});
-            } else {
-                // Dispositivos que não precisam de permissão
-                window.addEventListener('deviceorientation', function(e) {
-                    const gamma = Math.abs(e.gamma || 0);
-                    if (gamma > 30) {
-                        const isLandscape = window.innerWidth > window.innerHeight;
-                        if (!isLandscape) {
-                            handleOrientationChange();
-                        }
-                    }
-                });
-            }
-        }
-
-        // Inicializa
         setTimeout(handleOrientationChange, 500);
-
-        // Reavalia periodicamente (para casos onde a detecção falha)
         setInterval(handleOrientationChange, 5000);
-
-        console.log('🔄 Detecção de orientação ativada!');
     })();
 
     // =====================================================
@@ -895,16 +756,16 @@
     // DADOS MOCK
     // =====================================================
     const MOCK_FILMES = [
-        { id: 'filme-1', title: 'Todo Mundo em Pânico 6', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Filme+1', category: 'Comédia', year: '2026', views: 0, description: 'Uma comédia maluca que vai te fazer rir do começo ao fim.', createdAt: Date.now() - 100000 },
-        { id: 'filme-2', title: 'Noir & Vinil', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Filme+2', category: 'Drama', year: '2025', views: 0, description: 'Um drama intenso sobre música e paixão.', createdAt: Date.now() - 200000 },
-        { id: 'filme-3', title: 'Máscaras', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Filme+3', category: 'Suspense', year: '2024', views: 0, description: 'Um suspense psicológico que vai te prender até o final.', createdAt: Date.now() - 300000 },
-        { id: 'filme-4', title: 'Estrela Perdida', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Filme+4', category: 'Drama', year: '2025', views: 0, description: 'A história emocionante de uma estrela em busca de si mesma.', createdAt: Date.now() - 400000 },
+        { id: 'filme-1', title: 'Todo Mundo em Pânico 6', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Filme+1', category: 'Comédia, Terror, Suspense', year: '2026', views: 0, description: 'Uma comédia maluca que vai te fazer rir do começo ao fim. Com participações especiais e muitas piadas sobre filmes de terror.', createdAt: Date.now() - 100000 },
+        { id: 'filme-2', title: 'Noir & Vinil', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Filme+2', category: 'Drama, Romance', year: '2025', views: 0, description: 'Um drama intenso sobre música e paixão.', createdAt: Date.now() - 200000 },
+        { id: 'filme-3', title: 'Máscaras', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Filme+3', category: 'Suspense, Terror, Thriller', year: '2024', views: 0, description: 'Um suspense psicológico que vai te prender até o final. Uma história de mistério e segredos obscuros.', createdAt: Date.now() - 300000 },
+        { id: 'filme-4', title: 'Estrela Perdida', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Filme+4', category: 'Drama, Aventura', year: '2025', views: 0, description: 'A história emocionante de uma estrela em busca de si mesma.', createdAt: Date.now() - 400000 },
         { id: 'filme-5', title: 'Espectro', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Filme+5', category: 'Terror', year: '2023', views: 0, description: 'Um terror sobrenatural que vai te assombrar.', createdAt: Date.now() - 500000 }
     ];
 
     const MOCK_SERIES = [
-        { id: 'serie-1', title: 'Smallville', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Série+1', category: 'Ficção', year: '2001-2011', views: 0, description: 'A jornada de Clark Kent antes de se tornar Superman.' },
-        { id: 'serie-2', title: 'Supernatural', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Série+2', category: 'Terror', year: '2005-2020', views: 0, description: 'Os irmãos Winchester caçam criaturas sobrenaturais.' }
+        { id: 'serie-1', title: 'Smallville', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Série+1', category: 'Ficção, Aventura', year: '2001-2011', views: 0, description: 'A jornada de Clark Kent antes de se tornar Superman.' },
+        { id: 'serie-2', title: 'Supernatural', link: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', thumb: 'https://via.placeholder.com/300x450/e50914/fff?text=Série+2', category: 'Terror, Suspense', year: '2005-2020', views: 0, description: 'Os irmãos Winchester caçam criaturas sobrenaturais.' }
     ];
 
     const MOCK_CANAIS = [
@@ -1085,6 +946,102 @@
     }
 
     // =====================================================
+    // FUNÇÃO: DIVIDIR GÊNEROS POR VÍRGULA
+    // =====================================================
+    function splitGenres(category) {
+        if (!category) return [];
+        return category.split(',').map(g => g.trim()).filter(g => g.length > 0);
+    }
+
+    // =====================================================
+    // FUNÇÃO: CRIAR BADGES DE GÊNERO
+    // =====================================================
+    function createGenreBadges(category, container) {
+        if (!container) return;
+        const genres = splitGenres(category);
+        container.innerHTML = '';
+        
+        if (genres.length === 0) {
+            container.innerHTML = `<span class="badge views">🎭 Geral</span>`;
+            return;
+        }
+
+        genres.forEach(genre => {
+            const badge = document.createElement('span');
+            badge.className = 'badge';
+            badge.innerHTML = `<i class="fas fa-tag"></i> ${escapeHtml(genre)}`;
+            badge.style.cursor = 'pointer';
+            badge.onclick = function(e) {
+                e.stopPropagation();
+                if (currentMedia && genre) {
+                    currentTab = 'filmes';
+                    const filtered = filmes.filter(f => {
+                        if (!f.category) return false;
+                        const genresList = splitGenres(f.category);
+                        return genresList.some(g => g.toLowerCase() === genre.toLowerCase());
+                    });
+                    if (filtered.length > 0) {
+                        renderFilteredGrid(filtered, `🎭 Filmes de ${genre}`);
+                    } else {
+                        showToast(`Nenhum filme encontrado para o gênero ${genre}`);
+                    }
+                    closePlayer();
+                }
+            };
+            container.appendChild(badge);
+        });
+    }
+
+    // =====================================================
+    // FUNÇÃO: CONFIGURAR SINOPSE EXPANDÍVEL
+    // =====================================================
+    function setupSinopseToggle() {
+        const sinopseEl = document.getElementById('playerSinopse');
+        const toggleBtn = document.getElementById('sinopseToggle');
+        
+        if (!sinopseEl || !toggleBtn) return;
+
+        // Verifica se o texto precisa de expansão
+        const text = sinopseEl.textContent || '';
+        const lineHeight = 1.5; // em em
+        const fontSize = parseFloat(getComputedStyle(sinopseEl).fontSize) || 12;
+        const maxHeight = 3 * lineHeight * fontSize; // 3 linhas
+
+        // Reseta o estado
+        sinopseEl.classList.remove('expanded');
+        sinopseEl.style.maxHeight = '3em';
+        toggleBtn.style.display = 'none';
+        toggleBtn.querySelector('span').textContent = 'Ver mais';
+        toggleBtn.querySelector('i').className = 'fas fa-chevron-down';
+
+        // Se o texto for maior que 3 linhas, mostra o botão
+        if (sinopseEl.scrollHeight > maxHeight + 10) {
+            toggleBtn.style.display = 'inline-flex';
+        }
+
+        toggleBtn.onclick = function(e) {
+            e.stopPropagation();
+            const isExpanded = sinopseEl.classList.contains('expanded');
+            if (isExpanded) {
+                sinopseEl.classList.remove('expanded');
+                sinopseEl.style.maxHeight = '3em';
+                this.querySelector('span').textContent = 'Ver mais';
+                this.querySelector('i').className = 'fas fa-chevron-down';
+            } else {
+                sinopseEl.classList.add('expanded');
+                sinopseEl.style.maxHeight = sinopseEl.scrollHeight + 'px';
+                this.querySelector('span').textContent = 'Ver menos';
+                this.querySelector('i').className = 'fas fa-chevron-up';
+            }
+        };
+
+        // Também permite clicar na sinopse para expandir/contrair
+        sinopseEl.onclick = function() {
+            toggleBtn.click();
+        };
+    }
+
+    // =====================================================
     // LOGIN / AUTH
     // =====================================================
     document.getElementById('doLogin').onclick = () => {
@@ -1173,7 +1130,7 @@
     }
 
     // =====================================================
-    // CARREGAR DADOS - ORDENADOS POR DATA
+    // CARREGAR DADOS
     // =====================================================
     function loadFilmes() {
         return new Promise((resolve) => {
@@ -1427,7 +1384,7 @@
     }
 
     // =====================================================
-    // PLAYER
+    // PLAYER - ATUALIZADO COM BADGES DIVIDIDOS E SINOPSE EXPANDÍVEL
     // =====================================================
     function playMedia(item, type) {
         if (!item) { showToast('Item não encontrado'); return; }
@@ -1438,44 +1395,74 @@
 
         // Atualizar informações
         document.getElementById('playerTitle').textContent = item.title || 'Sem título';
-        document.getElementById('playerSinopse').textContent = item.description || item.sinopse || 'Sinopse não disponível.';
-        document.getElementById('playerYear').textContent = item.year || '';
-        document.getElementById('playerGenre').textContent = item.category || 'Geral';
-        document.getElementById('playerViews').textContent = item.views || 0;
+        
+        // ===== SINOPSE =====
+        const sinopseEl = document.getElementById('playerSinopse');
+        sinopseEl.textContent = item.description || item.sinopse || 'Sinopse não disponível.';
+        sinopseEl.classList.remove('expanded');
+        sinopseEl.style.maxHeight = '3em';
+        
+        // ===== BADGES DE GÊNERO DIVIDIDOS =====
+        const badgesContainer = document.getElementById('playerBadges');
+        badgesContainer.innerHTML = '';
+        
+        // Ano
+        if (item.year) {
+            const yearBadge = document.createElement('span');
+            yearBadge.className = 'badge';
+            yearBadge.innerHTML = `<i class="fas fa-calendar"></i> ${escapeHtml(item.year)}`;
+            yearBadge.onclick = function(e) {
+                e.stopPropagation();
+                if (item.year) {
+                    currentTab = 'filmes';
+                    const filtered = filmes.filter(f => f.year === item.year);
+                    if (filtered.length > 0) {
+                        renderFilteredGrid(filtered, `📅 Filmes de ${item.year}`);
+                    } else {
+                        showToast(`Nenhum filme encontrado para o ano ${item.year}`);
+                    }
+                    closePlayer();
+                }
+            };
+            badgesContainer.appendChild(yearBadge);
+        }
 
-        // Badges clicáveis
-        const yearBadge = document.getElementById('playerYearBadge');
-        const genreBadge = document.getElementById('playerGenreBadge');
-        
-        yearBadge.onclick = function(e) {
-            e.stopPropagation();
-            if (item.year) {
-                currentTab = 'filmes';
-                const year = item.year;
-                const filtered = filmes.filter(f => f.year === year);
-                if (filtered.length > 0) {
-                    renderFilteredGrid(filtered, `📅 Filmes de ${year}`);
-                } else {
-                    showToast(`Nenhum filme encontrado para o ano ${year}`);
-                }
-                closePlayer();
-            }
-        };
-        
-        genreBadge.onclick = function(e) {
-            e.stopPropagation();
-            if (item.category) {
-                currentTab = 'filmes';
-                const genre = item.category;
-                const filtered = filmes.filter(f => f.category === genre);
-                if (filtered.length > 0) {
-                    renderFilteredGrid(filtered, `🎭 Filmes de ${genre}`);
-                } else {
-                    showToast(`Nenhum filme encontrado para o gênero ${genre}`);
-                }
-                closePlayer();
-            }
-        };
+        // Visualizações
+        const viewsBadge = document.createElement('span');
+        viewsBadge.className = 'badge views';
+        viewsBadge.innerHTML = `<i class="fas fa-eye"></i> <span id="playerViews">${item.views || 0}</span> visualizações`;
+        badgesContainer.appendChild(viewsBadge);
+
+        // Gêneros divididos por vírgula
+        if (item.category) {
+            const genres = splitGenres(item.category);
+            genres.forEach(genre => {
+                const genreBadge = document.createElement('span');
+                genreBadge.className = 'badge';
+                genreBadge.innerHTML = `<i class="fas fa-tag"></i> ${escapeHtml(genre)}`;
+                genreBadge.onclick = function(e) {
+                    e.stopPropagation();
+                    if (genre) {
+                        currentTab = 'filmes';
+                        const filtered = filmes.filter(f => {
+                            if (!f.category) return false;
+                            const gList = splitGenres(f.category);
+                            return gList.some(g => g.toLowerCase() === genre.toLowerCase());
+                        });
+                        if (filtered.length > 0) {
+                            renderFilteredGrid(filtered, `🎭 Filmes de ${genre}`);
+                        } else {
+                            showToast(`Nenhum filme encontrado para o gênero ${genre}`);
+                        }
+                        closePlayer();
+                    }
+                };
+                badgesContainer.appendChild(genreBadge);
+            });
+        }
+
+        // ===== CONFIGURAR SINOPSE EXPANDÍVEL =====
+        setTimeout(setupSinopseToggle, 100);
 
         incrementView(item.id);
         loadLikeCount(item.id);
@@ -1483,7 +1470,7 @@
         loadComments(item.id);
         setupPlayerButtons(item);
 
-        // Reprodução
+        // ===== REPRODUÇÃO =====
         const link = item.link || '';
         const videoId = extractYoutubeId(link);
         const isHls = isIptvLink(link);
@@ -1610,7 +1597,8 @@
         db.ref(`visualizacoes/${id}`).transaction(v => (v || 0) + 1);
         if (currentMedia && currentMedia.id === id) {
             db.ref(`visualizacoes/${id}`).once('value', snap => {
-                document.getElementById('playerViews').textContent = snap.val() || 0;
+                const viewsEl = document.getElementById('playerViews');
+                if (viewsEl) viewsEl.textContent = snap.val() || 0;
             });
         }
     }
@@ -2939,6 +2927,8 @@
         console.log(`📊 ${filmes.length} filmes, ${series.length} séries, ${canais.length} canais`);
         console.log('🎬 Suporte a: YouTube, .mp4, .m3u8, IMDb, TokyVideo');
         console.log('🔄 Detecção de orientação ativada - Layout adaptável!');
+        console.log('🏷️ Gêneros divididos por vírgula em badges separados!');
+        console.log('📝 Sinopse expandível com botão "Ver mais"!');
     }
 
     if (document.readyState === 'loading') {
