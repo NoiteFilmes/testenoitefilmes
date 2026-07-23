@@ -255,13 +255,13 @@
         }
         .player-info .sinopse {
             font-size:0.75rem; color:rgba(255,255,255,0.6); line-height:1.5;
-            max-height: 3em;
+            max-height: 3em; /* 2 linhas */
             overflow: hidden;
             transition: max-height 0.4s ease;
             cursor: pointer;
         }
         .player-info .sinopse.expanded {
-            max-height: 500px;
+            max-height: 500px; /* suficiente para qualquer texto */
         }
         .player-info .sinopse-toggle {
             background: none;
@@ -317,11 +317,9 @@
         .player-info .actions-row .rating-stars i:hover { transform:scale(1.2); }
         .player-info .actions-row .rating-stars i.active { color:#ffc107; }
 
-        /* ===== COMENTÁRIOS - LAYOUT 80%/20% ===== */
         .player-right .comments-section {
             flex:1; display:flex; flex-direction:column; overflow:hidden; margin-top:0; padding-top:0;
             border-top:none;
-            height:100%;
         }
         .player-right .comments-section h4 {
             color:rgba(255,255,255,0.7); font-size:0.8rem; margin-bottom:8px;
@@ -329,35 +327,21 @@
         }
         .player-right #commentsList {
             flex:1; overflow-y:auto; padding-right:4px;
-            min-height:0;
-            max-height:100%;
-            flex: 0 0 80%;
-            height: 80%;
         }
         .player-right #commentsList::-webkit-scrollbar { width:3px; }
         .player-right #commentsList::-webkit-scrollbar-thumb { background:#e50914; border-radius:10px; }
-        
-        .player-right .comment-input-bottom {
-            display:flex; gap:8px; flex-shrink:0;
-            padding-top:10px;
-            border-top:1px solid rgba(255,255,255,0.05);
-            height:20%;
-            min-height:50px;
-            align-items:center;
-            flex: 0 0 20%;
+        .player-right .comment-input {
+            display:flex; gap:8px; margin-top:8px; flex-shrink:0;
         }
-        .player-right .comment-input-bottom input {
+        .player-right .comment-input input {
             flex:1; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);
             border-radius:30px; padding:6px 14px; color:#fff; font-size:0.75rem; outline:none;
-            height:36px;
         }
-        .player-right .comment-input-bottom button {
+        .player-right .comment-input button {
             background:#e50914; border:none; border-radius:30px; padding:6px 16px; color:#fff;
             font-size:0.7rem; cursor:pointer; transition:0.2s;
-            height:36px;
-            white-space:nowrap;
         }
-        .player-right .comment-input-bottom button:hover { background:#b20710; }
+        .player-right .comment-input button:hover { background:#b20710; }
 
         .comment-item { display:flex; gap:8px; margin-bottom:6px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.03); }
         .comment-item .avatar { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:bold; color:#fff; flex-shrink:0; overflow:hidden; }
@@ -377,8 +361,7 @@
             .player-left { flex:0 0 60% !important; min-height:0 !important; }
             .player-right { flex:1 !important; border-left:1px solid rgba(255,255,255,0.08) !important; padding-left:16px !important; border-top:none !important; padding-top:0 !important; min-height:0 !important; max-height:none !important; }
             .player-wrapper { flex:0 0 auto !important; min-height:300px !important; aspect-ratio:16/9 !important; }
-            .player-right #commentsList { max-height:none !important; min-height:0 !important; flex:0 0 80%; height:80%; }
-            .player-right .comment-input-bottom { flex:0 0 20%; height:20%; min-height:50px; }
+            .player-right #commentsList { max-height:none !important; min-height:0 !important; }
         }
 
         @media (orientation: landscape) and (max-width: 767px) {
@@ -393,9 +376,9 @@
             .player-info .actions-row button { font-size:0.55rem !important; padding:2px 10px !important; }
             .player-info .actions-row .rating-stars i { font-size:0.7rem !important; }
             .player-right .comments-section h4 { font-size:0.7rem !important; margin-bottom:4px !important; padding-bottom:4px !important; }
-            .player-right #commentsList { font-size:0.65rem !important; flex:0 0 80%; height:80%; }
-            .player-right .comment-input-bottom input { font-size:0.65rem !important; padding:4px 10px !important; height:30px; }
-            .player-right .comment-input-bottom button { font-size:0.6rem !important; padding:4px 12px !important; height:30px; }
+            .player-right #commentsList { font-size:0.65rem !important; }
+            .player-right .comment-input input { font-size:0.65rem !important; padding:4px 10px !important; }
+            .player-right .comment-input button { font-size:0.6rem !important; padding:4px 12px !important; }
             .comment-item .avatar { width:22px !important; height:22px !important; }
             .comment-item .content .user { font-size:0.6rem !important; }
             .comment-item .content .text { font-size:0.65rem !important; }
@@ -416,65 +399,9 @@
             }
             .player-left { flex:1 !important; min-height:0 !important; }
             .player-wrapper { aspect-ratio:16/9 !important; min-height:200px !important; flex:0 0 auto !important; }
-            .player-right { border-left:none !important; padding-left:0 !important; border-top:1px solid rgba(255,255,255,0.08) !important; padding-top:10px !important; min-height:200px !important; max-height:350px !important; flex:1 !important; }
-            .player-right #commentsList { max-height:none !important; min-height:0 !important; flex:0 0 80%; height:80%; }
-            .player-right .comment-input-bottom { flex:0 0 20%; height:20%; min-height:40px; padding-top:6px; }
+            .player-right { border-left:none !important; padding-left:0 !important; border-top:1px solid rgba(255,255,255,0.08) !important; padding-top:10px !important; min-height:150px !important; max-height:250px !important; flex:1 !important; }
+            .player-right #commentsList { max-height:100px !important; min-height:50px !important; }
             .player-box { max-height:98vh !important; padding:12px !important; max-width:100% !important; }
-        }
-
-        /* ===== LAYOUT HORIZONTAL PARA TV, SMART TV, XBOX, PLAYSTATION ===== */
-        @media (orientation: landscape) and (min-width: 1280px) {
-            .player-box {
-                max-width:98vw !important;
-                max-height:96vh !important;
-                padding:20px !important;
-            }
-            .player-layout {
-                min-height:600px !important;
-                height:calc(100% - 30px) !important;
-                gap:20px !important;
-            }
-            .player-left { flex:0 0 58% !important; }
-            .player-right { flex:1 !important; padding-left:20px !important; }
-            .player-wrapper { min-height:400px !important; }
-            .player-info h3 { font-size:1.3rem !important; }
-            .player-info .sinopse { font-size:0.85rem !important; -webkit-line-clamp:3 !important; }
-            .player-info .badges .badge { font-size:0.7rem !important; padding:4px 16px !important; }
-            .player-info .actions-row button { font-size:0.75rem !important; padding:6px 18px !important; }
-            .player-info .actions-row .rating-stars i { font-size:1.1rem !important; }
-            .player-right .comments-section h4 { font-size:0.95rem !important; margin-bottom:12px !important; padding-bottom:12px !important; }
-            .player-right #commentsList { font-size:0.8rem !important; flex:0 0 80%; height:80%; }
-            .player-right .comment-input-bottom input { font-size:0.8rem !important; padding:8px 16px !important; height:42px; }
-            .player-right .comment-input-bottom button { font-size:0.8rem !important; padding:8px 20px !important; height:42px; }
-            .comment-item .avatar { width:32px !important; height:32px !important; }
-            .comment-item .content .user { font-size:0.75rem !important; }
-            .comment-item .content .text { font-size:0.8rem !important; }
-        }
-
-        /* ===== LAYOUT HORIZONTAL PARA DISPOSITIVOS MÓVEIS EM LANDSCAPE ===== */
-        @media (orientation: landscape) and (max-width: 767px) and (min-height: 300px) {
-            .player-box { padding:8px !important; }
-            .player-layout { gap:8px !important; min-height:auto !important; }
-            .player-left { flex:0 0 50% !important; }
-            .player-right { flex:1 !important; padding-left:8px !important; }
-            .player-wrapper { min-height:140px !important; }
-            .player-right .comments-section h4 { font-size:0.6rem !important; margin-bottom:2px !important; padding-bottom:4px !important; }
-            .player-right #commentsList { font-size:0.55rem !important; flex:0 0 80%; height:80%; min-height:60px; }
-            .player-right .comment-input-bottom input { font-size:0.55rem !important; padding:3px 8px !important; height:26px; }
-            .player-right .comment-input-bottom button { font-size:0.5rem !important; padding:3px 10px !important; height:26px; }
-            .comment-item .avatar { width:18px !important; height:18px !important; }
-            .comment-item .content .user { font-size:0.5rem !important; }
-            .comment-item .content .text { font-size:0.55rem !important; }
-            .comment-item .content .time { font-size:0.45rem !important; }
-            .player-info h3 { font-size:0.7rem !important; }
-            .player-info .sinopse { font-size:0.55rem !important; -webkit-line-clamp:2 !important; }
-            .player-info .badges .badge { font-size:0.45rem !important; padding:1px 6px !important; }
-            .player-info .actions-row button { font-size:0.45rem !important; padding:2px 8px !important; }
-            .player-info .actions-row .rating-stars i { font-size:0.6rem !important; }
-            .player-info .actions-row .rating-wrapper span { font-size:0.5rem !important; }
-            .player-right .comments-section h4 { font-size:0.55rem !important; }
-            .player-right .comment-input-bottom input { font-size:0.5rem !important; }
-            .player-right .comment-input-bottom button { font-size:0.5rem !important; }
         }
 
         /* ===== SEARCH ===== */
@@ -649,8 +576,6 @@
             .admin-panel .admin-form { grid-template-columns:1fr; }
             .profile-header { flex-direction:column; text-align:center; }
             .profile-stats { justify-content:center; }
-            .player-right #commentsList { flex:0 0 80%; height:80%; }
-            .player-right .comment-input-bottom { flex:0 0 20%; height:20%; min-height:40px; }
         }
         @media (min-width:641px) and (max-width:1024px) { .grid { grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); } }
         @media (min-width:1025px) { .grid { grid-template-columns:repeat(auto-fill, minmax(170px,1fr)); } }
@@ -669,8 +594,6 @@
             .player-layout { min-height:auto; }
             .player-wrapper { min-height:150px; }
             .player-right { max-height:150px; min-height:100px; }
-            .player-right #commentsList { flex:0 0 75%; height:75%; }
-            .player-right .comment-input-bottom { flex:0 0 25%; height:25%; min-height:30px; }
         }
     </style>
 </head>
@@ -753,7 +676,7 @@
                 <div class="comments-section">
                     <h4>💬 Comentários</h4>
                     <div id="commentsList"></div>
-                    <div class="comment-input-bottom">
+                    <div class="comment-input">
                         <input type="text" id="commentInput" placeholder="Adicione um comentário...">
                         <button id="submitComment">Enviar</button>
                     </div>
@@ -1078,17 +1001,20 @@
         
         if (!sinopseEl || !toggleBtn) return;
 
+        // Verifica se o texto precisa de expansão
         const text = sinopseEl.textContent || '';
-        const lineHeight = 1.5;
+        const lineHeight = 1.5; // em em
         const fontSize = parseFloat(getComputedStyle(sinopseEl).fontSize) || 12;
-        const maxHeight = 3 * lineHeight * fontSize;
+        const maxHeight = 3 * lineHeight * fontSize; // 3 linhas
 
+        // Reseta o estado
         sinopseEl.classList.remove('expanded');
         sinopseEl.style.maxHeight = '3em';
         toggleBtn.style.display = 'none';
         toggleBtn.querySelector('span').textContent = 'Ver mais';
         toggleBtn.querySelector('i').className = 'fas fa-chevron-down';
 
+        // Se o texto for maior que 3 linhas, mostra o botão
         if (sinopseEl.scrollHeight > maxHeight + 10) {
             toggleBtn.style.display = 'inline-flex';
         }
@@ -1109,6 +1035,7 @@
             }
         };
 
+        // Também permite clicar na sinopse para expandir/contrair
         sinopseEl.onclick = function() {
             toggleBtn.click();
         };
@@ -1457,7 +1384,7 @@
     }
 
     // =====================================================
-    // PLAYER - COM LAYOUT 80%/20% PARA COMENTÁRIOS
+    // PLAYER - ATUALIZADO COM BADGES DIVIDIDOS E SINOPSE EXPANDÍVEL
     // =====================================================
     function playMedia(item, type) {
         if (!item) { showToast('Item não encontrado'); return; }
@@ -1868,7 +1795,7 @@
     }
 
     // =====================================================
-    // COMENTÁRIOS - INPUT NO BOTTOM
+    // COMENTÁRIOS
     // =====================================================
     function loadComments(id) {
         db.ref(`comentarios/${id}`).once('value', snap => {
@@ -3002,8 +2929,6 @@
         console.log('🔄 Detecção de orientação ativada - Layout adaptável!');
         console.log('🏷️ Gêneros divididos por vírgula em badges separados!');
         console.log('📝 Sinopse expandível com botão "Ver mais"!');
-        console.log('💬 Comentários: 80% lista / 20% input no bottom!');
-        console.log('📺 Layout horizontal otimizado para TV, Smart TV, Xbox, PlayStation!');
     }
 
     if (document.readyState === 'loading') {
@@ -3043,8 +2968,6 @@
     console.log('👑 Admin: senha "admin123"');
     console.log('🎥 Formatos suportados: YouTube, .mp4, .m3u8, IMDb, TokyVideo');
     console.log('🔄 Gire o dispositivo para paisagem e veja o layout adaptado!');
-    console.log('📝 Comentários: 80% lista de comentários, 20% input de envio!');
-    console.log('📺 Layout otimizado para TV, Smart TV, Xbox, PlayStation e dispositivos horizontais!');
 </script>
 </body>
 </html>
