@@ -391,7 +391,6 @@
             .player-info h3 { font-size:0.95rem !important; }
         }
 
-        /* ===== CORREÇÃO: PLAYER EM VERTICAL (LANDSCAPE) - REDUZIDO EM 10% ===== */
         @media (orientation: portrait), (max-width: 767px) and (orientation: portrait) {
             .player-layout {
                 flex-direction:column !important;
@@ -399,13 +398,12 @@
                 height:auto !important;
             }
             .player-left { flex:1 !important; min-height:0 !important; }
-            /* REDUZINDO O PLAYER EM 10% PARA DISPOSITIVOS MÓVEIS EM VERTICAL */
             .player-wrapper { 
-                aspect-ratio: 16/9 !important; 
-                min-height: 180px !important; 
-                flex: 0 0 auto !important;
-                height: 90% !important; /* 10% menor */
-                max-height: 90% !important; /* 10% menor */
+                aspect-ratio:16/9 !important; 
+                min-height:200px !important; 
+                flex:0 0 auto !important; 
+                height:90% !important;
+                max-height:90% !important;
             }
             .player-right { 
                 border-left:none !important; 
@@ -1249,6 +1247,34 @@
     }
 
     // =====================================================
+    // FUNÇÃO PARA BUSCAR VIEWS DO FIREBASE
+    // =====================================================
+    function fetchViews(id, callback) {
+        db.ref(`visualizacoes/${id}`).once('value', snap => {
+            const views = snap.val() || 0;
+            if (callback) callback(views);
+        });
+    }
+
+    // =====================================================
+    // FUNÇÃO PARA ATUALIZAR VIEWS NO CARD
+    // =====================================================
+    function updateCardViews(id) {
+        const cards = document.querySelectorAll(`.card[data-id="${id}"]`);
+        cards.forEach(card => {
+            const viewsP = card.querySelector('p i.fa-eye');
+            if (viewsP) {
+                const parentP = viewsP.parentElement;
+                fetchViews(id, (views) => {
+                    if (parentP) {
+                        parentP.innerHTML = `<i class="fas fa-eye" style="color:rgba(255,255,255,0.3);"></i> ${views}`;
+                    }
+                });
+            }
+        });
+    }
+
+    // =====================================================
     // RENDER GRID
     // =====================================================
     function renderGrid() {
@@ -1271,8 +1297,14 @@
         let html = `<div class="grid">`;
         items.forEach(item => {
             const isIptv = isIptvLink(item.link);
-            const views = item.views || 0;
             const hasFranchise = item.franchise ? true : false;
+            // Buscar views do Firebase
+            const viewsRef = db.ref(`visualizacoes/${item.id}`);
+            let viewsDisplay = 0;
+            viewsRef.once('value', snap => {
+                const val = snap.val() || 0;
+                // Atualizar após carregar
+            });
             html += `
                 <div class="card" data-id="${item.id}" data-type="${type}">
                     <div class="poster">
@@ -1281,13 +1313,21 @@
                         ${hasFranchise ? `<div class="franchise-badge" data-franchise="${escapeHtml(item.franchise)}"><i class="fas fa-film"></i> ${escapeHtml(item.franchise)}</div>` : ''}
                     </div>
                     <h4>${escapeHtml(item.title)} ${isIptv ? '<span style="font-size:0.5rem; background:#e50914; padding:0 6px; border-radius:10px;">VIDEO</span>' : ''}</h4>
-                    <p><i class="fas fa-eye" style="color:rgba(255,255,255,0.3);"></i> ${views}</p>
+                    <p><i class="fas fa-eye" style="color:rgba(255,255,255,0.3);"></i> <span class="views-count" data-id="${item.id}">0</span></p>
                     <p style="font-size:0.6rem; opacity:0.4;">${item.category || 'Geral'} ${item.year ? '• ' + item.year : ''}</p>
                 </div>
             `;
         });
         html += `</div>`;
         mainEl.innerHTML = html;
+
+        // Atualizar views de cada card
+        document.querySelectorAll('.views-count').forEach(el => {
+            const id = el.getAttribute('data-id');
+            fetchViews(id, (views) => {
+                el.textContent = views;
+            });
+        });
 
         document.querySelectorAll('.card').forEach(card => {
             card.addEventListener('click', () => {
@@ -1340,12 +1380,20 @@
                         <i class="fas fa-play-circle" style="${item.thumb ? 'display:none;' : ''}"></i>
                     </div>
                     <h4>${escapeHtml(item.title)}</h4>
-                    <p>${item.year || ''}</p>
+                    <p><i class="fas fa-eye" style="color:rgba(255,255,255,0.3);"></i> <span class="views-count" data-id="${item.id}">0</span></p>
                 </div>
             `;
         });
         html += `</div>`;
         mainEl.innerHTML = html;
+
+        // Atualizar views
+        document.querySelectorAll('.views-count').forEach(el => {
+            const id = el.getAttribute('data-id');
+            fetchViews(id, (views) => {
+                el.textContent = views;
+            });
+        });
 
         document.querySelectorAll('.card').forEach(card => {
             card.addEventListener('click', () => {
@@ -1383,12 +1431,19 @@
                         <div style="position:absolute; top:6px; left:6px; background:#e50914; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:bold; color:#fff;">${idx + 1}</div>
                     </div>
                     <h4>${escapeHtml(item.title)}</h4>
-                    <p>${item.year || ''}</p>
+                    <p><i class="fas fa-eye" style="color:rgba(255,255,255,0.3);"></i> <span class="views-count" data-id="${item.id}">0</span></p>
                 </div>
             `;
         });
         html += `</div>`;
         mainEl.innerHTML = html;
+
+        document.querySelectorAll('.views-count').forEach(el => {
+            const id = el.getAttribute('data-id');
+            fetchViews(id, (views) => {
+                el.textContent = views;
+            });
+        });
 
         document.querySelectorAll('.card').forEach(card => {
             card.addEventListener('click', () => {
@@ -1400,7 +1455,7 @@
     }
 
     // =====================================================
-    // PLAYER - ATUALIZADO COM BADGES DIVIDIDOS E SINOPSE EXPANDÍVEL
+    // PLAYER - CORRIGIDO PARA CONTABILIZAR VIEWS
     // =====================================================
     function playMedia(item, type) {
         if (!item) { showToast('Item não encontrado'); return; }
@@ -1443,11 +1498,16 @@
             badgesContainer.appendChild(yearBadge);
         }
 
-        // Visualizações
+        // Visualizações - carregar do Firebase
         const viewsBadge = document.createElement('span');
         viewsBadge.className = 'badge views';
-        viewsBadge.innerHTML = `<i class="fas fa-eye"></i> <span id="playerViews">${item.views || 0}</span> visualizações`;
+        viewsBadge.innerHTML = `<i class="fas fa-eye"></i> <span id="playerViews">0</span> visualizações`;
         badgesContainer.appendChild(viewsBadge);
+
+        // Carregar views do Firebase
+        fetchViews(item.id, (views) => {
+            document.getElementById('playerViews').textContent = views;
+        });
 
         // Gêneros divididos por vírgula
         if (item.category) {
@@ -1480,7 +1540,9 @@
         // ===== CONFIGURAR SINOPSE EXPANDÍVEL =====
         setTimeout(setupSinopseToggle, 100);
 
+        // ===== CONTABILIZAR VISUALIZAÇÃO =====
         incrementView(item.id);
+
         loadLikeCount(item.id);
         loadRatings(item.id);
         loadComments(item.id);
@@ -1609,14 +1671,43 @@
     closePlayerBtn.addEventListener('click', closePlayer);
     playerOverlay.addEventListener('click', (e) => { if (e.target === playerOverlay) closePlayer(); });
 
+    // =====================================================
+    // FUNÇÃO PARA INCREMENTAR VIEWS - CORRIGIDA
+    // =====================================================
     function incrementView(id) {
-        db.ref(`visualizacoes/${id}`).transaction(v => (v || 0) + 1);
-        if (currentMedia && currentMedia.id === id) {
-            db.ref(`visualizacoes/${id}`).once('value', snap => {
-                const viewsEl = document.getElementById('playerViews');
-                if (viewsEl) viewsEl.textContent = snap.val() || 0;
-            });
-        }
+        if (!id) return;
+        
+        // Incrementar no Firebase
+        const viewsRef = db.ref(`visualizacoes/${id}`);
+        viewsRef.transaction((current) => {
+            return (current || 0) + 1;
+        }, (error, committed, snapshot) => {
+            if (error) {
+                console.error('Erro ao incrementar views:', error);
+                return;
+            }
+            if (committed) {
+                const newViews = snapshot.val() || 0;
+                // Atualizar no player
+                const playerViewsEl = document.getElementById('playerViews');
+                if (playerViewsEl) {
+                    playerViewsEl.textContent = newViews;
+                }
+                // Atualizar nos cards
+                updateCardViews(id);
+            }
+        });
+    }
+
+    // =====================================================
+    // FUNÇÃO PARA CARREGAR VIEWS NO PLAYER
+    // =====================================================
+    function loadPlayerViews(id) {
+        const viewsEl = document.getElementById('playerViews');
+        if (!viewsEl) return;
+        fetchViews(id, (views) => {
+            viewsEl.textContent = views;
+        });
     }
 
     function loadLikeCount(id) {
@@ -1939,11 +2030,18 @@
                             <i class="fas fa-play-circle" style="${item.thumb ? 'display:none;' : ''}"></i>
                         </div>
                         <h4>${escapeHtml(item.title)}</h4>
-                        <p>${item.icon} ${item.type} ${item.year ? '• ' + item.year : ''}</p>
+                        <p><i class="fas fa-eye" style="color:rgba(255,255,255,0.3);"></i> <span class="views-count" data-id="${item.id}">0</span></p>
                     </div>
                 `).join('')}
             </div>
         `;
+
+        document.querySelectorAll('.views-count').forEach(el => {
+            const id = el.getAttribute('data-id');
+            fetchViews(id, (views) => {
+                el.textContent = views;
+            });
+        });
 
         document.querySelectorAll('#searchResults .card').forEach(card => {
             card.addEventListener('click', () => {
@@ -2945,6 +3043,7 @@
         console.log('🔄 Detecção de orientação ativada - Layout adaptável!');
         console.log('🏷️ Gêneros divididos por vírgula em badges separados!');
         console.log('📝 Sinopse expandível com botão "Ver mais"!');
+        console.log('👁️ Visualizações sendo contabilizadas corretamente!');
     }
 
     if (document.readyState === 'loading') {
