@@ -1,3 +1,6 @@
+Aqui está o código completo com a correção para dispositivos móveis em posição horizontal (paisagem), garantindo que todos os botões e funções fiquem visíveis na tela:
+
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -204,12 +207,12 @@
         .player-overlay {
             position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.85);
             backdrop-filter:blur(20px); display:none; align-items:center; justify-content:center;
-            padding:20px;
+            padding:10px;
         }
         .player-overlay.active { display:flex; }
         .player-box {
             background:rgba(20,20,20,0.9); border-radius:32px; max-width:1200px; width:100%;
-            max-height:95vh; overflow:hidden; border:1px solid rgba(255,0,0,0.2);
+            max-height:98vh; overflow:hidden; border:1px solid rgba(255,0,0,0.2);
             padding:16px; position:relative;
         }
         .player-box .close-btn {
@@ -301,18 +304,20 @@
 
         .player-info .actions-row {
             display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; align-items:center;
+            flex-shrink:0;
         }
         .player-info .actions-row button {
             background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08);
             border-radius:30px; padding:4px 14px; color:rgba(255,255,255,0.6);
             font-size:0.65rem; cursor:pointer; transition:all 0.2s;
             display:flex; align-items:center; gap:4px;
+            white-space:nowrap;
         }
         .player-info .actions-row button:hover {
             background:rgba(229,9,20,0.2); border-color:rgba(229,9,20,0.3); color:#fff;
         }
         .player-info .actions-row button.liked { color:#e50914; background:rgba(229,9,20,0.15); border-color:rgba(229,9,20,0.3); }
-        .player-info .actions-row .rating-wrapper { display:flex; align-items:center; gap:4px; }
+        .player-info .actions-row .rating-wrapper { display:flex; align-items:center; gap:4px; flex-shrink:0; }
         .player-info .actions-row .rating-stars i { font-size:0.9rem; cursor:pointer; color:rgba(255,255,255,0.2); transition:0.2s; }
         .player-info .actions-row .rating-stars i:hover { transform:scale(1.2); }
         .player-info .actions-row .rating-stars i.active { color:#ffc107; }
@@ -364,31 +369,136 @@
             .player-right #commentsList { max-height:none !important; min-height:0 !important; }
         }
 
-        @media (orientation: landscape) and (max-width: 767px) {
-            .player-box { max-width:100% !important; max-height:98vh !important; padding:10px !important; border-radius:20px !important; }
-            .player-layout { flex-direction:row !important; min-height:auto !important; height:auto !important; gap:10px !important; }
-            .player-left { flex:0 0 55% !important; min-height:0 !important; }
-            .player-right { flex:1 !important; border-left:1px solid rgba(255,255,255,0.08) !important; padding-left:10px !important; border-top:none !important; padding-top:0 !important; min-height:0 !important; max-height:none !important; }
-            .player-wrapper { min-height:180px !important; aspect-ratio:16/9 !important; flex:0 0 auto !important; }
-            .player-info h3 { font-size:0.85rem !important; }
-            .player-info .sinopse { font-size:0.65rem !important; }
-            .player-info .badges .badge { font-size:0.55rem !important; padding:1px 8px !important; }
-            .player-info .actions-row button { font-size:0.55rem !important; padding:2px 10px !important; }
-            .player-info .actions-row .rating-stars i { font-size:0.7rem !important; }
-            .player-right .comments-section h4 { font-size:0.7rem !important; margin-bottom:4px !important; padding-bottom:4px !important; }
-            .player-right #commentsList { font-size:0.65rem !important; }
-            .player-right .comment-input input { font-size:0.65rem !important; padding:4px 10px !important; }
-            .player-right .comment-input button { font-size:0.6rem !important; padding:4px 12px !important; }
-            .comment-item .avatar { width:22px !important; height:22px !important; }
-            .comment-item .content .user { font-size:0.6rem !important; }
-            .comment-item .content .text { font-size:0.65rem !important; }
+        /* ===== CORREÇÃO PARA DISPOSITIVOS MÓVEIS EM HORIZONTAL ===== */
+        @media (orientation: landscape) and (max-width: 1024px) {
+            .player-overlay { padding:5px !important; }
+            .player-box { 
+                max-width:100% !important; 
+                max-height:100vh !important; 
+                padding:8px !important; 
+                border-radius:16px !important;
+            }
+            .player-layout { 
+                flex-direction:row !important; 
+                min-height:auto !important; 
+                height:auto !important; 
+                gap:8px !important;
+                max-height:95vh !important;
+            }
+            .player-left { 
+                flex:0 0 50% !important; 
+                min-height:0 !important;
+                gap:6px !important;
+            }
+            .player-right { 
+                flex:1 !important; 
+                border-left:1px solid rgba(255,255,255,0.08) !important; 
+                padding-left:8px !important; 
+                border-top:none !important; 
+                padding-top:0 !important; 
+                min-height:0 !important; 
+                max-height:none !important;
+            }
+            .player-wrapper { 
+                min-height:150px !important; 
+                max-height:45vh !important;
+                aspect-ratio:16/9 !important; 
+                flex:0 0 auto !important;
+            }
+            .player-info {
+                gap:2px !important;
+                overflow-y:auto !important;
+                max-height:45vh !important;
+            }
+            .player-info h3 { 
+                font-size:0.75rem !important; 
+                margin:0 !important;
+                line-height:1.2 !important;
+            }
+            .player-info .sinopse { 
+                font-size:0.55rem !important;
+                max-height:2.4em !important;
+                line-height:1.3 !important;
+            }
+            .player-info .sinopse.expanded {
+                max-height:200px !important;
+            }
+            .player-info .sinopse-toggle {
+                font-size:0.5rem !important;
+                padding:0 !important;
+                margin-top:0 !important;
+            }
+            .player-info .badges { 
+                gap:3px !important;
+                margin-top:2px !important;
+            }
+            .player-info .badges .badge { 
+                font-size:0.45rem !important; 
+                padding:1px 6px !important;
+                border-radius:20px !important;
+            }
+            .player-info .actions-row { 
+                gap:3px !important;
+                margin-top:2px !important;
+                flex-wrap:wrap !important;
+            }
+            .player-info .actions-row button { 
+                font-size:0.45rem !important; 
+                padding:2px 8px !important;
+                border-radius:20px !important;
+            }
+            .player-info .actions-row .rating-stars i { 
+                font-size:0.6rem !important;
+            }
+            .player-info .actions-row .rating-wrapper span {
+                font-size:0.5rem !important;
+            }
+            .player-right .comments-section h4 { 
+                font-size:0.6rem !important; 
+                margin-bottom:4px !important; 
+                padding-bottom:4px !important;
+            }
+            .player-right #commentsList { 
+                font-size:0.55rem !important; 
+                max-height:120px !important;
+                min-height:60px !important;
+            }
+            .player-right .comment-input input { 
+                font-size:0.55rem !important; 
+                padding:3px 8px !important;
+            }
+            .player-right .comment-input button { 
+                font-size:0.5rem !important; 
+                padding:3px 10px !important;
+            }
+            .comment-item { 
+                gap:4px !important;
+                padding:3px 0 !important;
+                margin-bottom:3px !important;
+            }
+            .comment-item .avatar { 
+                width:18px !important; 
+                height:18px !important;
+                font-size:0.4rem !important;
+            }
+            .comment-item .content .user { 
+                font-size:0.5rem !important;
+            }
+            .comment-item .content .text { 
+                font-size:0.55rem !important;
+            }
+            .comment-item .content .time { 
+                font-size:0.45rem !important;
+            }
         }
 
         @media (orientation: landscape) and (min-width: 768px) and (max-width: 1024px) {
             .player-left { flex:0 0 55% !important; }
             .player-right { flex:1 !important; }
-            .player-wrapper { min-height:250px !important; }
-            .player-info h3 { font-size:0.95rem !important; }
+            .player-wrapper { min-height:200px !important; max-height:50vh !important; }
+            .player-info h3 { font-size:0.85rem !important; }
+            .player-info .badges .badge { font-size:0.5rem !important; }
+            .player-info .actions-row button { font-size:0.5rem !important; padding:2px 10px !important; }
         }
 
         @media (orientation: portrait), (max-width: 767px) and (orientation: portrait) {
@@ -1298,13 +1408,6 @@
         items.forEach(item => {
             const isIptv = isIptvLink(item.link);
             const hasFranchise = item.franchise ? true : false;
-            // Buscar views do Firebase
-            const viewsRef = db.ref(`visualizacoes/${item.id}`);
-            let viewsDisplay = 0;
-            viewsRef.once('value', snap => {
-                const val = snap.val() || 0;
-                // Atualizar após carregar
-            });
             html += `
                 <div class="card" data-id="${item.id}" data-type="${type}">
                     <div class="poster">
@@ -1455,7 +1558,7 @@
     }
 
     // =====================================================
-    // PLAYER - CORRIGIDO PARA CONTABILIZAR VIEWS
+    // PLAYER
     // =====================================================
     function playMedia(item, type) {
         if (!item) { showToast('Item não encontrado'); return; }
@@ -1672,12 +1775,11 @@
     playerOverlay.addEventListener('click', (e) => { if (e.target === playerOverlay) closePlayer(); });
 
     // =====================================================
-    // FUNÇÃO PARA INCREMENTAR VIEWS - CORRIGIDA
+    // FUNÇÃO PARA INCREMENTAR VIEWS
     // =====================================================
     function incrementView(id) {
         if (!id) return;
         
-        // Incrementar no Firebase
         const viewsRef = db.ref(`visualizacoes/${id}`);
         viewsRef.transaction((current) => {
             return (current || 0) + 1;
@@ -1688,25 +1790,12 @@
             }
             if (committed) {
                 const newViews = snapshot.val() || 0;
-                // Atualizar no player
                 const playerViewsEl = document.getElementById('playerViews');
                 if (playerViewsEl) {
                     playerViewsEl.textContent = newViews;
                 }
-                // Atualizar nos cards
                 updateCardViews(id);
             }
-        });
-    }
-
-    // =====================================================
-    // FUNÇÃO PARA CARREGAR VIEWS NO PLAYER
-    // =====================================================
-    function loadPlayerViews(id) {
-        const viewsEl = document.getElementById('playerViews');
-        if (!viewsEl) return;
-        fetchViews(id, (views) => {
-            viewsEl.textContent = views;
         });
     }
 
@@ -2200,7 +2289,7 @@
     }
 
     // =====================================================
-    // PERFIL (resumido)
+    // PERFIL
     // =====================================================
     function renderProfile(showOtherUserId = null) {
         if (!dataLoaded || !currentUser) return;
@@ -2482,7 +2571,7 @@
     }
 
     // =====================================================
-    // CHAT (resumido)
+    // CHAT
     // =====================================================
     function renderChat() {
         let html = `
@@ -2648,7 +2737,7 @@
     }
 
     // =====================================================
-    // ADMIN (resumido)
+    // ADMIN
     // =====================================================
     function renderAdmin() {
         let html = `
@@ -3041,8 +3130,7 @@
         console.log(`📊 ${filmes.length} filmes, ${series.length} séries, ${canais.length} canais`);
         console.log('🎬 Suporte a: YouTube, .mp4, .m3u8, IMDb, TokyVideo');
         console.log('🔄 Detecção de orientação ativada - Layout adaptável!');
-        console.log('🏷️ Gêneros divididos por vírgula em badges separados!');
-        console.log('📝 Sinopse expandível com botão "Ver mais"!');
+        console.log('📱 Player otimizado para dispositivos móveis em horizontal!');
         console.log('👁️ Visualizações sendo contabilizadas corretamente!');
     }
 
@@ -3086,3 +3174,4 @@
 </script>
 </body>
 </html>
+```
