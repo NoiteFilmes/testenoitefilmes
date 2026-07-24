@@ -5,6 +5,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes, viewport-fit=cover" />
     <title>Noite Filmes · rede social</title>
+    <!-- ===== META TAGS OPEN GRAPH PARA COMPARTILHAMENTO ===== -->
+    <meta property="og:title" content="Noite Filmes" />
+    <meta property="og:description" content="Assista filmes, séries e canais online" />
+    <meta property="og:image" content="https://i.ibb.co/Wps2rDCZ/C384-BA2-C-C5-BD-495-C-88-B8-00-C345-BE829-E.png" />
+    <meta property="og:url" content="https://noitefilmes26.web.app" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- ===================================================== -->
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <!-- Firebase -->
@@ -354,8 +362,7 @@
         .comment-item .content .text { font-size:0.75rem; color:rgba(255,255,255,0.8); }
         .comment-item .content .time { font-size:0.55rem; color:rgba(255,255,255,0.3); }
 
-        /* ===== PLAYER LAYOUT - RESPONSIVE UNIFICADO ===== */
-        /* ===== LAYOUT COMPACTO PARA QUALQUER ORIENTAÇÃO HORIZONTAL ===== */
+        /* ===== PLAYER LAYOUT - RESPONSIVE ===== */
         @media (orientation: landscape) {
             .player-overlay { padding:5px !important; }
             .player-box { 
@@ -478,7 +485,6 @@
             }
         }
 
-        /* ===== LAYOUT PARA ORIENTAÇÃO VERTICAL ===== */
         @media (orientation: portrait) {
             .player-layout {
                 flex-direction:column !important;
@@ -1437,6 +1443,33 @@
     }
 
     // =====================================================
+    // FUNÇÃO PARA ATUALIZAR META TAGS PARA COMPARTILHAMENTO
+    // =====================================================
+    function updateMetaTagsForShare(item) {
+        if (!item) return;
+        const title = item.title || 'Noite Filmes';
+        const description = item.description || item.sinopse || 'Assista este conteúdo no Noite Filmes';
+        const image = item.thumb || DEFAULT_AVATAR;
+        const url = window.location.href;
+
+        // Atualiza meta tags no head
+        let meta;
+        meta = document.querySelector('meta[property="og:title"]');
+        if (meta) meta.setAttribute('content', title);
+        meta = document.querySelector('meta[property="og:description"]');
+        if (meta) meta.setAttribute('content', description);
+        meta = document.querySelector('meta[property="og:image"]');
+        if (meta) meta.setAttribute('content', image);
+        meta = document.querySelector('meta[property="og:url"]');
+        if (meta) meta.setAttribute('content', url);
+        meta = document.querySelector('meta[name="twitter:card"]');
+        if (meta) meta.setAttribute('content', 'summary_large_image');
+
+        // Atualiza título da página
+        document.title = `${title} · Noite Filmes`;
+    }
+
+    // =====================================================
     // RENDER GRID
     // =====================================================
     function renderGrid() {
@@ -1996,12 +2029,31 @@
             }
         };
 
+        // ===== COMPARTILHAR COM IMAGEM E DESCRIÇÃO =====
         shareBtn.onclick = () => {
             const url = `${window.location.origin}${window.location.pathname}?mediaId=${item.id}&type=${currentMediaType}`;
+            const shareTitle = item.title || 'Noite Filmes';
+            const shareDesc = item.description || item.sinopse || 'Assista este conteúdo no Noite Filmes';
+            const shareText = `🎬 ${shareTitle}\n\n${shareDesc}\n\n📽️ Assista em: ${url}`;
+
+            // Atualiza meta tags para Open Graph (pré-visualização)
+            updateMetaTagsForShare(item);
+
             if (navigator.share) {
-                navigator.share({ title: item.title, text: `🎬 ${item.title} - NoiteFilmes`, url }).catch(() => {});
+                navigator.share({
+                    title: shareTitle,
+                    text: shareText,
+                    url: url
+                }).catch(() => {});
             } else {
-                navigator.clipboard.writeText(url).then(() => showToast('📋 Link copiado!'));
+                // Fallback: copiar link com texto enriquecido
+                const fullText = `${shareTitle}\n${shareDesc}\n\n🔗 ${url}`;
+                navigator.clipboard.writeText(fullText).then(() => {
+                    showToast('📋 Link e descrição copiados! Compartilhe onde quiser.');
+                }).catch(() => {
+                    // Se não conseguir copiar, mostra o link
+                    prompt('Copie o link para compartilhar:', url);
+                });
             }
         };
 
@@ -3161,21 +3213,24 @@
     // =====================================================
     async function init() {
         await loadAllData();
-        
+
+        // ===== VERIFICA PARÂMETROS PARA COMPARTILHAMENTO =====
         const params = new URLSearchParams(window.location.search);
         const mediaId = params.get('mediaId');
         const type = params.get('type');
         if (mediaId && type) {
-            setTimeout(() => {
-                let item;
-                if (type === 'filme') item = filmes.find(f => f.id === mediaId);
-                else if (type === 'serie') item = series.find(s => s.id === mediaId);
-                else item = canais.find(c => c.id === mediaId);
-                if (item) {
-                    switchTab('filmes');
-                    setTimeout(() => playMedia(item, type), 500);
-                }
-            }, 1000);
+            // Busca o item e atualiza meta tags
+            let item;
+            if (type === 'filme') item = filmes.find(f => f.id === mediaId);
+            else if (type === 'serie') item = series.find(s => s.id === mediaId);
+            else item = canais.find(c => c.id === mediaId);
+            if (item) {
+                updateMetaTagsForShare(item);
+                // Opcional: abrir o player automaticamente
+                setTimeout(() => {
+                    playMedia(item, type);
+                }, 500);
+            }
         }
 
         console.log('🚀 NoiteFilmes carregado com sucesso!');
@@ -3184,6 +3239,7 @@
         console.log('🔄 Detecção de orientação ativada - Layout adaptável!');
         console.log('📱 Player horizontal unificado - badges individuais, sinopse com toggle e rolagem!');
         console.log('👁️ Visualizações sendo contabilizadas corretamente!');
+        console.log('🔗 Compartilhamento com imagem, título e descrição via Open Graph!');
     }
 
     if (document.readyState === 'loading') {
