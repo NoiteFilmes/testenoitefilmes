@@ -1,3 +1,6 @@
+Aqui está o código completo com a correção para exibir os cards em 2 colunas na vertical (dispositivos móveis) e 5 colunas na horizontal:
+
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -131,10 +134,85 @@
         }
         @keyframes spin { to { transform:rotate(360deg); } }
 
-        /* ===== CARDS ===== */
+        /* ===== CARDS - CORRIGIDO ===== */
         .grid {
-            display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:18px; margin-top:4px;
+            display:grid;
+            gap:18px;
+            margin-top:4px;
         }
+
+        /* ===== CARDS EM DISPOSITIVOS MÓVEIS NA VERTICAL ===== */
+        @media (orientation: portrait) and (max-width: 1024px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px !important;
+            }
+            .card {
+                padding: 10px 6px 12px !important;
+                border-radius: 20px !important;
+            }
+            .card .poster {
+                font-size: 1.8rem !important;
+            }
+            .card h4 {
+                font-size: 0.75rem !important;
+            }
+            .card p {
+                font-size: 0.6rem !important;
+            }
+        }
+
+        /* ===== CARDS EM QUALQUER DISPOSITIVO NA HORIZONTAL ===== */
+        @media (orientation: landscape) {
+            .grid {
+                grid-template-columns: repeat(5, 1fr) !important;
+                gap: 16px !important;
+            }
+        }
+
+        /* ===== CARDS EM TABLETS NA VERTICAL ===== */
+        @media (orientation: portrait) and (min-width: 768px) and (max-width: 1024px) {
+            .grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 16px !important;
+            }
+        }
+
+        /* ===== CARDS EM TELAS GRANDES (DESKTOP) ===== */
+        @media (orientation: landscape) and (min-width: 1400px) {
+            .grid {
+                grid-template-columns: repeat(5, 1fr) !important;
+                gap: 20px !important;
+            }
+        }
+
+        @media (orientation: landscape) and (max-width: 767px) {
+            .grid {
+                grid-template-columns: repeat(5, 1fr) !important;
+                gap: 8px !important;
+            }
+            .card {
+                padding: 6px 4px 8px !important;
+                border-radius: 16px !important;
+            }
+            .card .poster {
+                border-radius: 12px !important;
+                font-size: 1.2rem !important;
+            }
+            .card h4 {
+                font-size: 0.6rem !important;
+                margin-bottom: 1px !important;
+            }
+            .card p {
+                font-size: 0.5rem !important;
+            }
+            .card .franchise-badge {
+                font-size: 0.4rem !important;
+                padding: 1px 6px !important;
+                bottom: 50px !important;
+            }
+        }
+
         .card {
             background:rgba(20,20,20,0.35); backdrop-filter:blur(8px); border-radius:28px;
             padding:14px 10px 16px; border:1px solid rgba(255,255,255,0.05);
@@ -255,13 +333,13 @@
         }
         .player-info .sinopse {
             font-size:0.75rem; color:rgba(255,255,255,0.6); line-height:1.5;
-            max-height: 3em; /* 2 linhas */
+            max-height: 3em;
             overflow: hidden;
             transition: max-height 0.4s ease;
             cursor: pointer;
         }
         .player-info .sinopse.expanded {
-            max-height: 500px; /* suficiente para qualquer texto */
+            max-height: 500px;
         }
         .player-info .sinopse-toggle {
             background: none;
@@ -366,7 +444,6 @@
             .player-right #commentsList { max-height:none !important; min-height:0 !important; }
         }
 
-        /* ===== CORREÇÃO PARA DISPOSITIVOS MÓVEIS EM HORIZONTAL ===== */
         @media (orientation: landscape) and (max-width: 1024px) {
             .player-overlay { padding:5px !important; }
             .player-box { 
@@ -684,10 +761,6 @@
             .top-links { justify-content:center; gap:3px 6px; flex-wrap:wrap; }
             .top-links a { font-size:0.7rem; padding:4px 10px; white-space:nowrap; }
             .main-content { padding:12px 12px 6px; gap:12px; }
-            .grid { grid-template-columns:repeat(auto-fill, minmax(110px,1fr)); gap:12px; }
-            .card { padding:10px 6px 12px; border-radius:20px; }
-            .card .poster { font-size:1.8rem; }
-            .card h4 { font-size:0.75rem; }
             .bottom-item { min-width:48px; padding:4px 6px; font-size:0.6rem; }
             .bottom-item i { font-size:1.3rem; }
             .player-box { padding:12px; margin:10px; max-height:98vh; }
@@ -698,16 +771,22 @@
             .profile-header { flex-direction:column; text-align:center; }
             .profile-stats { justify-content:center; }
         }
-        @media (min-width:641px) and (max-width:1024px) { .grid { grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); } }
-        @media (min-width:1025px) { .grid { grid-template-columns:repeat(auto-fill, minmax(170px,1fr)); } }
-        @media (min-width:1800px) { .grid { grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:26px; } }
+        @media (min-width:641px) and (max-width:1024px) { 
+            /* Tablet vertical já definido acima */
+        }
+        @media (min-width:1025px) { 
+            /* Desktop já definido acima */
+        }
+        @media (min-width:1800px) { 
+            .grid { gap:26px !important; } 
+        }
         @media (max-height:500px) and (orientation:landscape) {
             .app { height:98vh; min-height:400px; }
             .top-menu { padding:4px 12px; flex-direction:row; flex-wrap:wrap; }
             .brand { font-size:0.9rem; }
             .top-links a { font-size:0.6rem; padding:2px 8px; }
             .main-content { padding:6px 12px; gap:6px; }
-            .grid { grid-template-columns:repeat(auto-fill, minmax(100px,1fr)); gap:6px; }
+            .grid { grid-template-columns:repeat(5, 1fr) !important; gap:6px !important; }
             .card { padding:4px; }
             .card .poster { aspect-ratio:1/1.2; font-size:1.2rem; }
             .bottom-item { min-width:40px; padding:2px 6px; font-size:0.5rem; }
@@ -3127,7 +3206,7 @@
         console.log(`📊 ${filmes.length} filmes, ${series.length} séries, ${canais.length} canais`);
         console.log('🎬 Suporte a: YouTube, .mp4, .m3u8, IMDb, TokyVideo');
         console.log('🔄 Detecção de orientação ativada - Layout adaptável!');
-        console.log('📱 Player otimizado para dispositivos móveis em horizontal!');
+        console.log('📱 Cards: 2 colunas na vertical, 5 colunas na horizontal!');
         console.log('👁️ Visualizações sendo contabilizadas corretamente!');
     }
 
@@ -3171,3 +3250,4 @@
 </script>
 </body>
 </html>
+```
