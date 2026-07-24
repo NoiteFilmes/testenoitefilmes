@@ -1992,7 +1992,7 @@
     }
 
     // =====================================================
-    // SETUP PLAYER BUTTONS
+    // SETUP PLAYER BUTTONS - COMPARTILHAMENTO COM IMAGEM E CTA
     // =====================================================
     function setupPlayerButtons(item) {
         const likeBtn = document.getElementById('likeBtn');
@@ -2029,12 +2029,17 @@
             }
         };
 
-        // ===== COMPARTILHAR COM IMAGEM E DESCRIÇÃO =====
+        // ===== COMPARTILHAR COM IMAGEM, TÍTULO, DESCRIÇÃO E CTA =====
         shareBtn.onclick = () => {
             const url = `${window.location.origin}${window.location.pathname}?mediaId=${item.id}&type=${currentMediaType}`;
             const shareTitle = item.title || 'Noite Filmes';
             const shareDesc = item.description || item.sinopse || 'Assista este conteúdo no Noite Filmes';
-            const shareText = `🎬 ${shareTitle}\n\n${shareDesc}\n\n📽️ Assista em: ${url}`;
+            
+            // Texto com CTA do Instagram
+            const ctaText = '\n\n📲 Siga nosso Instagram: https://instagram.com/noitefilmes';
+            
+            // Conteúdo completo para compartilhar
+            const shareText = `🎬 ${shareTitle}\n\n${shareDesc}\n\n📽️ Assista em: ${url}${ctaText}`;
 
             // Atualiza meta tags para Open Graph (pré-visualização)
             updateMetaTagsForShare(item);
@@ -2047,9 +2052,9 @@
                 }).catch(() => {});
             } else {
                 // Fallback: copiar link com texto enriquecido
-                const fullText = `${shareTitle}\n${shareDesc}\n\n🔗 ${url}`;
+                const fullText = `${shareTitle}\n${shareDesc}\n\n🔗 ${url}${ctaText}`;
                 navigator.clipboard.writeText(fullText).then(() => {
-                    showToast('📋 Link e descrição copiados! Compartilhe onde quiser.');
+                    showToast('📋 Link, descrição e CTA copiados! Compartilhe onde quiser.');
                 }).catch(() => {
                     // Se não conseguir copiar, mostra o link
                     prompt('Copie o link para compartilhar:', url);
@@ -3239,7 +3244,7 @@
         console.log('🔄 Detecção de orientação ativada - Layout adaptável!');
         console.log('📱 Player horizontal unificado - badges individuais, sinopse com toggle e rolagem!');
         console.log('👁️ Visualizações sendo contabilizadas corretamente!');
-        console.log('🔗 Compartilhamento com imagem, título e descrição via Open Graph!');
+        console.log('🔗 Compartilhamento com imagem, título, descrição e CTA do Instagram!');
     }
 
     if (document.readyState === 'loading') {
