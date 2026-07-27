@@ -177,13 +177,21 @@
             background:rgba(229,9,20,0.8); transform:translateX(-50%) scale(1.05);
         }
 
-        /* ===== BOTTOM MENU ===== */
+        /* ===== BOTTOM MENU - FIXO ===== */
         .bottom-menu {
             position:relative; z-index:12; background:rgba(0,0,0,0.5);
             backdrop-filter:blur(20px) saturate(200%);
             border-top:1px solid rgba(255,0,0,0.2);
             padding:8px 12px 12px; display:flex; flex-wrap:wrap; align-items:center;
             justify-content:space-around; flex-shrink:0; gap:4px;
+        }
+        /* FIXAR O MENU INFERIOR EM TODOS OS DISPOSITIVOS */
+        @media (min-width: 768px) {
+            .bottom-menu {
+                position: sticky !important;
+                bottom: 0 !important;
+                margin-top: auto !important;
+            }
         }
         .bottom-item {
             display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -680,24 +688,255 @@
         .chat-main .input-area button { background:#e50914; border:none; border-radius:30px; padding:8px 16px; color:#fff; cursor:pointer; transition:0.2s; }
         .chat-main .input-area button:hover { background:#b20710; }
 
-        /* ===== ADMIN ===== */
-        .admin-panel { background:rgba(0,0,0,0.3); border-radius:20px; padding:16px; }
-        .admin-panel .admin-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
-        .admin-panel .admin-tabs button { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:30px; padding:4px 14px; color:rgba(255,255,255,0.6); font-size:0.7rem; cursor:pointer; transition:0.2s; }
-        .admin-panel .admin-tabs button.active { background:rgba(229,9,20,0.3); border-color:#e50914; color:#fff; }
-        .admin-panel .admin-form { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-        .admin-panel .admin-form input, .admin-panel .admin-form textarea, .admin-panel .admin-form select {
-            background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:12px;
-            padding:6px 12px; color:#fff; font-size:0.75rem; outline:none;
+        /* ===== ADMIN - NOVO LAYOUT MODERNO ===== */
+        .admin-panel { 
+            background:rgba(0,0,0,0.3); 
+            border-radius:20px; 
+            padding:16px;
         }
-        .admin-panel .admin-form textarea { grid-column:1/-1; resize:vertical; min-height:60px; }
-        .admin-panel .admin-form .full { grid-column:1/-1; }
-        .admin-panel .admin-form button { background:#e50914; border:none; border-radius:30px; padding:6px 16px; color:#fff; cursor:pointer; transition:0.2s; font-size:0.75rem; }
-        .admin-panel .admin-form button:hover { background:#b20710; }
-        .admin-panel .admin-list { max-height:200px; overflow-y:auto; margin-top:10px; }
-        .admin-panel .admin-list .item { display:flex; justify-content:space-between; align-items:center; padding:4px 8px; border-bottom:1px solid rgba(255,255,255,0.03); font-size:0.7rem; }
-        .admin-panel .admin-list .item .actions button { background:transparent; border:none; color:rgba(255,255,255,0.4); cursor:pointer; font-size:0.7rem; padding:0 4px; }
-        .admin-panel .admin-list .item .actions button:hover { color:#e50914; }
+        .admin-panel .admin-tabs { 
+            display:flex; 
+            gap:6px; 
+            flex-wrap:wrap; 
+            margin-bottom:12px; 
+        }
+        .admin-panel .admin-tabs button { 
+            background:rgba(255,255,255,0.05); 
+            border:1px solid rgba(255,255,255,0.08); 
+            border-radius:30px; 
+            padding:4px 14px; 
+            color:rgba(255,255,255,0.6); 
+            font-size:0.7rem; 
+            cursor:pointer; 
+            transition:0.2s; 
+        }
+        .admin-panel .admin-tabs button.active { 
+            background:rgba(229,9,20,0.3); 
+            border-color:#e50914; 
+            color:#fff; 
+        }
+
+        .admin-form { 
+            display:grid; 
+            grid-template-columns:1fr 1fr; 
+            gap:8px; 
+            background:rgba(255,255,255,0.03);
+            padding:12px;
+            border-radius:16px;
+            margin-bottom:16px;
+        }
+        .admin-form input, .admin-form textarea, .admin-form select {
+            background:rgba(255,255,255,0.06); 
+            border:1px solid rgba(255,255,255,0.08); 
+            border-radius:12px;
+            padding:8px 12px; 
+            color:#fff; 
+            font-size:0.75rem; 
+            outline:none;
+        }
+        .admin-form input:focus, .admin-form textarea:focus {
+            border-color:#e50914;
+        }
+        .admin-form textarea { 
+            grid-column:1/-1; 
+            resize:vertical; 
+            min-height:60px; 
+        }
+        .admin-form .full { 
+            grid-column:1/-1; 
+        }
+        .admin-form button { 
+            background:#e50914; 
+            border:none; 
+            border-radius:30px; 
+            padding:6px 16px; 
+            color:#fff; 
+            cursor:pointer; 
+            transition:0.2s; 
+            font-size:0.75rem; 
+        }
+        .admin-form button:hover { 
+            background:#b20710; 
+            transform:scale(1.02);
+        }
+
+        /* ===== ADMIN LIST - LAYOUT MODERNO COM CARDS ===== */
+        .admin-list { 
+            max-height:400px; 
+            overflow-y:auto; 
+            margin-top:10px;
+        }
+        .admin-list::-webkit-scrollbar { 
+            width:4px; 
+        }
+        .admin-list::-webkit-scrollbar-thumb { 
+            background:#e50914; 
+            border-radius:10px; 
+        }
+
+        .admin-search-box {
+            display:flex;
+            gap:8px;
+            margin-bottom:12px;
+            flex-wrap:wrap;
+        }
+        .admin-search-box input {
+            flex:1;
+            background:rgba(255,255,255,0.06);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:30px;
+            padding:8px 16px;
+            color:#fff;
+            font-size:0.8rem;
+            outline:none;
+            min-width:180px;
+        }
+        .admin-search-box input:focus {
+            border-color:#e50914;
+        }
+        .admin-search-box input::placeholder {
+            color:rgba(255,255,255,0.3);
+        }
+        .admin-search-box .search-clear-btn {
+            background:rgba(255,255,255,0.1);
+            border:none;
+            border-radius:50%;
+            width:32px;
+            height:32px;
+            color:#fff;
+            cursor:pointer;
+            display:none;
+            align-items:center;
+            justify-content:center;
+            transition:0.2s;
+            font-size:12px;
+        }
+        .admin-search-box .search-clear-btn:hover {
+            background:rgba(255,255,255,0.2);
+        }
+        .admin-search-box .search-count {
+            color:rgba(255,255,255,0.4);
+            font-size:0.7rem;
+            display:flex;
+            align-items:center;
+        }
+
+        .admin-card-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fill, minmax(200px,1fr));
+            gap:12px;
+        }
+
+        .admin-item-card {
+            background:rgba(255,255,255,0.04);
+            border:1px solid rgba(255,255,255,0.06);
+            border-radius:16px;
+            padding:12px;
+            transition:all 0.3s;
+            position:relative;
+        }
+        .admin-item-card:hover {
+            background:rgba(255,255,255,0.08);
+            border-color:rgba(229,9,20,0.3);
+            transform:translateY(-2px);
+            box-shadow:0 8px 24px rgba(0,0,0,0.3);
+        }
+        .admin-item-card .item-header {
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            gap:8px;
+            margin-bottom:6px;
+        }
+        .admin-item-card .item-title {
+            font-weight:600;
+            font-size:0.85rem;
+            color:#fff;
+            word-break:break-word;
+        }
+        .admin-item-card .item-actions {
+            display:flex;
+            gap:4px;
+            flex-shrink:0;
+        }
+        .admin-item-card .item-actions button {
+            background:transparent;
+            border:none;
+            color:rgba(255,255,255,0.4);
+            cursor:pointer;
+            font-size:0.7rem;
+            padding:4px 6px;
+            border-radius:8px;
+            transition:0.2s;
+        }
+        .admin-item-card .item-actions button:hover {
+            background:rgba(255,255,255,0.1);
+            color:#fff;
+        }
+        .admin-item-card .item-actions button.delete:hover {
+            background:rgba(229,9,20,0.2);
+            color:#e50914;
+        }
+        .admin-item-card .item-actions button.edit:hover {
+            background:rgba(255,193,7,0.2);
+            color:#ffc107;
+        }
+        .admin-item-card .item-details {
+            font-size:0.65rem;
+            color:rgba(255,255,255,0.5);
+            display:flex;
+            flex-direction:column;
+            gap:2px;
+        }
+        .admin-item-card .item-details span {
+            display:flex;
+            align-items:center;
+            gap:4px;
+        }
+        .admin-item-card .item-details i {
+            font-size:0.55rem;
+            opacity:0.5;
+        }
+        .admin-item-card .item-badge {
+            display:inline-block;
+            background:rgba(229,9,20,0.2);
+            color:#e50914;
+            font-size:0.55rem;
+            padding:1px 8px;
+            border-radius:20px;
+            margin-top:4px;
+        }
+        .admin-item-card .item-thumb {
+            width:40px;
+            height:60px;
+            border-radius:8px;
+            object-fit:cover;
+            background:rgba(255,255,255,0.05);
+            flex-shrink:0;
+        }
+        .admin-item-card .item-row {
+            display:flex;
+            gap:10px;
+            align-items:center;
+        }
+        .admin-item-card .item-info {
+            flex:1;
+            min-width:0;
+        }
+
+        /* Status badges para reports */
+        .status-pending {
+            background:rgba(255,193,7,0.2);
+            color:#ffc107;
+        }
+        .status-resolved {
+            background:rgba(76,175,80,0.2);
+            color:#4caf50;
+        }
+        .status-rejected {
+            background:rgba(229,9,20,0.2);
+            color:#e50914;
+        }
 
         /* ===== TOAST ===== */
         .toast {
@@ -752,15 +991,25 @@
             .admin-panel .admin-form { grid-template-columns:1fr; }
             .profile-header { flex-direction:column; text-align:center; }
             .profile-stats { justify-content:center; }
+            .admin-card-grid {
+                grid-template-columns:1fr !important;
+            }
         }
         @media (min-width:641px) and (max-width:1024px) { 
-            /* Tablet vertical já definido acima */
+            .admin-card-grid {
+                grid-template-columns:repeat(2, 1fr) !important;
+            }
         }
         @media (min-width:1025px) { 
-            /* Desktop já definido acima */
+            .admin-card-grid {
+                grid-template-columns:repeat(3, 1fr) !important;
+            }
         }
         @media (min-width:1800px) { 
-            .grid { gap:26px !important; } 
+            .grid { gap:26px !important; }
+            .admin-card-grid {
+                grid-template-columns:repeat(4, 1fr) !important;
+            }
         }
         @media (max-height:500px) and (orientation:landscape) {
             .app { height:98vh; min-height:400px; }
@@ -807,7 +1056,7 @@
         </div>
     </div>
 
-    <!-- BOTTOM MENU -->
+    <!-- BOTTOM MENU - FIXO -->
     <nav class="bottom-menu">
         <div class="bottom-item active" data-bottom="inicio"><i class="fas fa-home"></i><span>Inicio</span></div>
         <div class="bottom-item" data-bottom="feed"><i class="fas fa-rss"></i><span>Feed</span></div>
@@ -1448,13 +1697,11 @@
     function updateMetaTagsForShare(item) {
         if (!item) return;
         
-        // PEGA A IMAGEM DIRETAMENTE DO ITEM (thumb do card)
         const imageUrl = item.thumb || DEFAULT_AVATAR;
         const title = item.title || 'Noite Filmes';
         const description = item.description || item.sinopse || 'Assista este conteúdo no Noite Filmes';
         const url = window.location.href;
 
-        // Atualiza meta tags no head
         let meta;
         meta = document.querySelector('meta[property="og:title"]');
         if (meta) meta.setAttribute('content', title);
@@ -1501,10 +1748,7 @@
             document.head.appendChild(meta);
         }
 
-        // Atualiza título da página
         document.title = `${title} · Noite Filmes`;
-        
-        console.log(`✅ Meta tags atualizadas para compartilhamento: ${title} - ${imageUrl}`);
     }
 
     // =====================================================
@@ -1547,7 +1791,6 @@
         html += `</div>`;
         mainEl.innerHTML = html;
 
-        // Atualizar views de cada card
         document.querySelectorAll('.views-count').forEach(el => {
             const id = el.getAttribute('data-id');
             fetchViews(id, (views) => {
@@ -1613,7 +1856,6 @@
         html += `</div>`;
         mainEl.innerHTML = html;
 
-        // Atualizar views
         document.querySelectorAll('.views-count').forEach(el => {
             const id = el.getAttribute('data-id');
             fetchViews(id, (views) => {
@@ -1690,20 +1932,16 @@
 
         playerOverlay.classList.add('active');
 
-        // Atualizar informações
         document.getElementById('playerTitle').textContent = item.title || 'Sem título';
         
-        // ===== SINOPSE =====
         const sinopseEl = document.getElementById('playerSinopse');
         sinopseEl.textContent = item.description || item.sinopse || 'Sinopse não disponível.';
         sinopseEl.classList.remove('expanded');
         sinopseEl.style.maxHeight = '3em';
         
-        // ===== BADGES DE GÊNERO DIVIDIDOS =====
         const badgesContainer = document.getElementById('playerBadges');
         badgesContainer.innerHTML = '';
         
-        // Ano
         if (item.year) {
             const yearBadge = document.createElement('span');
             yearBadge.className = 'badge';
@@ -1724,18 +1962,15 @@
             badgesContainer.appendChild(yearBadge);
         }
 
-        // Visualizações - carregar do Firebase
         const viewsBadge = document.createElement('span');
         viewsBadge.className = 'badge views';
         viewsBadge.innerHTML = `<i class="fas fa-eye"></i> <span id="playerViews">0</span> visualizações`;
         badgesContainer.appendChild(viewsBadge);
 
-        // Carregar views do Firebase
         fetchViews(item.id, (views) => {
             document.getElementById('playerViews').textContent = views;
         });
 
-        // Gêneros divididos por vírgula
         if (item.category) {
             const genres = splitGenres(item.category);
             genres.forEach(genre => {
@@ -1763,18 +1998,13 @@
             });
         }
 
-        // ===== CONFIGURAR SINOPSE EXPANDÍVEL =====
         setTimeout(setupSinopseToggle, 100);
-
-        // ===== CONTABILIZAR VISUALIZAÇÃO =====
         incrementView(item.id);
-
         loadLikeCount(item.id);
         loadRatings(item.id);
         loadComments(item.id);
         setupPlayerButtons(item);
 
-        // ===== REPRODUÇÃO =====
         const link = item.link || '';
         const videoId = extractYoutubeId(link);
         const isHls = isIptvLink(link);
@@ -1791,7 +2021,6 @@
         loading.style.display = 'flex';
         wrapper.querySelectorAll('iframe').forEach(iframe => iframe.remove());
 
-        // YOUTUBE
         if (videoId) {
             youtubeDiv.style.display = 'block';
             loading.style.display = 'none';
@@ -1811,7 +2040,6 @@
             return;
         }
 
-        // IPTV
         if (isHls) {
             hlsVideo.style.display = 'block';
             loading.style.display = 'none';
@@ -1832,7 +2060,6 @@
             return;
         }
 
-        // IMDB
         if (isImdb) {
             const embedUrl = getImdbEmbedUrl(link);
             if (!embedUrl) {
@@ -1853,7 +2080,6 @@
             return;
         }
 
-        // TOKYVIDEO
         if (isToky) {
             const embedUrl = getTokyVideoEmbedUrl(link);
             if (!embedUrl) {
@@ -2030,7 +2256,7 @@
     }
 
     // =====================================================
-    // SETUP PLAYER BUTTONS - COMPARTILHAMENTO COM IMAGEM CORRETA E CTA
+    // SETUP PLAYER BUTTONS
     // =====================================================
     function setupPlayerButtons(item) {
         const likeBtn = document.getElementById('likeBtn');
@@ -2067,21 +2293,15 @@
             }
         };
 
-        // ===== COMPARTILHAR COM IMAGEM CORRESPONDENTE, TÍTULO, DESCRIÇÃO E CTA =====
         shareBtn.onclick = () => {
-            // PEGA A IMAGEM DIRETAMENTE DO ITEM (thumb do card)
             const shareImage = item.thumb || DEFAULT_AVATAR;
             const shareTitle = item.title || 'Noite Filmes';
             const shareDesc = item.description || item.sinopse || 'Assista este conteúdo no Noite Filmes';
             const url = `${window.location.origin}${window.location.pathname}?mediaId=${item.id}&type=${currentMediaType}`;
             
-            // Texto com CTA do Instagram
             const ctaText = '\n\n📲 Siga nosso Instagram: https://instagram.com/noitefilmes';
-            
-            // Conteúdo completo para compartilhar
             const shareText = `🎬 ${shareTitle}\n\n${shareDesc}\n\n📽️ Assista em: ${url}${ctaText}`;
 
-            // Atualiza meta tags para Open Graph com a imagem correta
             updateMetaTagsForShare(item);
 
             if (navigator.share) {
@@ -2091,17 +2311,13 @@
                     url: url
                 }).catch(() => {});
             } else {
-                // Fallback: copiar link com texto enriquecido
                 const fullText = `${shareTitle}\n${shareDesc}\n\n🔗 ${url}${ctaText}`;
                 navigator.clipboard.writeText(fullText).then(() => {
                     showToast('📋 Link, descrição e CTA copiados! Compartilhe onde quiser.');
                 }).catch(() => {
-                    // Se não conseguir copiar, mostra o link
                     prompt('Copie o link para compartilhar:', url);
                 });
             }
-            
-            console.log(`🔗 Compartilhando: ${shareTitle} - Imagem: ${shareImage}`);
         };
 
         reportBtn.onclick = () => {
@@ -2888,7 +3104,7 @@
     }
 
     // =====================================================
-    // ADMIN
+    // ADMIN - LAYOUT MODERNO COM BUSCA
     // =====================================================
     function renderAdmin() {
         let html = `
@@ -2957,62 +3173,258 @@
         const container = document.getElementById('adminList');
         let items = [];
         let type = 'filmes';
+        
         if (tab === 'filmes') { items = filmes; type = 'filmes'; }
         else if (tab === 'series') { items = series; type = 'series'; }
         else if (tab === 'canais') { items = canais; type = 'canais'; }
         else if (tab === 'usuarios') {
-            db.ref('usuarios').once('value', snap => {
-                const data = snap.val();
-                if (!data) { container.innerHTML = '<div style="color:rgba(255,255,255,0.3); text-align:center; padding:20px;">Nenhum usuário</div>'; return; }
-                const users = Object.entries(data).map(([uid, u]) => ({ uid, ...u }));
-                container.innerHTML = users.map(u => `
-                    <div class="item">
-                        <span>${escapeHtml(u.displayName || u.nickname || u.uid)}</span>
-                        <span style="font-size:0.6rem; color:rgba(255,255,255,0.3);">${u.email || ''}</span>
-                        <div class="actions">
-                            <button onclick="viewUserProfile('${u.uid}')"><i class="fas fa-eye"></i></button>
-                            <button onclick="deleteUser('${u.uid}')" style="color:#e50914;"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                `).join('');
-            });
+            renderAdminUsers(container);
             return;
         } else if (tab === 'reports') {
-            db.ref('reports').once('value', snap => {
-                const data = snap.val();
-                if (!data) { container.innerHTML = '<div style="color:rgba(255,255,255,0.3); text-align:center; padding:20px;">Nenhum report</div>'; return; }
-                const reports = Object.entries(data).map(([id, r]) => ({ id, ...r })).reverse();
-                container.innerHTML = reports.map(r => `
-                    <div class="item">
-                        <span>${escapeHtml(r.videoTitle || 'Sem título')}</span>
-                        <span style="font-size:0.6rem; color:rgba(255,255,255,0.3);">${r.reasonText || ''}</span>
-                        <div class="actions">
-                            <button onclick="markReportResolved('${r.id}')"><i class="fas fa-check"></i></button>
-                            <button onclick="deleteReport('${r.id}')" style="color:#e50914;"><i class="fas fa-trash"></i></button>
+            renderAdminReports(container);
+            return;
+        }
+
+        // Busca em tempo real para filmes, séries e canais
+        let searchHtml = `
+            <div class="admin-search-box">
+                <input type="text" id="adminSearchInput" placeholder="🔍 Buscar ${tab}...">
+                <button class="search-clear-btn" id="adminSearchClear"><i class="fas fa-times"></i></button>
+                <span class="search-count" id="adminSearchCount">${items.length} itens</span>
+            </div>
+            <div id="adminCardGrid" class="admin-card-grid">
+        `;
+
+        items.forEach(item => {
+            searchHtml += `
+                <div class="admin-item-card" data-title="${escapeHtml(item.title || '').toLowerCase()}">
+                    <div class="item-row">
+                        ${item.thumb ? `<img src="${item.thumb}" class="item-thumb" onerror="this.style.display='none'">` : ''}
+                        <div class="item-info">
+                            <div class="item-header">
+                                <div class="item-title">${escapeHtml(item.title || 'Sem título')}</div>
+                                <div class="item-actions">
+                                    <button class="edit" onclick="editAdminItem('${item.id}', '${type}')"><i class="fas fa-edit"></i></button>
+                                    <button class="delete" onclick="deleteAdminItem('${item.id}', '${type}')"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="item-details">
+                                ${item.category ? `<span><i class="fas fa-tag"></i> ${escapeHtml(item.category)}</span>` : ''}
+                                ${item.year ? `<span><i class="fas fa-calendar"></i> ${escapeHtml(item.year)}</span>` : ''}
+                                ${item.link ? `<span><i class="fas fa-link"></i> ${escapeHtml(item.link.substring(0, 40))}${item.link.length > 40 ? '...' : ''}</span>` : ''}
+                                ${item.createdAt ? `<span><i class="fas fa-clock"></i> ${formatTimeAgo(item.createdAt)}</span>` : ''}
+                            </div>
+                            ${item.views !== undefined ? `<span class="item-badge"><i class="fas fa-eye"></i> ${item.views || 0} visualizações</span>` : ''}
                         </div>
                     </div>
-                `).join('');
-            });
-            return;
-        }
-
-        if (items.length === 0) {
-            container.innerHTML = '<div style="color:rgba(255,255,255,0.3); text-align:center; padding:20px;">Nenhum item</div>';
-            return;
-        }
-
-        container.innerHTML = items.map(item => `
-            <div class="item">
-                <span>${escapeHtml(item.title || 'Sem título')}</span>
-                <span style="font-size:0.6rem; color:rgba(255,255,255,0.3);">${item.category || ''} ${item.year || ''}</span>
-                <div class="actions">
-                    <button onclick="editAdminItem('${item.id}', '${type}')"><i class="fas fa-edit"></i></button>
-                    <button onclick="deleteAdminItem('${item.id}', '${type}')" style="color:#e50914;"><i class="fas fa-trash"></i></button>
                 </div>
-            </div>
-        `).join('');
+            `;
+        });
+
+        searchHtml += `</div>`;
+        container.innerHTML = searchHtml;
+
+        // Função de busca em tempo real
+        const searchInput = document.getElementById('adminSearchInput');
+        const clearBtn = document.getElementById('adminSearchClear');
+        const countEl = document.getElementById('adminSearchCount');
+        const cards = document.querySelectorAll('.admin-item-card');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const term = this.value.toLowerCase().trim();
+                clearBtn.style.display = term.length > 0 ? 'flex' : 'none';
+                let visibleCount = 0;
+                cards.forEach(card => {
+                    const title = card.getAttribute('data-title') || '';
+                    const matches = title.includes(term);
+                    card.style.display = matches ? 'block' : 'none';
+                    if (matches) visibleCount++;
+                });
+                if (countEl) countEl.textContent = `${visibleCount} itens`;
+            });
+        }
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                if (searchInput) {
+                    searchInput.value = '';
+                    searchInput.dispatchEvent(new Event('input'));
+                    searchInput.focus();
+                }
+            });
+        }
+
+        // Adicionar evento de clique nos cards para editar
+        document.querySelectorAll('.admin-item-card .edit').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+        document.querySelectorAll('.admin-item-card .delete').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
     }
 
+    // =====================================================
+    // ADMIN - USUÁRIOS COM LAYOUT MODERNO E BUSCA
+    // =====================================================
+    function renderAdminUsers(container) {
+        db.ref('usuarios').once('value', snap => {
+            const data = snap.val();
+            if (!data) {
+                container.innerHTML = '<div style="color:rgba(255,255,255,0.3); text-align:center; padding:20px;">Nenhum usuário cadastrado</div>';
+                return;
+            }
+            
+            const users = Object.entries(data).map(([uid, u]) => ({ uid, ...u }));
+            
+            let html = `
+                <div class="admin-search-box">
+                    <input type="text" id="adminSearchInput" placeholder="🔍 Buscar usuários...">
+                    <button class="search-clear-btn" id="adminSearchClear"><i class="fas fa-times"></i></button>
+                    <span class="search-count" id="adminSearchCount">${users.length} usuários</span>
+                </div>
+                <div id="adminCardGrid" class="admin-card-grid">
+            `;
+
+            users.forEach(u => {
+                const displayName = u.displayName || u.nickname || u.uid.substring(0, 8);
+                const nickname = u.nickname || 'sem_nick';
+                html += `
+                    <div class="admin-item-card" data-title="${escapeHtml(displayName).toLowerCase()} ${escapeHtml(nickname).toLowerCase()}">
+                        <div class="item-row">
+                            <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:bold; color:#fff; flex-shrink:0; overflow:hidden;">
+                                <img src="${getAvatarUrl(u.avatarUrl)}" onerror="this.src='${DEFAULT_AVATAR}'" style="width:100%; height:100%; object-fit:cover;">
+                            </div>
+                            <div class="item-info">
+                                <div class="item-header">
+                                    <div class="item-title">${escapeHtml(displayName)}</div>
+                                    <div class="item-actions">
+                                        <button class="edit" onclick="viewUserProfile('${u.uid}')"><i class="fas fa-eye"></i></button>
+                                        <button class="delete" onclick="deleteUser('${u.uid}')"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </div>
+                                <div class="item-details">
+                                    <span><i class="fas fa-at"></i> @${escapeHtml(nickname)}</span>
+                                    ${u.email ? `<span><i class="fas fa-envelope"></i> ${escapeHtml(u.email)}</span>` : ''}
+                                    ${u.createdAt ? `<span><i class="fas fa-clock"></i> ${formatTimeAgo(u.createdAt)}</span>` : ''}
+                                    ${u.lastSeen ? `<span><i class="fas fa-circle" style="color:${Date.now() - u.lastSeen < 60000 ? '#4caf50' : '#999'}"></i> ${formatTimeAgo(u.lastSeen)}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+
+            setupAdminSearch('adminSearchInput', 'adminSearchClear', 'adminSearchCount');
+        });
+    }
+
+    // =====================================================
+    // ADMIN - REPORTS COM LAYOUT MODERNO E BUSCA
+    // =====================================================
+    function renderAdminReports(container) {
+        db.ref('reports').once('value', snap => {
+            const data = snap.val();
+            if (!data) {
+                container.innerHTML = '<div style="color:rgba(255,255,255,0.3); text-align:center; padding:20px;">Nenhum report encontrado</div>';
+                return;
+            }
+            
+            const reports = Object.entries(data).map(([id, r]) => ({ id, ...r })).reverse();
+            
+            let html = `
+                <div class="admin-search-box">
+                    <input type="text" id="adminSearchInput" placeholder="🔍 Buscar reports...">
+                    <button class="search-clear-btn" id="adminSearchClear"><i class="fas fa-times"></i></button>
+                    <span class="search-count" id="adminSearchCount">${reports.length} reports</span>
+                </div>
+                <div id="adminCardGrid" class="admin-card-grid">
+            `;
+
+            reports.forEach(r => {
+                const statusClass = r.status === 'resolved' ? 'status-resolved' : r.status === 'rejected' ? 'status-rejected' : 'status-pending';
+                const statusLabel = r.status === 'resolved' ? '✅ Resolvido' : r.status === 'rejected' ? '❌ Rejeitado' : '⏳ Pendente';
+                html += `
+                    <div class="admin-item-card" data-title="${escapeHtml(r.videoTitle || '').toLowerCase()} ${escapeHtml(r.reason || '').toLowerCase()}">
+                        <div class="item-row">
+                            <div style="width:40px; height:40px; border-radius:50%; background:rgba(229,9,20,0.2); display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:bold; color:#e50914; flex-shrink:0;">
+                                <i class="fas fa-flag"></i>
+                            </div>
+                            <div class="item-info">
+                                <div class="item-header">
+                                    <div class="item-title">${escapeHtml(r.videoTitle || 'Sem título')}</div>
+                                    <div class="item-actions">
+                                        ${r.status !== 'resolved' ? `<button class="edit" onclick="markReportResolved('${r.id}')"><i class="fas fa-check" style="color:#4caf50;"></i></button>` : ''}
+                                        <button class="delete" onclick="deleteReport('${r.id}')"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </div>
+                                <div class="item-details">
+                                    <span><i class="fas fa-user"></i> ${escapeHtml(r.reportedByName || 'Anônimo')}</span>
+                                    <span><i class="fas fa-comment"></i> ${escapeHtml(r.reason || 'Sem motivo')}</span>
+                                    <span><i class="fas fa-clock"></i> ${formatTimeAgo(r.reportedAt)}</span>
+                                    <span><span class="item-badge ${statusClass}">${statusLabel}</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+
+            setupAdminSearch('adminSearchInput', 'adminSearchClear', 'adminSearchCount');
+        });
+    }
+
+    // =====================================================
+    // FUNÇÃO AUXILIAR PARA BUSCA ADMIN
+    // =====================================================
+    function setupAdminSearch(inputId, clearId, countId) {
+        const searchInput = document.getElementById(inputId);
+        const clearBtn = document.getElementById(clearId);
+        const countEl = document.getElementById(countId);
+        const cards = document.querySelectorAll('.admin-item-card');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const term = this.value.toLowerCase().trim();
+                if (clearBtn) clearBtn.style.display = term.length > 0 ? 'flex' : 'none';
+                let visibleCount = 0;
+                cards.forEach(card => {
+                    const title = card.getAttribute('data-title') || '';
+                    const matches = title.includes(term);
+                    card.style.display = matches ? 'block' : 'none';
+                    if (matches) visibleCount++;
+                });
+                if (countEl) {
+                    const total = cards.length;
+                    countEl.textContent = `${visibleCount} de ${total} itens`;
+                }
+            });
+        }
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                if (searchInput) {
+                    searchInput.value = '';
+                    searchInput.dispatchEvent(new Event('input'));
+                    searchInput.focus();
+                }
+            });
+        }
+    }
+
+    // =====================================================
+    // ADMIN - FUNÇÕES CRUD
+    // =====================================================
     function saveAdminItem() {
         const title = document.getElementById('adminTitle').value.trim();
         const link = document.getElementById('adminLink').value.trim();
@@ -3040,6 +3452,7 @@
             if (type === 'filmes') loadFilmes();
             else if (type === 'series') loadSeries();
             else loadCanais();
+            const activeTab = document.querySelector('.admin-tabs button.active')?.getAttribute('data-tab') || 'filmes';
             renderAdminList(activeTab);
         }).catch(e => showToast('❌ Erro: ' + e.message));
     }
@@ -3125,7 +3538,6 @@
     function viewUserProfile(uid) {
         renderProfile(uid);
         switchTab('perfil');
-        document.querySelector('.admin-panel')?.scrollIntoView({ behavior: 'smooth' });
     }
 
     function deleteUser(uid) {
@@ -3261,19 +3673,16 @@
     async function init() {
         await loadAllData();
 
-        // ===== VERIFICA PARÂMETROS PARA COMPARTILHAMENTO =====
         const params = new URLSearchParams(window.location.search);
         const mediaId = params.get('mediaId');
         const type = params.get('type');
         if (mediaId && type) {
-            // Busca o item e atualiza meta tags
             let item;
             if (type === 'filme') item = filmes.find(f => f.id === mediaId);
             else if (type === 'serie') item = series.find(s => s.id === mediaId);
             else item = canais.find(c => c.id === mediaId);
             if (item) {
                 updateMetaTagsForShare(item);
-                // Opcional: abrir o player automaticamente
                 setTimeout(() => {
                     playMedia(item, type);
                 }, 500);
@@ -3287,6 +3696,8 @@
         console.log('📱 Player horizontal unificado - badges individuais, sinopse com toggle e rolagem!');
         console.log('👁️ Visualizações sendo contabilizadas corretamente!');
         console.log('🔗 Compartilhamento com imagem correta do card, título, descrição e CTA do Instagram!');
+        console.log('📌 Menu inferior fixo em todos os dispositivos!');
+        console.log('📋 Admin com layout moderno e busca em tempo real!');
     }
 
     if (document.readyState === 'loading') {
