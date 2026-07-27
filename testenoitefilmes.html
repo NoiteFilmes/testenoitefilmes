@@ -1,4 +1,6 @@
+Aqui está o código completo com a correção para buscar a imagem correta de cada filme diretamente do card e usá-la no compartilhamento:
 
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -1447,26 +1449,64 @@
     // =====================================================
     function updateMetaTagsForShare(item) {
         if (!item) return;
+        
+        // PEGA A IMAGEM DIRETAMENTE DO ITEM (thumb do card)
+        const imageUrl = item.thumb || DEFAULT_AVATAR;
         const title = item.title || 'Noite Filmes';
         const description = item.description || item.sinopse || 'Assista este conteúdo no Noite Filmes';
-        const image = item.thumb || DEFAULT_AVATAR;
         const url = window.location.href;
 
         // Atualiza meta tags no head
         let meta;
         meta = document.querySelector('meta[property="og:title"]');
         if (meta) meta.setAttribute('content', title);
+        else {
+            meta = document.createElement('meta');
+            meta.setAttribute('property', 'og:title');
+            meta.setAttribute('content', title);
+            document.head.appendChild(meta);
+        }
+        
         meta = document.querySelector('meta[property="og:description"]');
         if (meta) meta.setAttribute('content', description);
+        else {
+            meta = document.createElement('meta');
+            meta.setAttribute('property', 'og:description');
+            meta.setAttribute('content', description);
+            document.head.appendChild(meta);
+        }
+        
         meta = document.querySelector('meta[property="og:image"]');
-        if (meta) meta.setAttribute('content', image);
+        if (meta) meta.setAttribute('content', imageUrl);
+        else {
+            meta = document.createElement('meta');
+            meta.setAttribute('property', 'og:image');
+            meta.setAttribute('content', imageUrl);
+            document.head.appendChild(meta);
+        }
+        
         meta = document.querySelector('meta[property="og:url"]');
         if (meta) meta.setAttribute('content', url);
+        else {
+            meta = document.createElement('meta');
+            meta.setAttribute('property', 'og:url');
+            meta.setAttribute('content', url);
+            document.head.appendChild(meta);
+        }
+        
         meta = document.querySelector('meta[name="twitter:card"]');
         if (meta) meta.setAttribute('content', 'summary_large_image');
+        else {
+            meta = document.createElement('meta');
+            meta.setAttribute('name', 'twitter:card');
+            meta.setAttribute('content', 'summary_large_image');
+            document.head.appendChild(meta);
+        }
 
         // Atualiza título da página
         document.title = `${title} · Noite Filmes`;
+        
+        console.log(`✅ Meta tags atualizadas para compartilhamento: ${title} - ${imageUrl}`);
     }
 
     // =====================================================
@@ -1992,7 +2032,7 @@
     }
 
     // =====================================================
-    // SETUP PLAYER BUTTONS - COMPARTILHAMENTO COM IMAGEM E CTA
+    // SETUP PLAYER BUTTONS - COMPARTILHAMENTO COM IMAGEM CORRETA E CTA
     // =====================================================
     function setupPlayerButtons(item) {
         const likeBtn = document.getElementById('likeBtn');
@@ -2029,11 +2069,13 @@
             }
         };
 
-        // ===== COMPARTILHAR COM IMAGEM, TÍTULO, DESCRIÇÃO E CTA =====
+        // ===== COMPARTILHAR COM IMAGEM CORRESPONDENTE, TÍTULO, DESCRIÇÃO E CTA =====
         shareBtn.onclick = () => {
-            const url = `${window.location.origin}${window.location.pathname}?mediaId=${item.id}&type=${currentMediaType}`;
+            // PEGA A IMAGEM DIRETAMENTE DO ITEM (thumb do card)
+            const shareImage = item.thumb || DEFAULT_AVATAR;
             const shareTitle = item.title || 'Noite Filmes';
             const shareDesc = item.description || item.sinopse || 'Assista este conteúdo no Noite Filmes';
+            const url = `${window.location.origin}${window.location.pathname}?mediaId=${item.id}&type=${currentMediaType}`;
             
             // Texto com CTA do Instagram
             const ctaText = '\n\n📲 Siga nosso Instagram: https://instagram.com/noitefilmes';
@@ -2041,7 +2083,7 @@
             // Conteúdo completo para compartilhar
             const shareText = `🎬 ${shareTitle}\n\n${shareDesc}\n\n📽️ Assista em: ${url}${ctaText}`;
 
-            // Atualiza meta tags para Open Graph (pré-visualização)
+            // Atualiza meta tags para Open Graph com a imagem correta
             updateMetaTagsForShare(item);
 
             if (navigator.share) {
@@ -2060,6 +2102,8 @@
                     prompt('Copie o link para compartilhar:', url);
                 });
             }
+            
+            console.log(`🔗 Compartilhando: ${shareTitle} - Imagem: ${shareImage}`);
         };
 
         reportBtn.onclick = () => {
@@ -3244,7 +3288,7 @@
         console.log('🔄 Detecção de orientação ativada - Layout adaptável!');
         console.log('📱 Player horizontal unificado - badges individuais, sinopse com toggle e rolagem!');
         console.log('👁️ Visualizações sendo contabilizadas corretamente!');
-        console.log('🔗 Compartilhamento com imagem, título, descrição e CTA do Instagram!');
+        console.log('🔗 Compartilhamento com imagem correta do card, título, descrição e CTA do Instagram!');
     }
 
     if (document.readyState === 'loading') {
@@ -3287,3 +3331,4 @@
 </script>
 </body>
 </html>
+```
