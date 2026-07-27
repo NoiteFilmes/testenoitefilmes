@@ -63,6 +63,42 @@
             border: 1px solid rgba(255,30,30,0.2);
             position: relative;
         }
+        /* ===== CORREÇÃO: MENU INFERIOR FIXO EM DESKTOP ===== */
+        @media (min-width: 768px) {
+            .app {
+                height: 100vh !important;
+                max-height: 100vh !important;
+                min-height: 100vh !important;
+                border-radius: 0 !important;
+                padding-bottom: 70px !important;
+                overflow: hidden !important;
+            }
+            .bottom-menu {
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                z-index: 1000 !important;
+                background: rgba(0,0,0,0.85) !important;
+                backdrop-filter: blur(20px) saturate(200%) !important;
+                border-radius: 0 !important;
+                border-top: 1px solid rgba(255,0,0,0.3) !important;
+                padding: 8px 12px 12px !important;
+                margin: 0 !important;
+                max-width: 1400px !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                width: 100% !important;
+            }
+            .main-content {
+                padding-bottom: 80px !important;
+                overflow-y: auto !important;
+                flex: 1 !important;
+            }
+        }
+
         .app::before {
             content:''; position:absolute; inset:0;
             background: radial-gradient(circle at 30% 40%, rgba(255,20,20,0.08), transparent 70%),
@@ -177,21 +213,13 @@
             background:rgba(229,9,20,0.8); transform:translateX(-50%) scale(1.05);
         }
 
-        /* ===== BOTTOM MENU - FIXO ===== */
+        /* ===== BOTTOM MENU ===== */
         .bottom-menu {
             position:relative; z-index:12; background:rgba(0,0,0,0.5);
             backdrop-filter:blur(20px) saturate(200%);
             border-top:1px solid rgba(255,0,0,0.2);
             padding:8px 12px 12px; display:flex; flex-wrap:wrap; align-items:center;
             justify-content:space-around; flex-shrink:0; gap:4px;
-        }
-        /* FIXAR O MENU INFERIOR EM TODOS OS DISPOSITIVOS */
-        @media (min-width: 768px) {
-            .bottom-menu {
-                position: sticky !important;
-                bottom: 0 !important;
-                margin-top: auto !important;
-            }
         }
         .bottom-item {
             display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -937,6 +965,40 @@
             background:rgba(229,9,20,0.2);
             color:#e50914;
         }
+        .status-resolving {
+            background:rgba(33,150,243,0.2);
+            color:#2196f3;
+        }
+        .status-solving {
+            background:rgba(156,39,176,0.2);
+            color:#9c27b0;
+        }
+
+        /* Botões de resposta em reports */
+        .admin-response-buttons {
+            display:flex;
+            gap:4px;
+            flex-wrap:wrap;
+            margin-top:4px;
+        }
+        .admin-response-buttons button {
+            background:rgba(255,255,255,0.06);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:20px;
+            padding:2px 10px;
+            color:rgba(255,255,255,0.6);
+            font-size:0.6rem;
+            cursor:pointer;
+            transition:0.2s;
+        }
+        .admin-response-buttons button:hover {
+            background:rgba(229,9,20,0.2);
+            border-color:#e50914;
+            color:#fff;
+        }
+        .admin-response-buttons button.resolving { border-color:#2196f3; color:#2196f3; }
+        .admin-response-buttons button.solving { border-color:#9c27b0; color:#9c27b0; }
+        .admin-response-buttons button.resolved { border-color:#4caf50; color:#4caf50; }
 
         /* ===== TOAST ===== */
         .toast {
@@ -3104,7 +3166,7 @@
     }
 
     // =====================================================
-    // ADMIN - LAYOUT MODERNO COM BUSCA
+    // ADMIN - LAYOUT MODERNO COM BUSCA E FUNÇÕES DE REPORTS
     // =====================================================
     function renderAdmin() {
         let html = `
@@ -3169,6 +3231,9 @@
         }
     }
 
+    // =====================================================
+    // ADMIN - RENDER LIST COM CARDS MODERNOS E BUSCA
+    // =====================================================
     function renderAdminList(tab = 'filmes') {
         const container = document.getElementById('adminList');
         let items = [];
@@ -3254,18 +3319,6 @@
                 }
             });
         }
-
-        // Adicionar evento de clique nos cards para editar
-        document.querySelectorAll('.admin-item-card .edit').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        });
-        document.querySelectorAll('.admin-item-card .delete').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        });
     }
 
     // =====================================================
@@ -3327,7 +3380,7 @@
     }
 
     // =====================================================
-    // ADMIN - REPORTS COM LAYOUT MODERNO E BUSCA
+    // ADMIN - REPORTS COM LAYOUT MODERNO, LINK E BOTÕES DE RESPOSTA
     // =====================================================
     function renderAdminReports(container) {
         db.ref('reports').once('value', snap => {
@@ -3349,8 +3402,15 @@
             `;
 
             reports.forEach(r => {
-                const statusClass = r.status === 'resolved' ? 'status-resolved' : r.status === 'rejected' ? 'status-rejected' : 'status-pending';
-                const statusLabel = r.status === 'resolved' ? '✅ Resolvido' : r.status === 'rejected' ? '❌ Rejeitado' : '⏳ Pendente';
+                const statusClass = r.status === 'resolved' ? 'status-resolved' : 
+                                   r.status === 'resolving' ? 'status-resolving' :
+                                   r.status === 'solving' ? 'status-solving' :
+                                   r.status === 'rejected' ? 'status-rejected' : 'status-pending';
+                const statusLabel = r.status === 'resolved' ? '✅ Resolvido' : 
+                                   r.status === 'resolving' ? '🔵 Resolvendo' :
+                                   r.status === 'solving' ? '🟣 Solucionando' :
+                                   r.status === 'rejected' ? '❌ Rejeitado' : '⏳ Pendente';
+                const adminMsg = r.adminMessage || '';
                 html += `
                     <div class="admin-item-card" data-title="${escapeHtml(r.videoTitle || '').toLowerCase()} ${escapeHtml(r.reason || '').toLowerCase()}">
                         <div class="item-row">
@@ -3368,8 +3428,16 @@
                                 <div class="item-details">
                                     <span><i class="fas fa-user"></i> ${escapeHtml(r.reportedByName || 'Anônimo')}</span>
                                     <span><i class="fas fa-comment"></i> ${escapeHtml(r.reason || 'Sem motivo')}</span>
+                                    ${r.videoLink ? `<span><i class="fas fa-external-link-alt"></i> <a href="${escapeHtml(r.videoLink)}" target="_blank" style="color:#e50914;text-decoration:underline;">Link do vídeo</a></span>` : ''}
                                     <span><i class="fas fa-clock"></i> ${formatTimeAgo(r.reportedAt)}</span>
+                                    ${adminMsg ? `<span><i class="fas fa-reply"></i> <strong>Admin:</strong> ${escapeHtml(adminMsg)}</span>` : ''}
                                     <span><span class="item-badge ${statusClass}">${statusLabel}</span></span>
+                                </div>
+                                <!-- Botões para enviar mensagem ao reportador -->
+                                <div class="admin-response-buttons">
+                                    <button class="resolving" onclick="sendAdminReportResponse('${r.id}', 'Já estamos resolvendo o problema. Obrigado pelo report!')">🔵 Resolvendo</button>
+                                    <button class="solving" onclick="sendAdminReportResponse('${r.id}', 'Já solucionando o problema. Em breve estará corrigido!')">🟣 Solucionando</button>
+                                    <button class="resolved" onclick="sendAdminReportResponse('${r.id}', 'Problema corrigido! O vídeo já está disponível.')">✅ Corrigido</button>
                                 </div>
                             </div>
                         </div>
@@ -3382,6 +3450,21 @@
 
             setupAdminSearch('adminSearchInput', 'adminSearchClear', 'adminSearchCount');
         });
+    }
+
+    // =====================================================
+    // FUNÇÃO PARA ENVIAR RESPOSTA DO ADMIN AO REPORT
+    // =====================================================
+    function sendAdminReportResponse(reportId, message) {
+        if (!reportId) return;
+        db.ref(`reports/${reportId}`).update({
+            adminMessage: message,
+            status: message.includes('corrigido') ? 'resolved' : 
+                   message.includes('solucionando') ? 'solving' : 'resolving'
+        }).then(() => {
+            showToast('✅ Mensagem enviada ao reportador!');
+            renderAdminList('reports');
+        }).catch(e => showToast('❌ Erro: ' + e.message));
     }
 
     // =====================================================
@@ -3549,7 +3632,10 @@
     }
 
     function markReportResolved(id) {
-        db.ref(`reports/${id}/status`).set('resolved').then(() => {
+        db.ref(`reports/${id}`).update({
+            status: 'resolved',
+            adminMessage: 'Problema corrigido! O vídeo já está disponível.'
+        }).then(() => {
             showToast('✅ Report resolvido');
             renderAdminList('reports');
         });
@@ -3696,8 +3782,8 @@
         console.log('📱 Player horizontal unificado - badges individuais, sinopse com toggle e rolagem!');
         console.log('👁️ Visualizações sendo contabilizadas corretamente!');
         console.log('🔗 Compartilhamento com imagem correta do card, título, descrição e CTA do Instagram!');
-        console.log('📌 Menu inferior fixo em todos os dispositivos!');
-        console.log('📋 Admin com layout moderno e busca em tempo real!');
+        console.log('📌 Menu inferior fixo em desktop sem necessidade de rolagem!');
+        console.log('📋 Admin com layout moderno, busca em tempo real e respostas em reports!');
     }
 
     if (document.readyState === 'loading') {
@@ -3730,6 +3816,7 @@
     window.deleteAdminItem = deleteAdminItem;
     window.renderAdminList = renderAdminList;
     window.showFranchise = showFranchise;
+    window.sendAdminReportResponse = sendAdminReportResponse;
 
     console.log('✅ Todos os dados do banco integrados!');
     console.log('📌 Filmes ordenados por data de publicação (mais recentes primeiro)');
