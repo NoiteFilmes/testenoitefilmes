@@ -1,10 +1,19 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Noite Filmes · rede social</title>
+    
+    <!-- ===== META TAGS PWA ===== -->
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Noite Filmes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIk5vaXRlIEZpbG1lcyIsCiAgInNob3J0X25hbWUiOiAiTm9pdGUgRmlsbWVzIiwKICAiZGVzY3JpcHRpb24iOiAiQXNzaXN0YSBmaWxtZXMsIHPpcmllcyBlIGNhbmFpcyBvbmxpbmUiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzBhMGEwYSIsCiAgInRoZW1lX2NvbG9yIjogIiMwYTBhMGEiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2kuaWJiLmNvL1dwczJyRENaL0MzODQtQkEyLUMtQzUtQkQtNDk1LUMtODgtQjgtMDAtQzM0NS1CRTIyOS1FLnBuZyIsCiAgICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIiwKICAgICAgInB1cnBvc2UiOiAiYW55IgogICAgfSwKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2kuaWJiLmNvL1dwczJyRENaL0MzODQtQkEyLUMtQzUtQkQtNDk1LUMtODgtQjgtMDAtQzM0NS1CRTIyOS1FLnBuZyIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIiwKICAgICAgInB1cnBvc2UiOiAiYW55IgogICAgfQogIF0sCiAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IiwKICAic2NvcGUiOiAiY2VudGVyIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwYTBhMGEiLAogICJ0aGVtZV9jb2xvciI6ICIjMGEwYTBhIiwKICAiY2F0ZWdvcnkiOiAiZW50ZXJ0YWlubWVudCIsCiAgInNob3J0X25hbWUiOiAiTm9pdGUgRmlsbWVzIgp9" />
+    <link rel="apple-touch-icon" href="https://i.ibb.co/Wps2rDCZ/C384-BA2-C-C5-BD-495-C-88-B8-00-C345-BE829-E.png" />
+    
     <!-- ===== META TAGS OPEN GRAPH PARA COMPARTILHAMENTO ===== -->
     <meta property="og:title" content="Noite Filmes" />
     <meta property="og:description" content="Assista filmes, séries e canais online" />
@@ -24,23 +33,80 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <!-- HLS.js para IPTV -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
+    
+    <!-- ===== SERVICE WORKER PWA ===== -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:application/javascript;base64,' + btoa(`
+                const CACHE_NAME = 'noitefilmes-v1';
+                const urlsToCache = [
+                    '/',
+                    '/index.html',
+                    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css',
+                    'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js',
+                    'https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js',
+                    'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js',
+                    'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js',
+                    'https://www.youtube.com/iframe_api',
+                    'https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js'
+                ];
+
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then(cache => cache.addAll(urlsToCache))
+                            .then(() => self.skipWaiting())
+                    );
+                });
+
+                self.addEventListener('activate', event => {
+                    event.waitUntil(
+                        caches.keys().then(cacheNames => {
+                            return Promise.all(
+                                cacheNames.map(cacheName => {
+                                    if (cacheName !== CACHE_NAME) {
+                                        return caches.delete(cacheName);
+                                    }
+                                })
+                            );
+                        }).then(() => self.clients.claim())
+                    );
+                });
+
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then(response => response || fetch(event.request))
+                    );
+                });
+            `)).catch(() => console.log('Service worker não registrado'));
+        }
+    </script>
+    
     <style>
         /* ===== ESTILOS GLOBAIS - LIQUID GLASS ===== */
         * { margin:0; padding:0; box-sizing:border-box; font-family: system-ui, 'Segoe UI', Roboto, sans-serif; }
-        body {
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: #0a0a0a;
             background-image: 
                 radial-gradient(circle at 15% 25%, rgba(229,9,20,0.08) 0%, transparent 50%),
                 radial-gradient(circle at 85% 75%, rgba(255,50,50,0.06) 0%, transparent 45%),
                 radial-gradient(circle at 50% 50%, rgba(20,20,30,0.9) 0%, #000000 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
             color: #ffffff;
-            position: relative;
-            overflow-x: hidden;
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
         /* ===== BOLHAS DE AR FLUTUANTES ===== */
         body::before {
@@ -104,19 +170,55 @@
         body.light-mode .admin-item-card:hover { background: rgba(255,255,255,0.2) !important; }
 
         .app {
-            max-width: 1400px; width:100%; height:95vh; max-height:900px; min-height:650px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
             background: rgba(255,255,255,0.04);
             backdrop-filter: blur(24px) saturate(180%);
             -webkit-backdrop-filter: blur(24px) saturate(180%);
-            border-radius: 48px 48px 32px 32px;
+            border-radius: 0;
             box-shadow: 0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.08);
+            border: none;
             position: relative;
             z-index: 1;
+            height: 100vh;
+            width: 100vw;
         }
+        @media (min-width: 768px) {
+            .app {
+                border-radius: 24px;
+                height: 98vh;
+                width: 98vw;
+                max-height: 98vh;
+                top: 1vh;
+                left: 1vw;
+                right: 1vw;
+                bottom: 1vh;
+            }
+            .app .bottom-menu {
+                border-radius: 0 0 24px 24px !important;
+            }
+        }
+        @media (min-width: 1400px) {
+            .app {
+                max-width: 1400px;
+                max-height: 95vh;
+                height: 95vh;
+                width: 95vw;
+                left: 2.5vw;
+                top: 2.5vh;
+            }
+        }
+
         .app::before {
             content:''; position:absolute; inset:0;
             background: 
@@ -159,62 +261,67 @@
 
         /* ===== TOP MENU - LIQUID GLASS ===== */
         .top-menu {
-            position:relative; z-index:10; padding:12px 22px 8px 22px;
+            position:relative; z-index:10; padding:10px 16px 6px 16px;
             background:rgba(255,255,255,0.03);
             backdrop-filter:blur(16px);
             -webkit-backdrop-filter:blur(16px);
             border-bottom:1px solid rgba(255,255,255,0.06);
-            display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px;
+            display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:6px;
             flex-shrink:0;
+            min-height: 44px;
         }
         .brand {
-            display:flex; align-items:center; gap:8px; color:#e50914; font-weight:700; font-size:1.2rem;
+            display:flex; align-items:center; gap:6px; color:#e50914; font-weight:700; font-size:1.1rem;
             text-shadow:0 0 30px rgba(229,9,20,0.3);
         }
-        .brand i { font-size:1.4rem; filter:drop-shadow(0 0 12px rgba(229,9,20,0.3)); }
-        .brand .user-indicator { font-size:0.65rem; color:rgba(255,255,255,0.4); font-weight:400; margin-left:6px; }
+        .brand i { font-size:1.3rem; filter:drop-shadow(0 0 12px rgba(229,9,20,0.3)); }
+        .brand .user-indicator { font-size:0.6rem; color:rgba(255,255,255,0.4); font-weight:400; margin-left:4px; }
         body.light-mode .brand .user-indicator { color:rgba(0,0,0,0.4); }
 
         .top-links {
-            display:flex; flex-wrap:wrap; align-items:center; gap:3px 10px; list-style:none; font-weight:500;
+            display:flex; flex-wrap:wrap; align-items:center; gap:2px 6px; list-style:none; font-weight:500;
         }
         .top-links li { display:inline-block; }
         .top-links a {
-            color:rgba(255,255,255,0.7); text-decoration:none; font-size:0.85rem; padding:5px 12px;
+            color:rgba(255,255,255,0.6); text-decoration:none; font-size:0.7rem; padding:4px 10px;
             border-radius:40px; transition:all 0.3s; background:transparent; border:1px solid transparent;
             cursor:pointer;
             backdrop-filter:blur(4px);
+            white-space:nowrap;
         }
         .top-links a:hover, .top-links a.active {
-            background:rgba(229,9,20,0.15);
+            background:rgba(229,9,20,0.12);
             color:#fff; 
-            border-color:rgba(229,9,20,0.3);
-            box-shadow:0 0 30px rgba(229,9,20,0.1);
+            border-color:rgba(229,9,20,0.2);
+            box-shadow:0 0 30px rgba(229,9,20,0.08);
             transform:scale(1.02);
         }
-        .top-links a i { margin-right:5px; font-size:0.75rem; opacity:0.6; }
+        .top-links a i { margin-right:4px; font-size:0.65rem; opacity:0.6; }
         .top-links a .badge {
-            background:#e50914; color:#fff; border-radius:50%; padding:0 5px; font-size:0.5rem;
-            margin-left:3px;
+            background:#e50914; color:#fff; border-radius:50%; padding:0 4px; font-size:0.45rem;
+            margin-left:2px;
             box-shadow:0 0 15px rgba(229,9,20,0.3);
         }
 
         /* ===== MAIN CONTENT ===== */
         .main-content {
-            flex:1; position:relative; z-index:5; padding:14px 22px 8px 22px;
-            overflow-y:auto; display:flex; flex-direction:column; gap:14px;
+            flex:1; position:relative; z-index:5; padding:10px 16px 6px 16px;
+            overflow-y:auto; overflow-x:hidden; display:flex; flex-direction:column; gap:12px;
+            min-height:0;
+            height:100%;
         }
         .main-content::-webkit-scrollbar { width:3px; }
-        .main-content::-webkit-scrollbar-thumb { background:rgba(229,9,20,0.5); border-radius:10px; }
+        .main-content::-webkit-scrollbar-thumb { background:rgba(229,9,20,0.4); border-radius:10px; }
         .main-content::-webkit-scrollbar-track { background:rgba(255,255,255,0.02); }
 
         /* ===== LOADING ===== */
         .loading-screen {
             display:flex; flex-direction:column; align-items:center; justify-content:center;
-            height:100%; color:rgba(255,255,255,0.4); gap:16px;
+            height:100%; color:rgba(255,255,255,0.3); gap:12px;
+            flex:1;
         }
         .loading-screen .spinner {
-            width:36px; height:36px; border:2px solid rgba(255,255,255,0.06);
+            width:32px; height:32px; border:2px solid rgba(255,255,255,0.06);
             border-top-color:rgba(229,9,20,0.6); border-radius:50%;
             animation: spin 0.8s linear infinite;
         }
@@ -223,78 +330,79 @@
         /* ===== CARDS - LIQUID GLASS ===== */
         .grid {
             display:grid;
-            gap:16px;
-            margin-top:4px;
+            gap:12px;
+            margin-top:2px;
         }
 
         @media (orientation: portrait) and (max-width: 1024px) {
-            .grid { grid-template-columns: repeat(2, 1fr) !important; gap:12px !important; }
+            .grid { grid-template-columns: repeat(2, 1fr) !important; gap:10px !important; }
         }
         @media (orientation: landscape) {
-            .grid { grid-template-columns: repeat(5, 1fr) !important; gap:14px !important; }
+            .grid { grid-template-columns: repeat(5, 1fr) !important; gap:10px !important; }
         }
         @media (orientation: landscape) and (max-width: 767px) {
-            .grid { grid-template-columns: repeat(5, 1fr) !important; gap:6px !important; }
+            .grid { grid-template-columns: repeat(5, 1fr) !important; gap:5px !important; }
         }
         @media (orientation: portrait) and (min-width: 768px) and (max-width: 1024px) {
-            .grid { grid-template-columns: repeat(3, 1fr) !important; gap:14px !important; }
+            .grid { grid-template-columns: repeat(3, 1fr) !important; gap:10px !important; }
         }
         @media (orientation: landscape) and (min-width: 1400px) {
-            .grid { grid-template-columns: repeat(5, 1fr) !important; gap:18px !important; }
+            .grid { grid-template-columns: repeat(5, 1fr) !important; gap:14px !important; }
         }
-        @media (min-width: 1800px) { .grid { gap:24px !important; } }
+        @media (min-width: 1800px) { .grid { gap:18px !important; } }
 
         .card {
             background: rgba(255,255,255,0.03);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border-radius: 24px;
-            padding: 12px 8px 14px;
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 10px 6px 12px;
+            border: 1px solid rgba(255,255,255,0.04);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04);
             transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             display:flex; flex-direction:column; align-items:center; text-align:center; color:#f0f0f0;
             cursor:pointer; position:relative;
         }
         .card:hover {
-            transform:translateY(-8px) scale(1.02);
-            border-color: rgba(229,9,20,0.3);
+            transform:translateY(-4px) scale(1.01);
+            border-color: rgba(229,9,20,0.2);
             background: rgba(255,255,255,0.06);
-            box-shadow: 0 16px 48px rgba(229,9,20,0.08), inset 0 1px 0 rgba(255,255,255,0.08);
+            box-shadow: 0 12px 40px rgba(229,9,20,0.06), inset 0 1px 0 rgba(255,255,255,0.06);
         }
         .card .poster {
             width:100%; aspect-ratio:2/3; background:rgba(255,255,255,0.02);
-            border-radius:16px; display:flex; align-items:center; justify-content:center;
-            font-size:2.2rem; color:#e50914; border:1px solid rgba(229,9,20,0.1);
-            margin-bottom:8px; overflow:hidden; position:relative;
+            border-radius:14px; display:flex; align-items:center; justify-content:center;
+            font-size:1.8rem; color:#e50914; border:1px solid rgba(229,9,20,0.06);
+            margin-bottom:6px; overflow:hidden; position:relative;
             backdrop-filter:blur(4px);
         }
         .card .poster img { width:100%; height:100%; object-fit:cover; }
-        .card h4 { font-size:0.8rem; font-weight:600; margin-bottom:1px; color:rgba(255,255,255,0.9); }
-        .card p { font-size:0.65rem; opacity:0.5; display:flex; align-items:center; gap:5px; }
+        .card h4 { font-size:0.7rem; font-weight:600; margin-bottom:1px; color:rgba(255,255,255,0.85); line-height:1.2; }
+        .card p { font-size:0.55rem; opacity:0.4; display:flex; align-items:center; gap:4px; }
         .card .franchise-badge {
-            position:absolute; bottom:60px; left:50%; transform:translateX(-50%);
-            background:rgba(0,0,0,0.5); backdrop-filter:blur(10px);
-            border:1px solid rgba(229,9,20,0.2); border-radius:20px;
-            padding:1px 8px; font-size:0.5rem; color:#fff; display:flex; align-items:center; gap:3px;
+            position:absolute; bottom:50px; left:50%; transform:translateX(-50%);
+            background:rgba(0,0,0,0.4); backdrop-filter:blur(10px);
+            border:1px solid rgba(229,9,20,0.15); border-radius:20px;
+            padding:1px 6px; font-size:0.45rem; color:#fff; display:flex; align-items:center; gap:2px;
             white-space:nowrap; cursor:pointer; transition:all 0.3s;
         }
         .card .franchise-badge:hover {
-            background:rgba(229,9,20,0.5); transform:translateX(-50%) scale(1.05);
+            background:rgba(229,9,20,0.4); transform:translateX(-50%) scale(1.05);
         }
 
         @media (orientation: portrait) and (max-width: 1024px) {
-            .card { padding:8px 6px 10px !important; border-radius:18px !important; }
-            .card .poster { font-size:1.6rem !important; }
-            .card h4 { font-size:0.7rem !important; }
-            .card p { font-size:0.55rem !important; }
+            .card { padding:6px 4px 8px !important; border-radius:16px !important; }
+            .card .poster { font-size:1.4rem !important; border-radius:10px !important; }
+            .card h4 { font-size:0.6rem !important; }
+            .card p { font-size:0.5rem !important; }
+            .card .franchise-badge { font-size:0.4rem !important; padding:1px 4px !important; bottom:38px !important; }
         }
         @media (orientation: landscape) and (max-width: 767px) {
-            .card { padding:5px 4px 7px !important; border-radius:14px !important; }
-            .card .poster { border-radius:10px !important; font-size:1rem !important; }
-            .card h4 { font-size:0.55rem !important; margin-bottom:0 !important; }
-            .card p { font-size:0.45rem !important; }
-            .card .franchise-badge { font-size:0.35rem !important; padding:1px 5px !important; bottom:40px !important; }
+            .card { padding:4px 3px 6px !important; border-radius:12px !important; }
+            .card .poster { border-radius:8px !important; font-size:0.9rem !important; }
+            .card h4 { font-size:0.45rem !important; margin-bottom:0 !important; }
+            .card p { font-size:0.4rem !important; }
+            .card .franchise-badge { font-size:0.3rem !important; padding:1px 4px !important; bottom:30px !important; }
         }
 
         /* ===== BOTTOM MENU - ALTURA REDUZIDA E LIQUID GLASS ===== */
@@ -303,87 +411,71 @@
             background: rgba(255,255,255,0.02);
             backdrop-filter: blur(20px) saturate(200%);
             -webkit-backdrop-filter: blur(20px) saturate(200%);
-            border-top: 1px solid rgba(255,255,255,0.05);
-            padding: 4px 10px 6px 10px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            padding: 3px 8px 4px 8px;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-around;
             flex-shrink: 0;
             gap: 2px;
-            min-height: 48px;
+            min-height: 40px;
         }
         @media (min-width: 768px) {
             .bottom-menu {
-                position: fixed !important;
-                bottom: 0 !important;
-                left: 50% !important;
-                transform: translateX(-50%) !important;
-                width: 100% !important;
-                max-width: 1400px !important;
-                z-index: 1000 !important;
-                border-radius: 24px 24px 0 0 !important;
-                padding: 4px 12px 6px 12px !important;
-                min-height: 44px !important;
-                margin: 0 !important;
-                border: 1px solid rgba(255,255,255,0.05) !important;
-                border-bottom: none !important;
-                background: rgba(0,0,0,0.3) !important;
-                backdrop-filter: blur(24px) saturate(200%) !important;
-                -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
-            }
-            .app {
-                padding-bottom: 56px !important;
-                overflow: hidden !important;
-            }
-            .main-content {
-                padding-bottom: 60px !important;
-                overflow-y: auto !important;
-                flex: 1 !important;
+                border-radius: 0 0 24px 24px;
+                padding: 3px 12px 4px 12px !important;
+                min-height: 38px !important;
             }
         }
         .bottom-item {
             display:flex; flex-direction:column; align-items:center; justify-content:center;
-            color:rgba(255,255,255,0.5); text-decoration:none; font-size:0.55rem;
-            padding:3px 10px; border-radius:30px; transition:all 0.3s; background:transparent;
-            border:1px solid transparent; min-width:44px; gap:1px; cursor:pointer;
+            color:rgba(255,255,255,0.4); text-decoration:none; font-size:0.5rem;
+            padding:2px 8px; border-radius:30px; transition:all 0.3s; background:transparent;
+            border:1px solid transparent; min-width:36px; gap:1px; cursor:pointer;
         }
-        .bottom-item i { font-size:1.15rem; margin-bottom:0; }
+        .bottom-item i { font-size:1rem; margin-bottom:0; }
         .bottom-item.active { 
             color:#fff; 
-            background:rgba(229,9,20,0.12); 
-            border-color:rgba(229,9,20,0.2);
-            box-shadow:0 0 25px rgba(229,9,20,0.05);
+            background:rgba(229,9,20,0.08); 
+            border-color:rgba(229,9,20,0.12);
+            box-shadow:0 0 25px rgba(229,9,20,0.04);
         }
-        .bottom-item.active i { color:#e50914; text-shadow:0 0 20px rgba(229,9,20,0.3); }
+        .bottom-item.active i { color:#e50914; text-shadow:0 0 20px rgba(229,9,20,0.2); }
         .bottom-item:hover { 
-            background:rgba(229,9,20,0.06); 
+            background:rgba(229,9,20,0.04); 
             color:#fff; 
-            border-color:rgba(229,9,20,0.1); 
+            border-color:rgba(229,9,20,0.08); 
             transform:translateY(-1px);
         }
         .bottom-item .badge {
-            background:#e50914; color:#fff; border-radius:50%; padding:0 4px; font-size:0.4rem;
-            position:absolute; top:-2px; right:-2px;
+            background:#e50914; color:#fff; border-radius:50%; padding:0 3px; font-size:0.35rem;
+            position:absolute; top:-1px; right:-1px;
             box-shadow:0 0 12px rgba(229,9,20,0.3);
         }
         @media (max-width: 640px) {
-            .bottom-menu { min-height: 40px !important; padding:2px 6px 4px 6px !important; }
-            .bottom-item { min-width:36px !important; padding:2px 6px !important; font-size:0.45rem !important; }
-            .bottom-item i { font-size:1rem !important; }
+            .bottom-menu { min-height:32px !important; padding:2px 4px 3px 4px !important; }
+            .bottom-item { min-width:28px !important; padding:1px 4px !important; font-size:0.4rem !important; }
+            .bottom-item i { font-size:0.8rem !important; }
+        }
+        @media (max-height: 500px) and (orientation: landscape) {
+            .bottom-menu { min-height:28px !important; padding:1px 4px 2px 4px !important; }
+            .bottom-item { min-width:24px !important; padding:1px 3px !important; font-size:0.35rem !important; }
+            .bottom-item i { font-size:0.7rem !important; }
         }
 
         /* ===== BACK LINK ===== */
         .back-link {
-            color:rgba(255,255,255,0.6); background:rgba(0,0,0,0.2); padding:5px 14px; border-radius:40px;
-            border:1px solid rgba(255,255,255,0.05); cursor:pointer; display:inline-flex; align-items:center; gap:6px;
-            font-size:0.75rem; transition:0.3s; backdrop-filter:blur(8px); width:fit-content;
+            color:rgba(255,255,255,0.5); background:rgba(0,0,0,0.15); padding:4px 12px; border-radius:40px;
+            border:1px solid rgba(255,255,255,0.04); cursor:pointer; display:inline-flex; align-items:center; gap:4px;
+            font-size:0.65rem; transition:0.3s; backdrop-filter:blur(8px); width:fit-content;
         }
-        .back-link:hover { background:rgba(229,9,20,0.12); color:#fff; border-color:rgba(229,9,20,0.2); }
+        .back-link:hover { background:rgba(229,9,20,0.08); color:#fff; border-color:rgba(229,9,20,0.15); }
         .section-title { 
-            color:rgba(255,255,255,0.8); font-weight:500; letter-spacing:-0.2px; 
-            display:flex; align-items:center; gap:8px; flex-wrap:wrap; 
+            color:rgba(255,255,255,0.75); font-weight:500; letter-spacing:-0.2px; 
+            display:flex; align-items:center; gap:6px; flex-wrap:wrap; 
             text-shadow:0 0 30px rgba(255,255,255,0.02);
+            font-size:0.9rem;
         }
 
         /* ===== PLAYER OVERLAY - LIQUID GLASS ===== */
@@ -393,34 +485,34 @@
             backdrop-filter:blur(30px);
             -webkit-backdrop-filter:blur(30px);
             display:none; align-items:center; justify-content:center;
-            padding:10px;
+            padding:8px;
         }
         .player-overlay.active { display:flex; }
         .player-box {
             background:rgba(20,20,20,0.4);
             backdrop-filter:blur(30px) saturate(180%);
             -webkit-backdrop-filter:blur(30px) saturate(180%);
-            border-radius:32px; max-width:1200px; width:100%;
-            max-height:98vh; overflow:hidden; border:1px solid rgba(255,255,255,0.06);
-            padding:14px; position:relative;
-            box-shadow:0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+            border-radius:28px; max-width:1200px; width:100%;
+            max-height:98vh; overflow:hidden; border:1px solid rgba(255,255,255,0.04);
+            padding:12px; position:relative;
+            box-shadow:0 30px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
         }
         .player-box .close-btn {
-            position:absolute; top:10px; right:14px; background:rgba(255,255,255,0.05);
-            border:none; border-radius:50%; width:32px; height:32px; color:rgba(255,255,255,0.6);
-            font-size:1rem; cursor:pointer; transition:0.3s; z-index:20;
+            position:absolute; top:8px; right:12px; background:rgba(255,255,255,0.04);
+            border:none; border-radius:50%; width:28px; height:28px; color:rgba(255,255,255,0.5);
+            font-size:0.9rem; cursor:pointer; transition:0.3s; z-index:20;
             backdrop-filter:blur(8px);
         }
-        .player-box .close-btn:hover { background:rgba(229,9,20,0.3); color:#fff; transform:scale(1.1); }
+        .player-box .close-btn:hover { background:rgba(229,9,20,0.2); color:#fff; transform:scale(1.08); }
 
-        .player-layout { display:flex; gap:14px; height:100%; min-height:450px; }
-        .player-left { flex:0 0 60%; display:flex; flex-direction:column; gap:8px; min-width:0; }
-        .player-right { flex:1; display:flex; flex-direction:column; border-left:1px solid rgba(255,255,255,0.04); padding-left:14px; min-width:0; height:100%; overflow:hidden; }
+        .player-layout { display:flex; gap:10px; height:100%; min-height:400px; }
+        .player-left { flex:0 0 58%; display:flex; flex-direction:column; gap:6px; min-width:0; }
+        .player-right { flex:1; display:flex; flex-direction:column; border-left:1px solid rgba(255,255,255,0.04); padding-left:10px; min-width:0; height:100%; overflow:hidden; }
 
         .player-wrapper { 
-            background:rgba(0,0,0,0.3); border-radius:14px; overflow:hidden; aspect-ratio:16/9; 
-            position:relative; flex:0 0 auto; min-height:280px;
-            border:1px solid rgba(255,255,255,0.03);
+            background:rgba(0,0,0,0.3); border-radius:12px; overflow:hidden; aspect-ratio:16/9; 
+            position:relative; flex:0 0 auto; min-height:240px;
+            border:1px solid rgba(255,255,255,0.02);
         }
         .player-wrapper iframe, .player-wrapper video { 
             width:100%; height:100%; border:none; 
@@ -428,376 +520,398 @@
         }
         .player-wrapper .player-loading {
             position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-            color:rgba(255,255,255,0.2); background:rgba(0,0,0,0.3); z-index:1;
+            color:rgba(255,255,255,0.15); background:rgba(0,0,0,0.3); z-index:1;
+            font-size:0.8rem;
         }
 
         .player-info {
-            flex:1; display:flex; flex-direction:column; gap:3px; overflow-y:auto; padding-right:3px;
+            flex:1; display:flex; flex-direction:column; gap:2px; overflow-y:auto; padding-right:2px;
             min-height:0;
         }
-        .player-info h3 { font-size:1rem; color:rgba(255,255,255,0.9); margin:0; }
+        .player-info h3 { font-size:0.9rem; color:rgba(255,255,255,0.85); margin:0; }
         
         .player-info .sinopse-wrapper { position:relative; }
         .player-info .sinopse {
-            font-size:0.7rem; color:rgba(255,255,255,0.5); line-height:1.4;
-            max-height: 2.8em; overflow: hidden; transition: max-height 0.4s ease; cursor: pointer;
+            font-size:0.65rem; color:rgba(255,255,255,0.45); line-height:1.4;
+            max-height: 2.6em; overflow: hidden; transition: max-height 0.4s ease; cursor: pointer;
         }
-        .player-info .sinopse.expanded { max-height: 400px; }
+        .player-info .sinopse.expanded { max-height: 300px; }
         .player-info .sinopse-toggle {
-            background: none; border: none; color: #e50914; font-size:0.6rem; cursor: pointer;
-            padding:1px 0; margin-top:1px; display:inline-flex; align-items:center; gap:3px; transition:0.3s;
+            background: none; border: none; color: #e50914; font-size:0.55rem; cursor: pointer;
+            padding:1px 0; margin-top:1px; display:inline-flex; align-items:center; gap:2px; transition:0.3s;
         }
         .player-info .sinopse-toggle:hover { color: #ff4757; transform: scale(1.02); }
-        .player-info .sinopse-toggle i { font-size:0.5rem; }
+        .player-info .sinopse-toggle i { font-size:0.45rem; }
 
-        .player-info .badges { display:flex; flex-wrap:wrap; gap:4px; margin-top:2px; }
+        .player-info .badges { display:flex; flex-wrap:wrap; gap:3px; margin-top:2px; }
         .player-info .badges .badge {
-            background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.04);
-            border-radius:30px; padding:1px 10px; font-size:0.6rem; color:rgba(255,255,255,0.6);
+            background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.03);
+            border-radius:30px; padding:1px 8px; font-size:0.55rem; color:rgba(255,255,255,0.5);
             cursor:pointer; transition:0.3s; backdrop-filter:blur(4px);
         }
         .player-info .badges .badge:hover {
-            background:rgba(229,9,20,0.12); border-color:rgba(229,9,20,0.2); color:#fff;
+            background:rgba(229,9,20,0.08); border-color:rgba(229,9,20,0.12); color:#fff;
         }
         .player-info .badges .badge.views { cursor:default; }
-        .player-info .badges .badge.views:hover { background:rgba(255,255,255,0.04); }
+        .player-info .badges .badge.views:hover { background:rgba(255,255,255,0.03); }
 
         .player-info .actions-row {
-            display:flex; flex-wrap:wrap; gap:4px; margin-top:3px; align-items:center; flex-shrink:0;
+            display:flex; flex-wrap:wrap; gap:3px; margin-top:2px; align-items:center; flex-shrink:0;
         }
         .player-info .actions-row button {
-            background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04);
-            border-radius:30px; padding:3px 12px; color:rgba(255,255,255,0.5);
-            font-size:0.6rem; cursor:pointer; transition:0.3s; display:flex; align-items:center; gap:3px;
+            background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03);
+            border-radius:30px; padding:2px 10px; color:rgba(255,255,255,0.45);
+            font-size:0.55rem; cursor:pointer; transition:0.3s; display:flex; align-items:center; gap:2px;
             backdrop-filter:blur(4px);
         }
         .player-info .actions-row button:hover {
-            background:rgba(229,9,20,0.08); border-color:rgba(229,9,20,0.15); color:#fff;
+            background:rgba(229,9,20,0.06); border-color:rgba(229,9,20,0.1); color:#fff;
         }
-        .player-info .actions-row button.liked { color:#e50914; background:rgba(229,9,20,0.08); border-color:rgba(229,9,20,0.15); }
-        .player-info .actions-row .rating-stars i { font-size:0.8rem; cursor:pointer; color:rgba(255,255,255,0.15); transition:0.3s; }
+        .player-info .actions-row button.liked { color:#e50914; background:rgba(229,9,20,0.06); border-color:rgba(229,9,20,0.1); }
+        .player-info .actions-row .rating-stars i { font-size:0.7rem; cursor:pointer; color:rgba(255,255,255,0.12); transition:0.3s; }
         .player-info .actions-row .rating-stars i:hover { transform:scale(1.2); }
         .player-info .actions-row .rating-stars i.active { color:#ffc107; }
 
         .player-right .comments-section { flex:1; display:flex; flex-direction:column; overflow:hidden; }
         .player-right .comments-section h4 {
-            color:rgba(255,255,255,0.5); font-size:0.7rem; margin-bottom:6px;
-            flex-shrink:0; padding-bottom:6px; border-bottom:1px solid rgba(255,255,255,0.03);
+            color:rgba(255,255,255,0.45); font-size:0.65rem; margin-bottom:4px;
+            flex-shrink:0; padding-bottom:4px; border-bottom:1px solid rgba(255,255,255,0.03);
         }
-        .player-right #commentsList { flex:1; overflow-y:auto; padding-right:3px; }
+        .player-right #commentsList { flex:1; overflow-y:auto; padding-right:2px; }
         .player-right #commentsList::-webkit-scrollbar { width:2px; }
         .player-right #commentsList::-webkit-scrollbar-thumb { background:rgba(229,9,20,0.3); border-radius:10px; }
-        .player-right .comment-input { display:flex; gap:6px; margin-top:6px; flex-shrink:0; }
+        .player-right .comment-input { display:flex; gap:4px; margin-top:4px; flex-shrink:0; }
         .player-right .comment-input input {
-            flex:1; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04);
-            border-radius:30px; padding:5px 12px; color:#fff; font-size:0.7rem; outline:none;
+            flex:1; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03);
+            border-radius:30px; padding:4px 10px; color:#fff; font-size:0.65rem; outline:none;
         }
         .player-right .comment-input button {
-            background:rgba(229,9,20,0.6); border:none; border-radius:30px; padding:5px 14px; color:#fff;
-            font-size:0.65rem; cursor:pointer; transition:0.3s;
+            background:rgba(229,9,20,0.4); border:none; border-radius:30px; padding:4px 12px; color:#fff;
+            font-size:0.6rem; cursor:pointer; transition:0.3s;
         }
-        .player-right .comment-input button:hover { background:rgba(229,9,20,0.8); }
+        .player-right .comment-input button:hover { background:rgba(229,9,20,0.6); }
 
-        .comment-item { display:flex; gap:6px; margin-bottom:4px; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.02); }
-        .comment-item .avatar { width:24px; height:24px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:0.5rem; font-weight:bold; color:#fff; flex-shrink:0; overflow:hidden; }
+        .comment-item { display:flex; gap:4px; margin-bottom:3px; padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.02); }
+        .comment-item .avatar { width:20px; height:20px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:0.45rem; font-weight:bold; color:#fff; flex-shrink:0; overflow:hidden; }
         .comment-item .avatar img { width:100%; height:100%; object-fit:cover; }
-        .comment-item .content .user { font-size:0.6rem; font-weight:600; color:#e50914; }
-        .comment-item .content .text { font-size:0.65rem; color:rgba(255,255,255,0.7); }
-        .comment-item .content .time { font-size:0.5rem; color:rgba(255,255,255,0.2); }
+        .comment-item .content .user { font-size:0.55rem; font-weight:600; color:#e50914; }
+        .comment-item .content .text { font-size:0.6rem; color:rgba(255,255,255,0.65); }
+        .comment-item .content .time { font-size:0.45rem; color:rgba(255,255,255,0.2); }
 
         /* ===== PLAYER LAYOUT RESPONSIVE ===== */
         @media (orientation: landscape) {
-            .player-overlay { padding:5px !important; }
+            .player-overlay { padding:4px !important; }
             .player-box { 
                 max-width:100% !important; max-height:100vh !important; 
-                padding:8px !important; border-radius:20px !important;
+                padding:6px !important; border-radius:18px !important;
             }
-            .player-layout { flex-direction:row !important; gap:8px !important; max-height:95vh !important; }
-            .player-left { flex:0 0 50% !important; gap:4px !important; }
-            .player-right { flex:1 !important; padding-left:8px !important; }
-            .player-wrapper { min-height:150px !important; max-height:45vh !important; aspect-ratio:16/9 !important; }
-            .player-info h3 { font-size:0.75rem !important; }
-            .player-info .sinopse { font-size:0.55rem !important; max-height:2.4em !important; }
-            .player-info .badges .badge { font-size:0.45rem !important; padding:1px 6px !important; }
-            .player-info .actions-row button { font-size:0.45rem !important; padding:2px 8px !important; }
-            .player-info .actions-row .rating-stars i { font-size:0.6rem !important; }
-            .player-right .comments-section h4 { font-size:0.6rem !important; margin-bottom:3px !important; padding-bottom:3px !important; }
-            .player-right #commentsList { font-size:0.55rem !important; max-height:100px !important; min-height:50px !important; }
-            .player-right .comment-input input { font-size:0.55rem !important; padding:3px 8px !important; }
-            .player-right .comment-input button { font-size:0.5rem !important; padding:3px 8px !important; }
-            .comment-item .avatar { width:18px !important; height:18px !important; }
-            .comment-item .content .user { font-size:0.5rem !important; }
-            .comment-item .content .text { font-size:0.55rem !important; }
+            .player-layout { flex-direction:row !important; gap:6px !important; max-height:95vh !important; min-height:300px !important; }
+            .player-left { flex:0 0 48% !important; gap:3px !important; }
+            .player-right { flex:1 !important; padding-left:6px !important; }
+            .player-wrapper { min-height:120px !important; max-height:40vh !important; aspect-ratio:16/9 !important; }
+            .player-info h3 { font-size:0.7rem !important; }
+            .player-info .sinopse { font-size:0.5rem !important; max-height:2.2em !important; }
+            .player-info .badges .badge { font-size:0.4rem !important; padding:1px 5px !important; }
+            .player-info .actions-row button { font-size:0.4rem !important; padding:1px 6px !important; }
+            .player-info .actions-row .rating-stars i { font-size:0.55rem !important; }
+            .player-right .comments-section h4 { font-size:0.55rem !important; margin-bottom:2px !important; padding-bottom:2px !important; }
+            .player-right #commentsList { font-size:0.5rem !important; max-height:80px !important; min-height:40px !important; }
+            .player-right .comment-input input { font-size:0.5rem !important; padding:2px 6px !important; }
+            .player-right .comment-input button { font-size:0.45rem !important; padding:2px 8px !important; }
+            .comment-item .avatar { width:16px !important; height:16px !important; }
+            .comment-item .content .user { font-size:0.45rem !important; }
+            .comment-item .content .text { font-size:0.5rem !important; }
         }
         @media (orientation: portrait) {
-            .player-layout { flex-direction:column !important; }
+            .player-layout { flex-direction:column !important; min-height:auto !important; }
             .player-left { flex:1 !important; }
-            .player-wrapper { aspect-ratio:16/9 !important; min-height:200px !important; }
-            .player-right { border-left:none !important; padding-left:0 !important; border-top:1px solid rgba(255,255,255,0.04) !important; padding-top:8px !important; min-height:150px !important; max-height:220px !important; }
-            .player-right #commentsList { max-height:80px !important; min-height:40px !important; }
-            .player-box { max-height:98vh !important; padding:10px !important; }
+            .player-wrapper { aspect-ratio:16/9 !important; min-height:180px !important; }
+            .player-right { border-left:none !important; padding-left:0 !important; border-top:1px solid rgba(255,255,255,0.03) !important; padding-top:6px !important; min-height:120px !important; max-height:180px !important; }
+            .player-right #commentsList { max-height:60px !important; min-height:30px !important; }
+            .player-box { max-height:98vh !important; padding:8px !important; }
+        }
+        @media (max-height: 500px) and (orientation: landscape) {
+            .player-wrapper { min-height:80px !important; max-height:30vh !important; }
+            .player-layout { min-height:200px !important; }
+            .player-right #commentsList { max-height:50px !important; min-height:20px !important; }
         }
 
         /* ===== SEARCH ===== */
-        .search-box { display:flex; gap:8px; align-items:center; flex-wrap:wrap; position:relative; }
-        .search-box .search-input-wrapper { flex:1; position:relative; min-width:160px; }
+        .search-box { display:flex; gap:6px; align-items:center; flex-wrap:wrap; position:relative; }
+        .search-box .search-input-wrapper { flex:1; position:relative; min-width:120px; }
         .search-box input { 
-            width:100%; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04);
-            border-radius:30px; padding:7px 35px 7px 14px; color:#fff; font-size:0.8rem; outline:none;
+            width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03);
+            border-radius:30px; padding:5px 30px 5px 12px; color:#fff; font-size:0.7rem; outline:none;
             backdrop-filter:blur(4px);
         }
-        .search-box input::placeholder { color:rgba(255,255,255,0.2); }
+        .search-box input::placeholder { color:rgba(255,255,255,0.15); }
         .search-box .clear-search-btn {
-            position:absolute; right:10px; top:50%; transform:translateY(-50%);
-            background:rgba(255,255,255,0.04); border:none; border-radius:50%;
-            width:20px; height:20px; color:rgba(255,255,255,0.3); font-size:10px;
+            position:absolute; right:8px; top:50%; transform:translateY(-50%);
+            background:rgba(255,255,255,0.03); border:none; border-radius:50%;
+            width:18px; height:18px; color:rgba(255,255,255,0.2); font-size:8px;
             cursor:pointer; display:none; align-items:center; justify-content:center; transition:0.3s;
         }
-        .search-box .clear-search-btn:hover { background:rgba(255,255,255,0.08); }
-        .search-filters { display:flex; gap:4px; flex-wrap:wrap; }
+        .search-box .clear-search-btn:hover { background:rgba(255,255,255,0.06); }
+        .search-filters { display:flex; gap:3px; flex-wrap:wrap; }
         .search-filters button { 
-            background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04);
-            border-radius:30px; padding:3px 12px; color:rgba(255,255,255,0.4); font-size:0.65rem;
+            background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03);
+            border-radius:30px; padding:2px 10px; color:rgba(255,255,255,0.35); font-size:0.6rem;
             cursor:pointer; transition:0.3s; backdrop-filter:blur(4px);
         }
-        .search-filters button.active { background:rgba(229,9,20,0.1); border-color:rgba(229,9,20,0.15); color:#fff; }
+        .search-filters button.active { background:rgba(229,9,20,0.06); border-color:rgba(229,9,20,0.1); color:#fff; }
 
         /* ===== PROFILE ===== */
-        .profile-header { display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:8px 0; }
-        .profile-avatar { width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:#fff; flex-shrink:0; overflow:hidden; position:relative; border:2px solid rgba(255,255,255,0.05); }
+        .profile-header { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:6px 0; }
+        .profile-avatar { width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:#fff; flex-shrink:0; overflow:hidden; position:relative; border:2px solid rgba(255,255,255,0.04); }
         .profile-avatar img { width:100%; height:100%; object-fit:cover; }
-        .profile-info .name { font-size:1.1rem; font-weight:700; color:rgba(255,255,255,0.9); }
-        .profile-info .nick { color:rgba(255,255,255,0.4); font-size:0.75rem; }
-        .profile-info .bio { font-size:0.8rem; margin-top:3px; color:rgba(255,255,255,0.6); }
-        .profile-stats { display:flex; gap:16px; margin-top:6px; }
-        .profile-stats span { font-size:0.75rem; color:rgba(255,255,255,0.5); }
-        .profile-stats span strong { color:rgba(255,255,255,0.8); }
+        .profile-info .name { font-size:1rem; font-weight:700; color:rgba(255,255,255,0.85); }
+        .profile-info .nick { color:rgba(255,255,255,0.35); font-size:0.65rem; }
+        .profile-info .bio { font-size:0.7rem; margin-top:2px; color:rgba(255,255,255,0.5); }
+        .profile-stats { display:flex; gap:12px; margin-top:4px; }
+        .profile-stats span { font-size:0.65rem; color:rgba(255,255,255,0.4); }
+        .profile-stats span strong { color:rgba(255,255,255,0.75); }
         .profile-stats span .clickable { cursor:pointer; transition:0.3s; }
         .profile-stats span .clickable:hover { color:#e50914; }
 
-        .profile-tabs { display:flex; gap:3px; border-bottom:1px solid rgba(255,255,255,0.03); margin-top:10px; }
-        .profile-tabs button { background:transparent; border:none; padding:6px 14px; color:rgba(255,255,255,0.3); font-size:0.65rem; cursor:pointer; transition:0.3s; border-bottom:2px solid transparent; }
+        .profile-tabs { display:flex; gap:2px; border-bottom:1px solid rgba(255,255,255,0.02); margin-top:6px; }
+        .profile-tabs button { background:transparent; border:none; padding:4px 10px; color:rgba(255,255,255,0.25); font-size:0.6rem; cursor:pointer; transition:0.3s; border-bottom:2px solid transparent; }
         .profile-tabs button.active { color:#fff; border-bottom-color:#e50914; }
-        .profile-posts { display:grid; grid-template-columns:repeat(3,1fr); gap:3px; margin-top:10px; }
-        .profile-posts .post-item { aspect-ratio:1; background:rgba(255,255,255,0.02); border-radius:6px; overflow:hidden; cursor:pointer; position:relative; }
+        .profile-posts { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; margin-top:6px; }
+        .profile-posts .post-item { aspect-ratio:1; background:rgba(255,255,255,0.02); border-radius:4px; overflow:hidden; cursor:pointer; position:relative; }
         .profile-posts .post-item img, .profile-posts .post-item video { width:100%; height:100%; object-fit:cover; }
 
         /* ===== CHAT ===== */
-        .chat-container { display:flex; height:100%; gap:10px; }
-        .chat-sidebar { width:260px; flex-shrink:0; background:rgba(255,255,255,0.02); border-radius:18px; padding:10px; overflow-y:auto; backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.03); }
-        .chat-sidebar h4 { color:rgba(255,255,255,0.4); font-size:0.75rem; margin-bottom:8px; }
-        .chat-user-item { display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:10px; cursor:pointer; transition:0.3s; }
-        .chat-user-item:hover { background:rgba(255,255,255,0.03); }
-        .chat-user-item.active { background:rgba(229,9,20,0.06); }
-        .chat-user-item .avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:bold; color:#fff; flex-shrink:0; overflow:hidden; }
+        .chat-container { display:flex; height:100%; gap:8px; min-height:0; }
+        .chat-sidebar { width:220px; flex-shrink:0; background:rgba(255,255,255,0.02); border-radius:16px; padding:8px; overflow-y:auto; backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.02); }
+        .chat-sidebar h4 { color:rgba(255,255,255,0.35); font-size:0.65rem; margin-bottom:6px; }
+        .chat-user-item { display:flex; align-items:center; gap:6px; padding:4px 6px; border-radius:8px; cursor:pointer; transition:0.3s; }
+        .chat-user-item:hover { background:rgba(255,255,255,0.02); }
+        .chat-user-item.active { background:rgba(229,9,20,0.04); }
+        .chat-user-item .avatar { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:0.5rem; font-weight:bold; color:#fff; flex-shrink:0; overflow:hidden; }
         .chat-user-item .avatar img { width:100%; height:100%; object-fit:cover; }
-        .chat-user-item .info .name { font-size:0.75rem; font-weight:600; color:rgba(255,255,255,0.8); }
-        .chat-user-item .info .last { font-size:0.6rem; color:rgba(255,255,255,0.3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .chat-user-item .unread { background:#e50914; border-radius:50%; padding:0 4px; font-size:0.55rem; color:#fff; }
-        .chat-main { flex:1; display:flex; flex-direction:column; background:rgba(255,255,255,0.02); border-radius:18px; overflow:hidden; border:1px solid rgba(255,255,255,0.03); }
-        .chat-main .header { padding:8px 14px; border-bottom:1px solid rgba(255,255,255,0.03); display:flex; align-items:center; gap:8px; }
-        .chat-main .header .avatar { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:bold; color:#fff; flex-shrink:0; overflow:hidden; }
+        .chat-user-item .info .name { font-size:0.65rem; font-weight:600; color:rgba(255,255,255,0.75); }
+        .chat-user-item .info .last { font-size:0.55rem; color:rgba(255,255,255,0.25); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .chat-user-item .unread { background:#e50914; border-radius:50%; padding:0 3px; font-size:0.45rem; color:#fff; }
+        .chat-main { flex:1; display:flex; flex-direction:column; background:rgba(255,255,255,0.02); border-radius:16px; overflow:hidden; border:1px solid rgba(255,255,255,0.02); min-height:0; }
+        .chat-main .header { padding:6px 10px; border-bottom:1px solid rgba(255,255,255,0.02); display:flex; align-items:center; gap:6px; flex-shrink:0; }
+        .chat-main .header .avatar { width:24px; height:24px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:0.5rem; font-weight:bold; color:#fff; flex-shrink:0; overflow:hidden; }
         .chat-main .header .avatar img { width:100%; height:100%; object-fit:cover; }
-        .chat-main .header .name { font-weight:600; font-size:0.8rem; }
-        .chat-main .messages { flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:4px; }
-        .chat-main .messages .msg { max-width:75%; padding:6px 12px; border-radius:14px; font-size:0.75rem; word-break:break-word; }
-        .chat-main .messages .msg.sent { align-self:flex-end; background:rgba(229,9,20,0.6); color:#fff; border-bottom-right-radius:3px; }
-        .chat-main .messages .msg.received { align-self:flex-start; background:rgba(255,255,255,0.04); color:rgba(255,255,255,0.8); border-bottom-left-radius:3px; }
-        .chat-main .messages .msg .time { font-size:0.45rem; opacity:0.4; margin-top:1px; display:block; text-align:right; }
-        .chat-main .input-area { display:flex; gap:6px; padding:8px 14px; border-top:1px solid rgba(255,255,255,0.03); }
-        .chat-main .input-area input { flex:1; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); border-radius:30px; padding:6px 14px; color:#fff; font-size:0.75rem; outline:none; }
-        .chat-main .input-area button { background:rgba(229,9,20,0.5); border:none; border-radius:30px; padding:6px 14px; color:#fff; cursor:pointer; transition:0.3s; }
-        .chat-main .input-area button:hover { background:rgba(229,9,20,0.7); }
+        .chat-main .header .name { font-weight:600; font-size:0.7rem; }
+        .chat-main .messages { flex:1; overflow-y:auto; padding:8px; display:flex; flex-direction:column; gap:3px; min-height:0; }
+        .chat-main .messages .msg { max-width:75%; padding:4px 10px; border-radius:12px; font-size:0.65rem; word-break:break-word; }
+        .chat-main .messages .msg.sent { align-self:flex-end; background:rgba(229,9,20,0.5); color:#fff; border-bottom-right-radius:2px; }
+        .chat-main .messages .msg.received { align-self:flex-start; background:rgba(255,255,255,0.03); color:rgba(255,255,255,0.75); border-bottom-left-radius:2px; }
+        .chat-main .messages .msg .time { font-size:0.4rem; opacity:0.4; margin-top:1px; display:block; text-align:right; }
+        .chat-main .input-area { display:flex; gap:4px; padding:6px 10px; border-top:1px solid rgba(255,255,255,0.02); flex-shrink:0; }
+        .chat-main .input-area input { flex:1; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); border-radius:30px; padding:4px 10px; color:#fff; font-size:0.65rem; outline:none; }
+        .chat-main .input-area button { background:rgba(229,9,20,0.4); border:none; border-radius:30px; padding:4px 12px; color:#fff; cursor:pointer; transition:0.3s; font-size:0.6rem; }
+        .chat-main .input-area button:hover { background:rgba(229,9,20,0.6); }
 
         /* ===== ADMIN - LIQUID GLASS ===== */
         .admin-panel { 
             background:rgba(255,255,255,0.02);
             backdrop-filter:blur(12px);
             -webkit-backdrop-filter:blur(12px);
-            border-radius:18px; padding:14px;
-            border:1px solid rgba(255,255,255,0.03);
+            border-radius:16px; padding:10px;
+            border:1px solid rgba(255,255,255,0.02);
+            flex:1;
+            display:flex;
+            flex-direction:column;
+            min-height:0;
+            overflow:hidden;
         }
-        .admin-panel .admin-tabs { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:10px; }
+        .admin-panel .admin-tabs { display:flex; gap:3px; flex-wrap:wrap; margin-bottom:8px; flex-shrink:0; }
         .admin-panel .admin-tabs button { 
-            background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03);
-            border-radius:30px; padding:3px 12px; color:rgba(255,255,255,0.4); font-size:0.65rem;
+            background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.02);
+            border-radius:30px; padding:2px 10px; color:rgba(255,255,255,0.35); font-size:0.6rem;
             cursor:pointer; transition:0.3s; backdrop-filter:blur(4px);
         }
-        .admin-panel .admin-tabs button.active { background:rgba(229,9,20,0.08); border-color:rgba(229,9,20,0.12); color:#fff; }
+        .admin-panel .admin-tabs button.active { background:rgba(229,9,20,0.06); border-color:rgba(229,9,20,0.08); color:#fff; }
 
         .admin-form { 
-            display:grid; grid-template-columns:1fr 1fr; gap:6px; 
-            background:rgba(255,255,255,0.01); padding:10px; border-radius:14px; margin-bottom:14px;
+            display:grid; grid-template-columns:1fr 1fr; gap:4px; 
+            background:rgba(255,255,255,0.01); padding:8px; border-radius:12px; margin-bottom:8px;
             border:1px solid rgba(255,255,255,0.02);
+            flex-shrink:0;
         }
         .admin-form input, .admin-form textarea, .admin-form select {
-            background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03);
-            border-radius:10px; padding:6px 10px; color:#fff; font-size:0.7rem; outline:none;
+            background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.02);
+            border-radius:8px; padding:4px 8px; color:#fff; font-size:0.6rem; outline:none;
             backdrop-filter:blur(4px);
         }
-        .admin-form input:focus, .admin-form textarea:focus { border-color:rgba(229,9,20,0.2); }
-        .admin-form textarea { grid-column:1/-1; resize:vertical; min-height:50px; }
+        .admin-form input:focus, .admin-form textarea:focus { border-color:rgba(229,9,20,0.15); }
+        .admin-form textarea { grid-column:1/-1; resize:vertical; min-height:40px; }
         .admin-form .full { grid-column:1/-1; }
         .admin-form button { 
-            background:rgba(229,9,20,0.4); border:none; border-radius:30px; padding:5px 14px; 
-            color:#fff; cursor:pointer; transition:0.3s; font-size:0.7rem;
+            background:rgba(229,9,20,0.3); border:none; border-radius:30px; padding:4px 12px; 
+            color:#fff; cursor:pointer; transition:0.3s; font-size:0.6rem;
             backdrop-filter:blur(4px);
         }
-        .admin-form button:hover { background:rgba(229,9,20,0.6); transform:scale(1.02); }
+        .admin-form button:hover { background:rgba(229,9,20,0.5); transform:scale(1.02); }
 
-        .admin-list { max-height:400px; overflow-y:auto; margin-top:8px; }
-        .admin-list::-webkit-scrollbar { width:3px; }
+        .admin-list { 
+            flex:1; 
+            overflow-y:auto; 
+            margin-top:4px;
+            min-height:0;
+        }
+        .admin-list::-webkit-scrollbar { width:2px; }
         .admin-list::-webkit-scrollbar-thumb { background:rgba(229,9,20,0.3); border-radius:10px; }
 
-        .admin-search-box { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+        .admin-search-box { display:flex; gap:4px; margin-bottom:6px; flex-wrap:wrap; flex-shrink:0; }
         .admin-search-box input {
-            flex:1; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03);
-            border-radius:30px; padding:6px 14px; color:#fff; font-size:0.75rem; outline:none;
-            min-width:160px; backdrop-filter:blur(4px);
+            flex:1; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.02);
+            border-radius:30px; padding:4px 10px; color:#fff; font-size:0.65rem; outline:none;
+            min-width:120px; backdrop-filter:blur(4px);
         }
-        .admin-search-box input:focus { border-color:rgba(229,9,20,0.15); }
-        .admin-search-box input::placeholder { color:rgba(255,255,255,0.15); }
+        .admin-search-box input:focus { border-color:rgba(229,9,20,0.1); }
+        .admin-search-box input::placeholder { color:rgba(255,255,255,0.12); }
         .admin-search-box .search-clear-btn {
-            background:rgba(255,255,255,0.03); border:none; border-radius:50%; width:28px; height:28px;
-            color:rgba(255,255,255,0.3); cursor:pointer; display:none; align-items:center; justify-content:center;
-            transition:0.3s; font-size:10px;
+            background:rgba(255,255,255,0.02); border:none; border-radius:50%; width:24px; height:24px;
+            color:rgba(255,255,255,0.2); cursor:pointer; display:none; align-items:center; justify-content:center;
+            transition:0.3s; font-size:8px;
         }
-        .admin-search-box .search-clear-btn:hover { background:rgba(255,255,255,0.06); }
-        .admin-search-box .search-count { color:rgba(255,255,255,0.3); font-size:0.65rem; display:flex; align-items:center; }
+        .admin-search-box .search-clear-btn:hover { background:rgba(255,255,255,0.04); }
+        .admin-search-box .search-count { color:rgba(255,255,255,0.2); font-size:0.55rem; display:flex; align-items:center; }
 
-        .admin-card-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:10px; }
+        .admin-card-grid { 
+            display:grid; 
+            grid-template-columns:repeat(auto-fill, minmax(160px,1fr)); 
+            gap:6px; 
+        }
         @media (max-width:640px) { .admin-card-grid { grid-template-columns:1fr !important; } }
         @media (min-width:641px) and (max-width:1024px) { .admin-card-grid { grid-template-columns:repeat(2, 1fr) !important; } }
         @media (min-width:1025px) { .admin-card-grid { grid-template-columns:repeat(3, 1fr) !important; } }
         @media (min-width:1800px) { .admin-card-grid { grid-template-columns:repeat(4, 1fr) !important; } }
 
         .admin-item-card {
-            background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03);
-            border-radius:14px; padding:10px; transition:all 0.4s; position:relative;
+            background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.02);
+            border-radius:12px; padding:8px; transition:all 0.4s; position:relative;
             backdrop-filter:blur(4px);
         }
         .admin-item-card:hover {
-            background:rgba(255,255,255,0.04); border-color:rgba(229,9,20,0.1);
-            transform:translateY(-2px); box-shadow:0 8px 32px rgba(0,0,0,0.15);
+            background:rgba(255,255,255,0.04); border-color:rgba(229,9,20,0.06);
+            transform:translateY(-1px); box-shadow:0 4px 20px rgba(0,0,0,0.1);
         }
-        .admin-item-card .item-header { display:flex; justify-content:space-between; align-items:flex-start; gap:6px; margin-bottom:4px; }
-        .admin-item-card .item-title { font-weight:600; font-size:0.8rem; color:rgba(255,255,255,0.85); word-break:break-word; }
-        .admin-item-card .item-actions { display:flex; gap:3px; flex-shrink:0; }
+        .admin-item-card .item-header { display:flex; justify-content:space-between; align-items:flex-start; gap:4px; margin-bottom:2px; }
+        .admin-item-card .item-title { font-weight:600; font-size:0.7rem; color:rgba(255,255,255,0.8); word-break:break-word; }
+        .admin-item-card .item-actions { display:flex; gap:2px; flex-shrink:0; }
         .admin-item-card .item-actions button {
-            background:transparent; border:none; color:rgba(255,255,255,0.2); cursor:pointer;
-            font-size:0.65rem; padding:3px 4px; border-radius:6px; transition:0.3s;
+            background:transparent; border:none; color:rgba(255,255,255,0.15); cursor:pointer;
+            font-size:0.55rem; padding:2px 3px; border-radius:4px; transition:0.3s;
         }
-        .admin-item-card .item-actions button:hover { background:rgba(255,255,255,0.04); color:#fff; }
-        .admin-item-card .item-actions button.delete:hover { background:rgba(229,9,20,0.1); color:#e50914; }
-        .admin-item-card .item-actions button.edit:hover { background:rgba(255,193,7,0.1); color:#ffc107; }
-        .admin-item-card .item-details { font-size:0.6rem; color:rgba(255,255,255,0.35); display:flex; flex-direction:column; gap:1px; }
-        .admin-item-card .item-details span { display:flex; align-items:center; gap:3px; }
-        .admin-item-card .item-details i { font-size:0.5rem; opacity:0.5; }
+        .admin-item-card .item-actions button:hover { background:rgba(255,255,255,0.03); color:#fff; }
+        .admin-item-card .item-actions button.delete:hover { background:rgba(229,9,20,0.06); color:#e50914; }
+        .admin-item-card .item-actions button.edit:hover { background:rgba(255,193,7,0.06); color:#ffc107; }
+        .admin-item-card .item-details { font-size:0.5rem; color:rgba(255,255,255,0.3); display:flex; flex-direction:column; gap:1px; }
+        .admin-item-card .item-details span { display:flex; align-items:center; gap:2px; }
+        .admin-item-card .item-details i { font-size:0.4rem; opacity:0.5; }
         .admin-item-card .item-badge {
-            display:inline-block; background:rgba(229,9,20,0.08); color:rgba(229,9,20,0.6);
-            font-size:0.5rem; padding:1px 6px; border-radius:20px; margin-top:3px;
+            display:inline-block; background:rgba(229,9,20,0.06); color:rgba(229,9,20,0.5);
+            font-size:0.45rem; padding:1px 5px; border-radius:20px; margin-top:2px;
         }
-        .admin-item-card .item-thumb { width:36px; height:54px; border-radius:6px; object-fit:cover; background:rgba(255,255,255,0.02); flex-shrink:0; }
-        .admin-item-card .item-row { display:flex; gap:8px; align-items:center; }
+        .admin-item-card .item-thumb { width:30px; height:45px; border-radius:4px; object-fit:cover; background:rgba(255,255,255,0.02); flex-shrink:0; }
+        .admin-item-card .item-row { display:flex; gap:6px; align-items:center; }
         .admin-item-card .item-info { flex:1; min-width:0; }
 
-        .status-pending { background:rgba(255,193,7,0.08); color:#ffc107; }
-        .status-resolved { background:rgba(76,175,80,0.08); color:#4caf50; }
-        .status-rejected { background:rgba(229,9,20,0.08); color:#e50914; }
-        .status-resolving { background:rgba(33,150,243,0.08); color:#2196f3; }
-        .status-solving { background:rgba(156,39,176,0.08); color:#9c27b0; }
+        .status-pending { background:rgba(255,193,7,0.06); color:#ffc107; }
+        .status-resolved { background:rgba(76,175,80,0.06); color:#4caf50; }
+        .status-rejected { background:rgba(229,9,20,0.06); color:#e50914; }
+        .status-resolving { background:rgba(33,150,243,0.06); color:#2196f3; }
+        .status-solving { background:rgba(156,39,176,0.06); color:#9c27b0; }
 
-        .admin-response-buttons { display:flex; gap:3px; flex-wrap:wrap; margin-top:3px; }
+        .admin-response-buttons { display:flex; gap:2px; flex-wrap:wrap; margin-top:2px; }
         .admin-response-buttons button {
-            background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03);
-            border-radius:20px; padding:1px 8px; color:rgba(255,255,255,0.4); font-size:0.55rem;
+            background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.02);
+            border-radius:20px; padding:1px 6px; color:rgba(255,255,255,0.3); font-size:0.45rem;
             cursor:pointer; transition:0.3s; backdrop-filter:blur(4px);
         }
-        .admin-response-buttons button:hover { background:rgba(229,9,20,0.06); border-color:rgba(229,9,20,0.08); color:#fff; }
-        .admin-response-buttons button.resolving { border-color:rgba(33,150,243,0.2); color:#2196f3; }
-        .admin-response-buttons button.solving { border-color:rgba(156,39,176,0.2); color:#9c27b0; }
-        .admin-response-buttons button.resolved { border-color:rgba(76,175,80,0.2); color:#4caf50; }
+        .admin-response-buttons button:hover { background:rgba(229,9,20,0.04); border-color:rgba(229,9,20,0.06); color:#fff; }
+        .admin-response-buttons button.resolving { border-color:rgba(33,150,243,0.15); color:#2196f3; }
+        .admin-response-buttons button.solving { border-color:rgba(156,39,176,0.15); color:#9c27b0; }
+        .admin-response-buttons button.resolved { border-color:rgba(76,175,80,0.15); color:#4caf50; }
 
         /* ===== TOAST ===== */
         .toast {
-            position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
-            background:rgba(0,0,0,0.6); backdrop-filter:blur(24px);
+            position:fixed; bottom:60px; left:50%; transform:translateX(-50%);
+            background:rgba(0,0,0,0.5); backdrop-filter:blur(24px);
             -webkit-backdrop-filter:blur(24px);
-            color:#fff; padding:8px 20px; border-radius:60px; font-size:0.75rem; z-index:9999;
-            border:1px solid rgba(255,255,255,0.04); animation:fadeToast 3s ease forwards;
+            color:#fff; padding:6px 16px; border-radius:60px; font-size:0.65rem; z-index:9999;
+            border:1px solid rgba(255,255,255,0.03); animation:fadeToast 3s ease forwards;
+            white-space:nowrap;
+            max-width:90vw;
+            overflow:hidden;
+            text-overflow:ellipsis;
         }
         @keyframes fadeToast {
-            0% { opacity:0; transform:translateX(-50%) translateY(15px); }
+            0% { opacity:0; transform:translateX(-50%) translateY(12px); }
             15% { opacity:1; transform:translateX(-50%) translateY(0); }
             85% { opacity:1; transform:translateX(-50%) translateY(0); }
-            100% { opacity:0; transform:translateX(-50%) translateY(-8px); }
+            100% { opacity:0; transform:translateX(-50%) translateY(-6px); }
         }
 
         /* ===== LOGIN MODAL ===== */
         .login-modal {
-            position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.6);
+            position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.5);
             backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px);
-            display:none; align-items:center; justify-content:center; padding:20px;
+            display:none; align-items:center; justify-content:center; padding:16px;
         }
         .login-modal.active { display:flex; }
         .login-box {
             background:rgba(20,20,20,0.3); backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px);
-            border-radius:32px; padding:28px; max-width:400px; width:100%;
-            border:1px solid rgba(255,255,255,0.04); box-shadow:0 30px 80px rgba(0,0,0,0.4);
+            border-radius:28px; padding:24px; max-width:380px; width:100%;
+            border:1px solid rgba(255,255,255,0.03); box-shadow:0 30px 80px rgba(0,0,0,0.3);
         }
-        .login-box h2 { color:rgba(255,255,255,0.9); text-align:center; margin-bottom:16px; font-size:1.2rem; }
+        .login-box h2 { color:rgba(255,255,255,0.85); text-align:center; margin-bottom:14px; font-size:1.1rem; }
         .login-box h2 i { color:#e50914; }
         .login-box input {
-            width:100%; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04);
-            border-radius:10px; padding:8px 12px; color:#fff; font-size:0.8rem; margin-bottom:8px; outline:none;
+            width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03);
+            border-radius:8px; padding:6px 10px; color:#fff; font-size:0.75rem; margin-bottom:6px; outline:none;
         }
-        .login-box input:focus { border-color:rgba(229,9,20,0.2); }
+        .login-box input:focus { border-color:rgba(229,9,20,0.15); }
         .login-box button {
-            width:100%; background:rgba(229,9,20,0.5); border:none; border-radius:10px; padding:8px;
+            width:100%; background:rgba(229,9,20,0.4); border:none; border-radius:8px; padding:6px;
             color:#fff; font-weight:600; cursor:pointer; transition:0.3s;
         }
-        .login-box button:hover { background:rgba(229,9,20,0.7); }
-        .login-box .switch { text-align:center; margin-top:8px; color:rgba(255,255,255,0.3); font-size:0.75rem; cursor:pointer; }
+        .login-box button:hover { background:rgba(229,9,20,0.6); }
+        .login-box .switch { text-align:center; margin-top:6px; color:rgba(255,255,255,0.25); font-size:0.65rem; cursor:pointer; }
         .login-box .switch:hover { color:#e50914; }
-        .login-box .register-hint { text-align:center; font-size:0.65rem; color:rgba(255,255,255,0.15); margin-top:6px; }
+        .login-box .register-hint { text-align:center; font-size:0.55rem; color:rgba(255,255,255,0.12); margin-top:4px; }
 
         /* ===== RESPONSIVE GERAL ===== */
         @media (max-width:640px) {
-            .app { height:98vh; min-height:560px; border-radius:24px; }
-            .top-menu { flex-direction:column; align-items:stretch; padding:8px 12px; gap:4px; }
-            .brand { justify-content:center; font-size:1rem; }
-            .top-links { justify-content:center; gap:2px 4px; }
-            .top-links a { font-size:0.65rem; padding:3px 8px; }
-            .main-content { padding:10px 12px 4px 12px; gap:10px; }
-            .player-box { padding:10px; margin:6px; max-height:98vh; }
-            .player-wrapper { min-height:160px; }
-            .chat-sidebar { width:160px; }
+            .top-menu { padding:6px 10px 4px 10px; min-height:36px; }
+            .brand { font-size:0.9rem; }
+            .brand i { font-size:1.1rem; }
+            .top-links a { font-size:0.6rem; padding:3px 6px; }
+            .main-content { padding:6px 10px 4px 10px; gap:8px; }
+            .bottom-menu { min-height:28px !important; padding:2px 4px 3px 4px !important; }
+            .bottom-item { min-width:24px !important; padding:1px 4px !important; font-size:0.35rem !important; }
+            .bottom-item i { font-size:0.7rem !important; }
+            .player-box { padding:6px; margin:4px; max-height:98vh; border-radius:20px; }
+            .player-wrapper { min-height:140px; }
+            .chat-sidebar { width:140px; }
             .admin-panel .admin-form { grid-template-columns:1fr; }
             .profile-header { flex-direction:column; text-align:center; }
             .profile-stats { justify-content:center; }
-            .bottom-menu { min-height:36px !important; padding:2px 4px 3px 4px !important; }
-            .bottom-item { min-width:32px !important; padding:1px 4px !important; font-size:0.4rem !important; }
-            .bottom-item i { font-size:0.9rem !important; }
-            @media (min-width:768px) {
-                .bottom-menu { min-height:38px !important; padding:2px 8px 3px 8px !important; }
-                .bottom-item { min-width:38px !important; padding:2px 6px !important; font-size:0.45rem !important; }
-                .bottom-item i { font-size:0.95rem !important; }
-            }
         }
         @media (max-height:500px) and (orientation:landscape) {
-            .app { height:98vh; min-height:380px; }
-            .top-menu { padding:3px 10px; }
-            .brand { font-size:0.8rem; }
-            .top-links a { font-size:0.55rem; padding:2px 6px; }
-            .main-content { padding:4px 10px; gap:4px; }
-            .grid { grid-template-columns:repeat(5, 1fr) !important; gap:4px !important; }
-            .card { padding:3px 2px 4px !important; }
-            .card .poster { aspect-ratio:1/1.2; font-size:1rem !important; }
-            .bottom-item { min-width:28px !important; padding:1px 3px !important; font-size:0.35rem !important; }
-            .bottom-item i { font-size:0.75rem !important; }
-            .bottom-menu { min-height:30px !important; padding:1px 4px 2px 4px !important; }
-            .player-wrapper { min-height:120px; }
-            .player-right { max-height:120px; min-height:80px; }
+            .top-menu { padding:2px 8px; min-height:28px; }
+            .brand { font-size:0.7rem; }
+            .brand i { font-size:0.9rem; }
+            .top-links a { font-size:0.5rem; padding:2px 4px; }
+            .main-content { padding:2px 8px; gap:4px; }
+            .grid { grid-template-columns:repeat(5, 1fr) !important; gap:3px !important; }
+            .card { padding:2px 2px 4px !important; }
+            .card .poster { aspect-ratio:1/1.2; font-size:0.8rem !important; border-radius:6px !important; }
+            .card h4 { font-size:0.4rem !important; }
+            .bottom-menu { min-height:22px !important; padding:1px 4px 2px 4px !important; }
+            .bottom-item { min-width:20px !important; padding:1px 2px !important; font-size:0.3rem !important; }
+            .bottom-item i { font-size:0.6rem !important; }
+            .player-wrapper { min-height:80px; }
+            .player-right { max-height:80px; min-height:40px; }
+            .player-right #commentsList { max-height:30px !important; min-height:10px !important; }
+            .player-layout { min-height:160px !important; }
         }
     </style>
 </head>
@@ -871,7 +985,7 @@
                                 <i data-value="4" class="far fa-star"></i>
                                 <i data-value="5" class="far fa-star"></i>
                             </div>
-                            <span id="ratingPercent" style="font-size:0.6rem; color:#ffc107;">0%</span>
+                            <span id="ratingPercent" style="font-size:0.55rem; color:#ffc107;">0%</span>
                         </div>
                     </div>
                 </div>
@@ -1453,7 +1567,7 @@
                 const parentP = viewsP.parentElement;
                 fetchViews(id, (views) => {
                     if (parentP) {
-                        parentP.innerHTML = `<i class="fas fa-eye" style="color:rgba(255,255,255,0.3);"></i> ${views}`;
+                        parentP.innerHTML = `<i class="fas fa-eye" style="color:rgba(255,255,255,0.2);"></i> ${views}`;
                     }
                 });
             }
@@ -1533,8 +1647,8 @@
         else if (currentTab === 'canais') { items = canais; type = 'canal'; }
 
         if (items.length === 0) {
-            mainEl.innerHTML = `<div style="color:rgba(255,255,255,0.2); text-align:center; padding:30px;">
-                <i class="fas fa-inbox" style="font-size:1.8rem; display:block; margin-bottom:8px;"></i>
+            mainEl.innerHTML = `<div style="color:rgba(255,255,255,0.15); text-align:center; padding:20px;">
+                <i class="fas fa-inbox" style="font-size:1.5rem; display:block; margin-bottom:6px;"></i>
                 Nenhum conteúdo disponível ainda.
             </div>`;
             return;
@@ -1551,9 +1665,9 @@
                         <i class="fas fa-play-circle" style="${item.thumb ? 'display:none;' : ''}"></i>
                         ${hasFranchise ? `<div class="franchise-badge" data-franchise="${escapeHtml(item.franchise)}"><i class="fas fa-film"></i> ${escapeHtml(item.franchise)}</div>` : ''}
                     </div>
-                    <h4>${escapeHtml(item.title)} ${isIptv ? '<span style="font-size:0.45rem; background:rgba(229,9,20,0.3); padding:0 4px; border-radius:8px;">VIDEO</span>' : ''}</h4>
-                    <p><i class="fas fa-eye" style="color:rgba(255,255,255,0.2);"></i> <span class="views-count" data-id="${item.id}">0</span></p>
-                    <p style="font-size:0.55rem; opacity:0.3;">${item.category || 'Geral'} ${item.year ? '• ' + item.year : ''}</p>
+                    <h4>${escapeHtml(item.title)} ${isIptv ? '<span style="font-size:0.4rem; background:rgba(229,9,20,0.2); padding:0 3px; border-radius:6px;">VIDEO</span>' : ''}</h4>
+                    <p><i class="fas fa-eye" style="color:rgba(255,255,255,0.15);"></i> <span class="views-count" data-id="${item.id}">0</span></p>
+                    <p style="font-size:0.5rem; opacity:0.25;">${item.category || 'Geral'} ${item.year ? '• ' + item.year : ''}</p>
                 </div>
             `;
         });
@@ -1595,18 +1709,18 @@
     // =====================================================
     function renderFilteredGrid(items, title) {
         if (items.length === 0) {
-            mainEl.innerHTML = `<div style="color:rgba(255,255,255,0.2); text-align:center; padding:30px;">
-                <i class="fas fa-search" style="font-size:1.8rem; display:block; margin-bottom:8px;"></i>
+            mainEl.innerHTML = `<div style="color:rgba(255,255,255,0.15); text-align:center; padding:20px;">
+                <i class="fas fa-search" style="font-size:1.5rem; display:block; margin-bottom:6px;"></i>
                 Nenhum resultado encontrado.
             </div>`;
             return;
         }
 
         let html = `
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
                 <span class="back-link" onclick="renderGrid()"><i class="fas fa-arrow-left"></i> Voltar</span>
                 <h2 class="section-title">${title}</h2>
-                <span style="color:rgba(255,255,255,0.2); font-size:0.75rem;">${items.length} filmes</span>
+                <span style="color:rgba(255,255,255,0.15); font-size:0.65rem;">${items.length} filmes</span>
             </div>
             <div class="grid">
         `;
@@ -1618,7 +1732,7 @@
                         <i class="fas fa-play-circle" style="${item.thumb ? 'display:none;' : ''}"></i>
                     </div>
                     <h4>${escapeHtml(item.title)}</h4>
-                    <p><i class="fas fa-eye" style="color:rgba(255,255,255,0.2);"></i> <span class="views-count" data-id="${item.id}">0</span></p>
+                    <p><i class="fas fa-eye" style="color:rgba(255,255,255,0.15);"></i> <span class="views-count" data-id="${item.id}">0</span></p>
                 </div>
             `;
         });
@@ -1651,10 +1765,10 @@
             return;
         }
         let html = `
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
                 <span class="back-link" onclick="renderGrid()"><i class="fas fa-arrow-left"></i> Voltar</span>
                 <h2 class="section-title"><i class="fas fa-film" style="color:#e50914;"></i> ${escapeHtml(nome)}</h2>
-                <span style="color:rgba(255,255,255,0.2); font-size:0.75rem;">${filmesFranquia.length} filmes</span>
+                <span style="color:rgba(255,255,255,0.15); font-size:0.65rem;">${filmesFranquia.length} filmes</span>
             </div>
             <div class="grid">
         `;
@@ -1665,10 +1779,10 @@
                     <div class="poster">
                         ${item.thumb ? `<img src="${item.thumb}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">` : ''}
                         <i class="fas fa-play-circle" style="${item.thumb ? 'display:none;' : ''}"></i>
-                        <div style="position:absolute; top:4px; left:4px; background:rgba(229,9,20,0.7); border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:0.5rem; font-weight:bold; color:#fff;">${idx + 1}</div>
+                        <div style="position:absolute; top:3px; left:3px; background:rgba(229,9,20,0.6); border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center; font-size:0.4rem; font-weight:bold; color:#fff;">${idx + 1}</div>
                     </div>
                     <h4>${escapeHtml(item.title)}</h4>
-                    <p><i class="fas fa-eye" style="color:rgba(255,255,255,0.2);"></i> <span class="views-count" data-id="${item.id}">0</span></p>
+                    <p><i class="fas fa-eye" style="color:rgba(255,255,255,0.15);"></i> <span class="views-count" data-id="${item.id}">0</span></p>
                 </div>
             `;
         });
@@ -2135,7 +2249,7 @@
             const list = data ? Object.values(data).reverse() : [];
             const container = document.getElementById('commentsList');
             if (list.length === 0) {
-                container.innerHTML = '<div style="color:rgba(255,255,255,0.2); font-size:0.65rem; text-align:center; padding:6px;">Nenhum comentário ainda.</div>';
+                container.innerHTML = '<div style="color:rgba(255,255,255,0.15); font-size:0.6rem; text-align:center; padding:4px;">Nenhum comentário ainda.</div>';
                 return;
             }
             container.innerHTML = list.map(c => `
@@ -2192,7 +2306,7 @@
                     <button data-filter="canais">📡 Canais</button>
                 </div>
             </div>
-            <div id="searchResults" style="margin-top:10px;"></div>
+            <div id="searchResults" style="margin-top:8px;"></div>
         `;
         mainEl.innerHTML = html;
 
@@ -2207,7 +2321,7 @@
         clearBtn.addEventListener('click', () => {
             searchInput.value = '';
             clearBtn.style.display = 'none';
-            document.getElementById('searchResults').innerHTML = '<div style="color:rgba(255,255,255,0.2); text-align:center; padding:20px;">🔍 Digite para buscar</div>';
+            document.getElementById('searchResults').innerHTML = '<div style="color:rgba(255,255,255,0.15); text-align:center; padding:16px;">🔍 Digite para buscar</div>';
             searchInput.focus();
         });
 
@@ -2226,7 +2340,7 @@
         const results = document.getElementById('searchResults');
 
         if (!term) {
-            results.innerHTML = '<div style="color:rgba(255,255,255,0.2); text-align:center; padding:20px;">🔍 Digite para buscar</div>';
+            results.innerHTML = '<div style="color:rgba(255,255,255,0.15); text-align:center; padding:16px;">🔍 Digite para buscar</div>';
             return;
         }
 
@@ -2242,7 +2356,7 @@
         }
 
         if (items.length === 0) {
-            results.innerHTML = `<div style="color:rgba(255,255,255,0.2); text-align:center; padding:20px;">❌ Nenhum resultado para "${term}"</div>`;
+            results.innerHTML = `<div style="color:rgba(255,255,255,0.15); text-align:center; padding:16px;">❌ Nenhum resultado para "${term}"</div>`;
             return;
         }
 
@@ -2255,7 +2369,7 @@
                             <i class="fas fa-play-circle" style="${item.thumb ? 'display:none;' : ''}"></i>
                         </div>
                         <h4>${escapeHtml(item.title)}</h4>
-                        <p><i class="fas fa-eye" style="color:rgba(255,255,255,0.2);"></i> <span class="views-count" data-id="${item.id}">0</span></p>
+                        <p><i class="fas fa-eye" style="color:rgba(255,255,255,0.15);"></i> <span class="views-count" data-id="${item.id}">0</span></p>
                     </div>
                 `).join('')}
             </div>
@@ -2287,9 +2401,9 @@
     function renderFeed() {
         if (!dataLoaded || !currentUser) return;
         let html = `
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px; margin-bottom:8px;">
                 <h2 class="section-title"><i class="fas fa-rss" style="color:#e50914;"></i> Feed</h2>
-                <button id="newPostBtn" style="background:rgba(229,9,20,0.3); border:none; border-radius:30px; padding:4px 14px; color:#fff; font-size:0.65rem; cursor:pointer; transition:0.3s;">
+                <button id="newPostBtn" style="background:rgba(229,9,20,0.2); border:none; border-radius:30px; padding:3px 12px; color:#fff; font-size:0.6rem; cursor:pointer; transition:0.3s;">
                     <i class="fas fa-plus"></i> Nova publicação
                 </button>
             </div>
@@ -2311,31 +2425,31 @@
         db.ref('feed_posts').orderByChild('createdAt').once('value', snap => {
             const data = snap.val();
             if (!data) {
-                container.innerHTML = '<div style="color:rgba(255,255,255,0.2); text-align:center; padding:20px;">Nenhuma publicação ainda. Seja o primeiro!</div>';
+                container.innerHTML = '<div style="color:rgba(255,255,255,0.15); text-align:center; padding:16px;">Nenhuma publicação ainda. Seja o primeiro!</div>';
                 return;
             }
             const posts = Object.values(data).reverse();
             container.innerHTML = posts.map(post => `
-                <div style="background:rgba(255,255,255,0.02); backdrop-filter:blur(10px); border-radius:16px; padding:10px; margin-bottom:10px; border:1px solid rgba(255,255,255,0.03);">
-                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                        <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:bold; color:#fff; overflow:hidden;">
+                <div style="background:rgba(255,255,255,0.02); backdrop-filter:blur(10px); border-radius:14px; padding:8px; margin-bottom:8px; border:1px solid rgba(255,255,255,0.02);">
+                    <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                        <div style="width:24px; height:24px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:0.5rem; font-weight:bold; color:#fff; overflow:hidden;">
                             <img src="${getAvatarUrl(post.avatarUrl)}" onerror="this.src='${DEFAULT_AVATAR}'" style="width:100%; height:100%; object-fit:cover;">
                         </div>
                         <div>
-                            <div style="font-weight:600; font-size:0.8rem;">${escapeHtml(post.userName || 'Usuário')}</div>
-                            <div style="font-size:0.55rem; color:rgba(255,255,255,0.2);">${formatTimeAgo(post.createdAt)}</div>
+                            <div style="font-weight:600; font-size:0.7rem;">${escapeHtml(post.userName || 'Usuário')}</div>
+                            <div style="font-size:0.5rem; color:rgba(255,255,255,0.15);">${formatTimeAgo(post.createdAt)}</div>
                         </div>
                     </div>
                     ${post.mediaUrl ? `
-                        <div style="border-radius:10px; overflow:hidden; margin-bottom:6px; background:rgba(0,0,0,0.2);">
+                        <div style="border-radius:8px; overflow:hidden; margin-bottom:4px; background:rgba(0,0,0,0.15);">
                             ${post.mediaType === 'video' ? 
-                                `<video src="${post.mediaUrl}" controls style="width:100%; max-height:280px; object-fit:contain;"></video>` :
-                                `<img src="${post.mediaUrl}" style="width:100%; max-height:280px; object-fit:cover;" onerror="this.src='${DEFAULT_AVATAR}'">`
+                                `<video src="${post.mediaUrl}" controls style="width:100%; max-height:240px; object-fit:contain;"></video>` :
+                                `<img src="${post.mediaUrl}" style="width:100%; max-height:240px; object-fit:cover;" onerror="this.src='${DEFAULT_AVATAR}'">`
                             }
                         </div>
                     ` : ''}
-                    ${post.caption ? `<div style="font-size:0.75rem; margin-bottom:6px;">${makeNicknamesClickable(escapeHtml(post.caption))}</div>` : ''}
-                    <div style="display:flex; gap:10px; font-size:0.65rem; color:rgba(255,255,255,0.3);">
+                    ${post.caption ? `<div style="font-size:0.65rem; margin-bottom:4px;">${makeNicknamesClickable(escapeHtml(post.caption))}</div>` : ''}
+                    <div style="display:flex; gap:8px; font-size:0.55rem; color:rgba(255,255,255,0.2);">
                         <span><i class="fas fa-heart"></i> ${post.likesCount || 0}</span>
                         <span><i class="fas fa-comment"></i> ${post.comments ? Object.keys(post.comments).length : 0}</span>
                     </div>
@@ -2348,18 +2462,18 @@
     function createPostModal() {
         const overlay = document.createElement('div');
         overlay.style.cssText = `
-            position:fixed; inset:0; z-index:3000; background:rgba(0,0,0,0.5); backdrop-filter:blur(30px);
-            display:flex; align-items:center; justify-content:center; padding:20px;
+            position:fixed; inset:0; z-index:3000; background:rgba(0,0,0,0.4); backdrop-filter:blur(30px);
+            display:flex; align-items:center; justify-content:center; padding:16px;
         `;
         overlay.innerHTML = `
-            <div style="background:rgba(20,20,20,0.3); backdrop-filter:blur(30px); border-radius:28px; padding:20px; max-width:500px; width:100%; border:1px solid rgba(255,255,255,0.04);">
-                <h3 style="color:#fff; margin-bottom:10px;"><i class="fas fa-plus-circle" style="color:#e50914;"></i> Nova Publicação</h3>
-                <input type="file" id="postMediaInput" accept="image/*,video/*" style="width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:10px; padding:6px; color:#fff; margin-bottom:8px;">
-                <div id="postPreview" style="border-radius:10px; overflow:hidden; margin-bottom:8px; display:none;"></div>
-                <textarea id="postCaption" placeholder="Escreva uma legenda..." style="width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:10px; padding:6px 10px; color:#fff; font-size:0.8rem; resize:vertical; min-height:50px;"></textarea>
-                <div style="display:flex; gap:8px; margin-top:10px;">
-                    <button id="cancelPost" style="flex:1; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:30px; padding:6px; color:rgba(255,255,255,0.4); cursor:pointer;">Cancelar</button>
-                    <button id="submitPost" style="flex:1; background:rgba(229,9,20,0.4); border:none; border-radius:30px; padding:6px; color:#fff; font-weight:600; cursor:pointer;">Publicar</button>
+            <div style="background:rgba(20,20,20,0.3); backdrop-filter:blur(30px); border-radius:24px; padding:16px; max-width:500px; width:100%; border:1px solid rgba(255,255,255,0.03);">
+                <h3 style="color:#fff; margin-bottom:8px; font-size:0.95rem;"><i class="fas fa-plus-circle" style="color:#e50914;"></i> Nova Publicação</h3>
+                <input type="file" id="postMediaInput" accept="image/*,video/*" style="width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); border-radius:8px; padding:4px; color:#fff; margin-bottom:6px; font-size:0.7rem;">
+                <div id="postPreview" style="border-radius:8px; overflow:hidden; margin-bottom:6px; display:none;"></div>
+                <textarea id="postCaption" placeholder="Escreva uma legenda..." style="width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); border-radius:8px; padding:4px 8px; color:#fff; font-size:0.7rem; resize:vertical; min-height:40px;"></textarea>
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                    <button id="cancelPost" style="flex:1; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); border-radius:30px; padding:4px; color:rgba(255,255,255,0.35); cursor:pointer; font-size:0.7rem;">Cancelar</button>
+                    <button id="submitPost" style="flex:1; background:rgba(229,9,20,0.3); border:none; border-radius:30px; padding:4px; color:#fff; font-weight:600; cursor:pointer; font-size:0.7rem;">Publicar</button>
                 </div>
             </div>
         `;
@@ -2374,11 +2488,11 @@
             preview.style.display = 'block';
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
-                reader.onload = (e) => { preview.innerHTML = `<img src="${e.target.result}" style="width:100%; max-height:280px; object-fit:contain;">`; };
+                reader.onload = (e) => { preview.innerHTML = `<img src="${e.target.result}" style="width:100%; max-height:240px; object-fit:contain;">`; };
                 reader.readAsDataURL(file);
             } else if (file.type.startsWith('video/')) {
                 const reader = new FileReader();
-                reader.onload = (e) => { preview.innerHTML = `<video src="${e.target.result}" controls style="width:100%; max-height:280px;"></video>`; };
+                reader.onload = (e) => { preview.innerHTML = `<video src="${e.target.result}" controls style="width:100%; max-height:240px;"></video>`; };
                 reader.readAsDataURL(file);
             }
         });
@@ -2441,8 +2555,8 @@
         }
 
         if (!targetUserId) {
-            mainEl.innerHTML = `<div style="color:rgba(255,255,255,0.2); text-align:center; padding:30px;">
-                <i class="fas fa-user-circle" style="font-size:2.5rem; display:block; margin-bottom:8px;"></i>
+            mainEl.innerHTML = `<div style="color:rgba(255,255,255,0.15); text-align:center; padding:24px;">
+                <i class="fas fa-user-circle" style="font-size:2rem; display:block; margin-bottom:6px;"></i>
                 Faça login para ver seu perfil
             </div>`;
             return;
@@ -2475,20 +2589,20 @@
                 <div class="profile-header">
                     <div class="profile-avatar">
                         <img src="${avatarUrl}" onerror="this.src='${DEFAULT_AVATAR}'">
-                        ${isOwn ? `<div style="position:absolute; bottom:0; right:0; background:rgba(229,9,20,0.6); border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:2px solid rgba(255,255,255,0.05);" id="changeAvatarBtn"><i class="fas fa-camera" style="font-size:8px; color:#fff;"></i></div>` : ''}
+                        ${isOwn ? `<div style="position:absolute; bottom:0; right:0; background:rgba(229,9,20,0.5); border-radius:50%; width:18px; height:18px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:2px solid rgba(255,255,255,0.04);" id="changeAvatarBtn"><i class="fas fa-camera" style="font-size:7px; color:#fff;"></i></div>` : ''}
                     </div>
                     <div class="profile-info">
                         <div class="name">${escapeHtml(displayName)}</div>
                         <div class="nick">@${escapeHtml(nickname)}</div>
                         <div class="bio">${makeNicknamesClickable(escapeHtml(bio))}</div>
-                        ${externalLink ? `<a href="${externalLink}" target="_blank" style="color:#e50914; font-size:0.65rem; display:inline-block; margin-top:3px;"><i class="fas fa-link"></i> ${escapeHtml(externalLink)}</a>` : ''}
+                        ${externalLink ? `<a href="${externalLink}" target="_blank" style="color:#e50914; font-size:0.6rem; display:inline-block; margin-top:2px;"><i class="fas fa-link"></i> ${escapeHtml(externalLink)}</a>` : ''}
                         <div class="profile-stats">
                             <span><strong>${totalPosts}</strong> posts</span>
                             <span><strong class="clickable" onclick="showFollowersList('${targetUserId}')">${followersCount}</strong> seguidores</span>
                             <span><strong class="clickable" onclick="showFollowingList('${targetUserId}')">${followingCount}</strong> seguindo</span>
                         </div>
-                        ${!isOwn ? `<button id="followBtn" style="background:${isFollowing ? 'rgba(255,255,255,0.06)' : 'rgba(229,9,20,0.3)'}; border:1px solid ${isFollowing ? 'rgba(255,255,255,0.04)' : 'rgba(229,9,20,0.15)'}; border-radius:30px; padding:4px 16px; color:#fff; font-weight:600; cursor:pointer; margin-top:6px; transition:0.3s;">${isFollowing ? 'Seguindo' : 'Seguir'}</button>` : ''}
-                        ${isOwn ? `<button id="editProfileBtn" style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:30px; padding:3px 12px; color:rgba(255,255,255,0.4); font-size:0.65rem; cursor:pointer; margin-top:6px; transition:0.3s;"><i class="fas fa-edit"></i> Editar perfil</button>` : ''}
+                        ${!isOwn ? `<button id="followBtn" style="background:${isFollowing ? 'rgba(255,255,255,0.04)' : 'rgba(229,9,20,0.2)'}; border:1px solid ${isFollowing ? 'rgba(255,255,255,0.03)' : 'rgba(229,9,20,0.1)'}; border-radius:30px; padding:3px 14px; color:#fff; font-weight:600; cursor:pointer; margin-top:4px; transition:0.3s; font-size:0.65rem;">${isFollowing ? 'Seguindo' : 'Seguir'}</button>` : ''}
+                        ${isOwn ? `<button id="editProfileBtn" style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); border-radius:30px; padding:2px 10px; color:rgba(255,255,255,0.35); font-size:0.6rem; cursor:pointer; margin-top:4px; transition:0.3s;"><i class="fas fa-edit"></i> Editar perfil</button>` : ''}
                     </div>
                 </div>
                 <div class="profile-tabs">
@@ -2577,7 +2691,7 @@
                 const data = snap.val();
                 const posts = data ? Object.values(data).filter(p => !p.originalPostId).sort((a, b) => b.createdAt - a.createdAt) : [];
                 if (posts.length === 0) {
-                    container.innerHTML = '<div style="color:rgba(255,255,255,0.2); text-align:center; padding:20px;">Nenhuma publicação</div>';
+                    container.innerHTML = '<div style="color:rgba(255,255,255,0.15); text-align:center; padding:16px;">Nenhuma publicação</div>';
                     return;
                 }
                 container.innerHTML = `<div class="profile-posts">${posts.map(p => `
@@ -2594,7 +2708,7 @@
                 const data = snap.val();
                 const favs = data ? Object.values(data) : [];
                 if (favs.length === 0) {
-                    container.innerHTML = '<div style="color:rgba(255,255,255,0.2); text-align:center; padding:20px;">Nenhum favorito</div>';
+                    container.innerHTML = '<div style="color:rgba(255,255,255,0.15); text-align:center; padding:16px;">Nenhum favorito</div>';
                     return;
                 }
                 container.innerHTML = `<div class="profile-posts">${favs.map(f => `
@@ -2606,10 +2720,10 @@
         } else if (tab === 'salvos') {
             db.ref('feed_posts').once('value', snap => {
                 const all = snap.val();
-                if (!all) { container.innerHTML = '<div style="color:rgba(255,255,255,0.2); text-align:center; padding:20px;">Nenhum salvo</div>'; return; }
+                if (!all) { container.innerHTML = '<div style="color:rgba(255,255,255,0.15); text-align:center; padding:16px;">Nenhum salvo</div>'; return; }
                 const saved = Object.values(all).filter(p => p.saves && p.saves[userId]);
                 if (saved.length === 0) {
-                    container.innerHTML = '<div style="color:rgba(255,255,255,0.2); text-align:center; padding:20px;">Nenhum salvo</div>';
+                    container.innerHTML = '<div style="color:rgba(255,255,255,0.15); text-align:center; padding:16px;">Nenhum salvo</div>';
                     return;
                 }
                 container.innerHTML = `<div class="profile-posts">${saved.map(p => `
@@ -2624,12 +2738,12 @@
         } else if (tab === 'assistidos') {
             db.ref(`watched_history/${userId}`).once('value', snap => {
                 const data = snap.val();
-                if (!data) { container.innerHTML = '<div style="color:rgba(255,255,255,0.2); text-align:center; padding:20px;">Nenhum assistido</div>'; return; }
+                if (!data) { container.innerHTML = '<div style="color:rgba(255,255,255,0.15); text-align:center; padding:16px;">Nenhum assistido</div>'; return; }
                 const list = Object.values(data).sort((a, b) => b.watchedAt - a.watchedAt);
                 container.innerHTML = `<div class="profile-posts">${list.slice(0, 30).map(h => `
                     <div class="post-item" onclick="playMediaById('${h.mediaId}', '${h.mediaType || 'filme'}')">
                         <img src="${h.thumb || DEFAULT_AVATAR}" onerror="this.src='${DEFAULT_AVATAR}'">
-                        <div style="position:absolute; bottom:0; left:0; height:2px; background:rgba(229,9,20,0.4); width:${h.progress || 0}%;"></div>
+                        <div style="position:absolute; bottom:0; left:0; height:2px; background:rgba(229,9,20,0.3); width:${h.progress || 0}%;"></div>
                     </div>
                 `).join('')}</div>`;
             });
@@ -2656,19 +2770,19 @@
     function openEditProfileModal() {
         const overlay = document.createElement('div');
         overlay.style.cssText = `
-            position:fixed; inset:0; z-index:3000; background:rgba(0,0,0,0.5); backdrop-filter:blur(30px);
-            display:flex; align-items:center; justify-content:center; padding:20px;
+            position:fixed; inset:0; z-index:3000; background:rgba(0,0,0,0.4); backdrop-filter:blur(30px);
+            display:flex; align-items:center; justify-content:center; padding:16px;
         `;
         overlay.innerHTML = `
-            <div style="background:rgba(20,20,20,0.3); backdrop-filter:blur(30px); border-radius:28px; padding:20px; max-width:400px; width:100%; border:1px solid rgba(255,255,255,0.04);">
-                <h3 style="color:#fff; margin-bottom:10px;"><i class="fas fa-edit" style="color:#e50914;"></i> Editar Perfil</h3>
-                <input id="editDisplayName" value="${escapeHtml(userProfileData.displayName || '')}" placeholder="Nome de exibição" style="width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:10px; padding:6px 10px; color:#fff; margin-bottom:6px;">
-                <input id="editNickname" value="${escapeHtml(currentUsername)}" placeholder="@Nickname" style="width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:10px; padding:6px 10px; color:#fff; margin-bottom:6px;">
-                <textarea id="editBio" placeholder="Bio" style="width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:10px; padding:6px 10px; color:#fff; resize:vertical; min-height:50px;">${escapeHtml(userProfileData.bio || '')}</textarea>
-                <input id="editLink" value="${escapeHtml(userProfileData.externalLink || '')}" placeholder="Link externo" style="width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:10px; padding:6px 10px; color:#fff; margin-top:6px;">
-                <div style="display:flex; gap:8px; margin-top:10px;">
-                    <button id="cancelEdit" style="flex:1; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:30px; padding:6px; color:rgba(255,255,255,0.4); cursor:pointer;">Cancelar</button>
-                    <button id="saveEdit" style="flex:1; background:rgba(229,9,20,0.4); border:none; border-radius:30px; padding:6px; color:#fff; font-weight:600; cursor:pointer;">Salvar</button>
+            <div style="background:rgba(20,20,20,0.3); backdrop-filter:blur(30px); border-radius:24px; padding:16px; max-width:400px; width:100%; border:1px solid rgba(255,255,255,0.03);">
+                <h3 style="color:#fff; margin-bottom:8px; font-size:0.9rem;"><i class="fas fa-edit" style="color:#e50914;"></i> Editar Perfil</h3>
+                <input id="editDisplayName" value="${escapeHtml(userProfileData.displayName || '')}" placeholder="Nome de exibição" style="width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); border-radius:8px; padding:4px 8px; color:#fff; margin-bottom:4px; font-size:0.7rem;">
+                <input id="editNickname" value="${escapeHtml(currentUsername)}" placeholder="@Nickname" style="width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); border-radius:8px; padding:4px 8px; color:#fff; margin-bottom:4px; font-size:0.7rem;">
+                <textarea id="editBio" placeholder="Bio" style="width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); border-radius:8px; padding:4px 8px; color:#fff; resize:vertical; min-height:40px; font-size:0.7rem;">${escapeHtml(userProfileData.bio || '')}</textarea>
+                <input id="editLink" value="${escapeHtml(userProfileData.externalLink || '')}" placeholder="Link externo" style="width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); border-radius:8px; padding:4px 8px; color:#fff; margin-top:4px; font-size:0.7rem;">
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                    <button id="cancelEdit" style="flex:1; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); border-radius:30px; padding:4px; color:rgba(255,255,255,0.35); cursor:pointer; font-size:0.7rem;">Cancelar</button>
+                    <button id="saveEdit" style="flex:1; background:rgba(229,9,20,0.3); border:none; border-radius:30px; padding:4px; color:#fff; font-weight:600; cursor:pointer; font-size:0.7rem;">Salvar</button>
                 </div>
             </div>
         `;
@@ -2720,7 +2834,7 @@
                     <div class="header">
                         <div class="avatar" id="chatAvatar">G</div>
                         <div class="name" id="chatName">Geral</div>
-                        <button id="backToChats" style="margin-left:auto; background:transparent; border:none; color:rgba(255,255,255,0.2); cursor:pointer;"><i class="fas fa-arrow-left"></i></button>
+                        <button id="backToChats" style="margin-left:auto; background:transparent; border:none; color:rgba(255,255,255,0.15); cursor:pointer; font-size:0.7rem;"><i class="fas fa-arrow-left"></i></button>
                     </div>
                     <div class="messages" id="chatMessages"></div>
                     <div class="input-area">
@@ -2738,7 +2852,7 @@
         };
 
         if (currentUser) loadChatList();
-        else document.getElementById('chatUserList').innerHTML = '<div style="color:rgba(255,255,255,0.2); text-align:center; padding:20px;">Faça login para conversar</div>';
+        else document.getElementById('chatUserList').innerHTML = '<div style="color:rgba(255,255,255,0.15); text-align:center; padding:16px;">Faça login para conversar</div>';
 
         document.getElementById('chatSendBtn').onclick = sendChatMessage;
         document.getElementById('chatInput').addEventListener('keypress', (e) => {
@@ -2801,7 +2915,7 @@
         if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
 
         const messagesContainer = document.getElementById('chatMessages');
-        messagesContainer.innerHTML = '<div style="color:rgba(255,255,255,0.2); text-align:center; padding:20px;">Carregando...</div>';
+        messagesContainer.innerHTML = '<div style="color:rgba(255,255,255,0.15); text-align:center; padding:16px;">Carregando...</div>';
 
         let ref;
         if (chatId === 'geral') {
@@ -2816,7 +2930,7 @@
         const onMessages = (snap) => {
             const data = snap.val();
             if (!data) {
-                messagesContainer.innerHTML = '<div style="color:rgba(255,255,255,0.2); text-align:center; padding:20px;">Nenhuma mensagem ainda</div>';
+                messagesContainer.innerHTML = '<div style="color:rgba(255,255,255,0.15); text-align:center; padding:16px;">Nenhuma mensagem ainda</div>';
                 return;
             }
             const msgs = Object.entries(data).map(([id, m]) => ({ id, ...m })).sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
@@ -2878,12 +2992,12 @@
     function renderAdmin() {
         let html = `
             <div class="admin-panel">
-                <h3 style="color:rgba(255,255,255,0.8); margin-bottom:10px;"><i class="fas fa-crown" style="color:#e50914;"></i> Painel Administrativo</h3>
+                <h3 style="color:rgba(255,255,255,0.75); margin-bottom:8px; font-size:0.9rem;"><i class="fas fa-crown" style="color:#e50914;"></i> Painel Administrativo</h3>
                 ${!isAdminLogged ? `
-                    <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-                        <input type="password" id="adminPass" placeholder="Senha admin" style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:10px; padding:5px 10px; color:#fff; font-size:0.75rem;">
-                        <button id="adminLoginBtn" style="background:rgba(229,9,20,0.3); border:none; border-radius:30px; padding:4px 14px; color:#fff; cursor:pointer;">Entrar</button>
-                        <span style="font-size:0.55rem; color:rgba(255,255,255,0.15);">Senha: admin123</span>
+                    <div style="display:flex; gap:4px; align-items:center; flex-wrap:wrap;">
+                        <input type="password" id="adminPass" placeholder="Senha admin" style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); border-radius:8px; padding:4px 8px; color:#fff; font-size:0.7rem;">
+                        <button id="adminLoginBtn" style="background:rgba(229,9,20,0.2); border:none; border-radius:30px; padding:3px 12px; color:#fff; cursor:pointer; font-size:0.7rem;">Entrar</button>
+                        <span style="font-size:0.5rem; color:rgba(255,255,255,0.12);">Senha: admin123</span>
                     </div>
                 ` : `
                     <div class="admin-tabs">
@@ -2900,7 +3014,7 @@
                         <input type="text" id="adminCategory" placeholder="Gênero">
                         <input type="text" id="adminYear" placeholder="Ano">
                         <textarea id="adminDesc" placeholder="Descrição"></textarea>
-                        <div class="full" style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <div class="full" style="display:flex; gap:4px; flex-wrap:wrap;">
                             <button id="adminSave"><i class="fas fa-save"></i> Salvar</button>
                             <button id="adminCancel" style="background:rgba(255,255,255,0.02);"><i class="fas fa-times"></i> Cancelar</button>
                             <button id="adminAutoFill" style="background:rgba(255,255,255,0.02);"><i class="fas fa-magic"></i> Auto-preencher</button>
@@ -2979,7 +3093,7 @@
                             <div class="item-details">
                                 ${item.category ? `<span><i class="fas fa-tag"></i> ${escapeHtml(item.category)}</span>` : ''}
                                 ${item.year ? `<span><i class="fas fa-calendar"></i> ${escapeHtml(item.year)}</span>` : ''}
-                                ${item.link ? `<span><i class="fas fa-link"></i> ${escapeHtml(item.link.substring(0, 35))}${item.link.length > 35 ? '...' : ''}</span>` : ''}
+                                ${item.link ? `<span><i class="fas fa-link"></i> ${escapeHtml(item.link.substring(0, 30))}${item.link.length > 30 ? '...' : ''}</span>` : ''}
                                 ${item.createdAt ? `<span><i class="fas fa-clock"></i> ${formatTimeAgo(item.createdAt)}</span>` : ''}
                             </div>
                             ${item.views !== undefined ? `<span class="item-badge"><i class="fas fa-eye"></i> ${item.views || 0} visualizações</span>` : ''}
@@ -3027,7 +3141,7 @@
         db.ref('usuarios').once('value', snap => {
             const data = snap.val();
             if (!data) {
-                container.innerHTML = '<div style="color:rgba(255,255,255,0.2); text-align:center; padding:20px;">Nenhum usuário cadastrado</div>';
+                container.innerHTML = '<div style="color:rgba(255,255,255,0.15); text-align:center; padding:16px;">Nenhum usuário cadastrado</div>';
                 return;
             }
             
@@ -3048,7 +3162,7 @@
                 html += `
                     <div class="admin-item-card" data-title="${escapeHtml(displayName).toLowerCase()} ${escapeHtml(nickname).toLowerCase()}">
                         <div class="item-row">
-                            <div style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:bold; color:#fff; flex-shrink:0; overflow:hidden;">
+                            <div style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:bold; color:#fff; flex-shrink:0; overflow:hidden;">
                                 <img src="${getAvatarUrl(u.avatarUrl)}" onerror="this.src='${DEFAULT_AVATAR}'" style="width:100%; height:100%; object-fit:cover;">
                             </div>
                             <div class="item-info">
@@ -3063,7 +3177,7 @@
                                     <span><i class="fas fa-at"></i> @${escapeHtml(nickname)}</span>
                                     ${u.email ? `<span><i class="fas fa-envelope"></i> ${escapeHtml(u.email)}</span>` : ''}
                                     ${u.createdAt ? `<span><i class="fas fa-clock"></i> ${formatTimeAgo(u.createdAt)}</span>` : ''}
-                                    ${u.lastSeen ? `<span><i class="fas fa-circle" style="color:${Date.now() - u.lastSeen < 60000 ? 'rgba(76,175,80,0.5)' : 'rgba(153,153,153,0.3)'};"></i> ${formatTimeAgo(u.lastSeen)}</span>` : ''}
+                                    ${u.lastSeen ? `<span><i class="fas fa-circle" style="color:${Date.now() - u.lastSeen < 60000 ? 'rgba(76,175,80,0.4)' : 'rgba(153,153,153,0.2)'};"></i> ${formatTimeAgo(u.lastSeen)}</span>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -3082,7 +3196,7 @@
         db.ref('reports').once('value', snap => {
             const data = snap.val();
             if (!data) {
-                container.innerHTML = '<div style="color:rgba(255,255,255,0.2); text-align:center; padding:20px;">Nenhum report encontrado</div>';
+                container.innerHTML = '<div style="color:rgba(255,255,255,0.15); text-align:center; padding:16px;">Nenhum report encontrado</div>';
                 return;
             }
             
@@ -3110,7 +3224,7 @@
                 html += `
                     <div class="admin-item-card" data-title="${escapeHtml(r.videoTitle || '').toLowerCase()} ${escapeHtml(r.reason || '').toLowerCase()}">
                         <div class="item-row">
-                            <div style="width:36px; height:36px; border-radius:50%; background:rgba(229,9,20,0.08); display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:bold; color:#e50914; flex-shrink:0;">
+                            <div style="width:32px; height:32px; border-radius:50%; background:rgba(229,9,20,0.06); display:flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:bold; color:#e50914; flex-shrink:0;">
                                 <i class="fas fa-flag"></i>
                             </div>
                             <div class="item-info">
@@ -3124,7 +3238,7 @@
                                 <div class="item-details">
                                     <span><i class="fas fa-user"></i> ${escapeHtml(r.reportedByName || 'Anônimo')}</span>
                                     <span><i class="fas fa-comment"></i> ${escapeHtml(r.reason || 'Sem motivo')}</span>
-                                    ${r.videoLink ? `<span><i class="fas fa-external-link-alt"></i> <a href="${escapeHtml(r.videoLink)}" target="_blank" style="color:#e50914;text-decoration:underline;opacity:0.7;">Link do vídeo</a></span>` : ''}
+                                    ${r.videoLink ? `<span><i class="fas fa-external-link-alt"></i> <a href="${escapeHtml(r.videoLink)}" target="_blank" style="color:#e50914;text-decoration:underline;opacity:0.6;font-size:0.5rem;">Link do vídeo</a></span>` : ''}
                                     <span><i class="fas fa-clock"></i> ${formatTimeAgo(r.reportedAt)}</span>
                                     ${adminMsg ? `<span><i class="fas fa-reply"></i> <strong>Admin:</strong> ${escapeHtml(adminMsg)}</span>` : ''}
                                     <span><span class="item-badge ${statusClass}">${statusLabel}</span></span>
@@ -3367,24 +3481,24 @@
     function showUserList(users, title) {
         const overlay = document.createElement('div');
         overlay.style.cssText = `
-            position:fixed; inset:0; z-index:4000; background:rgba(0,0,0,0.5); backdrop-filter:blur(30px);
-            display:flex; align-items:center; justify-content:center; padding:20px;
+            position:fixed; inset:0; z-index:4000; background:rgba(0,0,0,0.4); backdrop-filter:blur(30px);
+            display:flex; align-items:center; justify-content:center; padding:16px;
         `;
         overlay.innerHTML = `
-            <div style="background:rgba(20,20,20,0.3); backdrop-filter:blur(30px); border-radius:28px; padding:20px; max-width:400px; width:100%; max-height:80vh; overflow-y:auto; border:1px solid rgba(255,255,255,0.04);">
-                <h3 style="color:#fff; margin-bottom:10px;">${title}</h3>
+            <div style="background:rgba(20,20,20,0.3); backdrop-filter:blur(30px); border-radius:24px; padding:16px; max-width:400px; width:100%; max-height:80vh; overflow-y:auto; border:1px solid rgba(255,255,255,0.03);">
+                <h3 style="color:#fff; margin-bottom:8px; font-size:0.9rem;">${title}</h3>
                 ${users.map(u => `
-                    <div style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.02); cursor:pointer;" onclick="this.closest('[style]').remove(); renderProfile('${u.uid}'); switchTab('perfil');">
-                        <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:bold; color:#fff; overflow:hidden;">
+                    <div style="display:flex; align-items:center; gap:6px; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.02); cursor:pointer;" onclick="this.closest('[style]').remove(); renderProfile('${u.uid}'); switchTab('perfil');">
+                        <div style="width:24px; height:24px; border-radius:50%; background:linear-gradient(135deg,#e50914,#b20710); display:flex; align-items:center; justify-content:center; font-size:0.5rem; font-weight:bold; color:#fff; overflow:hidden;">
                             <img src="${getAvatarUrl(u.avatarUrl)}" onerror="this.src='${DEFAULT_AVATAR}'" style="width:100%; height:100%; object-fit:cover;">
                         </div>
                         <div>
-                            <div style="font-weight:600; font-size:0.8rem;">${escapeHtml(u.displayName || u.nickname || 'Usuário')}</div>
-                            <div style="font-size:0.55rem; color:rgba(255,255,255,0.2);">@${escapeHtml(u.nickname || '')}</div>
+                            <div style="font-weight:600; font-size:0.7rem;">${escapeHtml(u.displayName || u.nickname || 'Usuário')}</div>
+                            <div style="font-size:0.5rem; color:rgba(255,255,255,0.15);">@${escapeHtml(u.nickname || '')}</div>
                         </div>
                     </div>
                 `).join('')}
-                <button onclick="this.closest('[style]').remove()" style="margin-top:10px; width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:30px; padding:6px; color:rgba(255,255,255,0.4); cursor:pointer;">Fechar</button>
+                <button onclick="this.closest('[style]').remove()" style="margin-top:8px; width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); border-radius:30px; padding:4px; color:rgba(255,255,255,0.35); cursor:pointer; font-size:0.7rem;">Fechar</button>
             </div>
         `;
         document.body.appendChild(overlay);
@@ -3464,6 +3578,9 @@
         console.log('🚀 NoiteFilmes carregado com sucesso!');
         console.log('💧 Design Liquid Glass ativado - UI fluida e transparente!');
         console.log('📱 Menu inferior com altura reduzida em todos os dispositivos!');
+        console.log('📲 PWA ativado - Instale como aplicativo!');
+        console.log('🔒 Zoom bloqueado em todo o sistema!');
+        console.log('📐 Layout ajustado para ocupar 100% da tela sem barras de rolagem!');
         console.log('🔄 Detecção de orientação ativada - Layout adaptável!');
     }
 
